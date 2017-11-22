@@ -1,0 +1,56 @@
+package chars
+
+import (
+	"bytes"
+)
+
+type IsInCharset func(ch byte) bool
+
+func Unescape(src []byte) (dst []byte) {
+	if bytes.IndexByte(src, '%') == -1 {
+		return src
+	}
+
+	len1 := len(src)
+
+	for i := 0; i < len1; {
+		if (src[i] == '%') && ((i + 2) < len1) && IsHex(src[i+1]) && IsHex(src[i+2]) {
+			dst = append(dst, unescapeToByte(src[i:]))
+			i += 3
+		} else {
+			dst = append(dst, src[i])
+			i++
+		}
+	}
+
+	return dst
+}
+
+func unescapeToByte(src []byte) byte {
+	return HexToByte(src[1])<<4 | HexToByte(src[2])
+}
+
+func Escape(src []byte, inCharset IsInCharset) (dst []byte) {
+	if !NeedEscape(src, inCharset) {
+		return src
+	}
+
+	for _, v := range src {
+		if inCharset(v) {
+			dst = append(dst, v)
+		} else {
+			dst = append(dst, '%', ToUpperHex(v>>4), ToUpperHex(v))
+		}
+	}
+
+	return dst
+}
+
+func NeedEscape(src []byte, inCharset IsInCharset) bool {
+	for _, v := range src {
+		if !inCharset(v) {
+			return true
+		}
+	}
+	return false
+}
