@@ -183,7 +183,20 @@ func BenchmarkChunkAllocatorAllocFree(b *testing.B) {
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		c := allocator.Alloc()
-		allocator.Free(c)
+		c := allocator.AllocEx()
+		allocator.Free(c.id)
 	}
 }
+
+/*func BenchmarkChunkAllocatorAllocFreeEx(b *testing.B) {
+	b.StopTimer()
+	allocator := NewChunkAllocator(1000)
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		c := allocator.AllocEx()
+		allocator.FreeEx(c)
+	}
+}*/
