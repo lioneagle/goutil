@@ -1,10 +1,10 @@
 package containers
 
 type Chunk struct {
-	id   int32
-	used int32
-	prev int32
-	next int32
+	Id   int32
+	Used int32
+	Prev int32
+	Next int32
 	Data interface{}
 }
 
@@ -12,50 +12,86 @@ type ChunkAllocator struct {
 	capacity int32
 	size     int32
 	freeHead int32
-	busyHead int32
-	chunks   []Chunk
+	//busyHead int32
+	Chunks []Chunk
 }
 
 func NewChunkAllocator(capacity int32) *ChunkAllocator {
 	allocator := &ChunkAllocator{capacity: capacity}
-	allocator.chunks = make([]Chunk, capacity)
+	allocator.Chunks = make([]Chunk, capacity)
 
-	allocator.chunks[0].id = 0
-	allocator.chunks[0].used = 0
-	allocator.chunks[0].prev = capacity - 1
-	allocator.chunks[0].next = 1
+	allocator.Chunks[0].Id = 0
+	allocator.Chunks[0].Used = 0
+	allocator.Chunks[0].Prev = capacity - 1
+	allocator.Chunks[0].Next = 1
 
 	for i := int32(1); i < capacity; i++ {
-		allocator.chunks[i].id = i
-		allocator.chunks[i].prev = i - 1
-		allocator.chunks[i].next = i + 1
+		allocator.Chunks[i].Id = i
+		allocator.Chunks[i].Prev = i - 1
+		allocator.Chunks[i].Next = i + 1
 	}
 
-	allocator.chunks[capacity-1].next = 0
-	allocator.busyHead = -1
+	allocator.Chunks[capacity-1].Next = 0
+	//allocator.busyHead = -1
 
 	return allocator
 }
 
-func (this *ChunkAllocator) Alloc() *Chunk {
+func (this *ChunkAllocator) GetData(id int32) (interface{}, bool) {
+	if id < 0 || int(id) > len(this.Chunks) {
+		return nil, false
+	}
+
+	chunk := &this.Chunks[id]
+	if chunk.Used == 0 {
+		return nil, false
+	}
+
+	return chunk.Data, true
+}
+
+func (this *ChunkAllocator) SetData(id int32, data interface{}) bool {
+	if id < 0 || int(id) > len(this.Chunks) {
+		return false
+	}
+
+	chunk := &this.Chunks[id]
+	if chunk.Used == 0 {
+		return false
+	}
+
+	chunk.Data = data
+
+	return true
+}
+
+func (this *ChunkAllocator) Alloc() int32 {
+	chunk := this.AllocEx()
+	if chunk == nil {
+		return -1
+	}
+	return chunk.Id
+}
+
+func (this *ChunkAllocator) AllocEx() *Chunk {
 	if this.size >= this.capacity {
 		return nil
 	}
 
 	// pop_front from free list
 	freeNum := this.capacity - this.size
-	chunk := &this.chunks[this.freeHead]
+	chunk := &this.Chunks[this.freeHead]
 
 	if freeNum == 1 {
 		this.freeHead = -1
 	} else {
-		this.chunks[chunk.prev].next = chunk.next
-		this.chunks[chunk.next].prev = chunk.prev
-		this.freeHead = chunk.next
+		this.Chunks[chunk.Prev].Next = chunk.Next
+		this.Chunks[chunk.Next].Prev = chunk.Prev
+		this.freeHead = chunk.Next
 	}
 
 	// push_back to busy list
-	if this.busyHead == -1 {
+	/*if this.busyHead == -1 {
 		chunk.next = chunk.id
 		chunk.prev = chunk.id
 		this.busyHead = chunk.id
@@ -66,21 +102,26 @@ func (this *ChunkAllocator) Alloc() *Chunk {
 		chunk.prev = tail.id
 		tail.next = chunk.id
 		head.prev = chunk.id
-	}
+	}*/
 
-	chunk.used = 1
+	chunk.Used = 1
 
 	this.size++
 	return chunk
 }
 
-func (this *ChunkAllocator) Free(chunk *Chunk) {
-	if chunk.used == 0 {
+func (this *ChunkAllocator) Free(id int32) {
+	if id < 0 || int(id) > len(this.Chunks) {
+		return
+	}
+
+	chunk := &this.Chunks[id]
+	if chunk.Used == 0 {
 		return
 	}
 
 	// remove from busy list
-	if this.size == 1 {
+	/*if this.size == 1 {
 		this.busyHead = -1
 	} else {
 		this.chunks[chunk.prev].next = chunk.next
@@ -88,22 +129,22 @@ func (this *ChunkAllocator) Free(chunk *Chunk) {
 		if this.busyHead == chunk.id {
 			this.busyHead = chunk.next
 		}
-	}
+	}*/
 
 	// push_back to free list
 	if this.freeHead == -1 {
-		chunk.next = chunk.id
-		chunk.prev = chunk.id
-		this.freeHead = chunk.id
+		chunk.Next = id
+		chunk.Prev = id
+		this.freeHead = id
 	} else {
-		head := &this.chunks[this.freeHead]
-		tail := &this.chunks[head.prev]
-		chunk.next = this.freeHead
-		chunk.prev = tail.id
-		tail.next = chunk.id
-		head.prev = chunk.id
+		head := &this.Chunks[this.freeHead]
+		tail := &this.Chunks[head.Prev]
+		chunk.Next = this.freeHead
+		chunk.Prev = tail.Id
+		tail.Next = id
+		head.Prev = id
 	}
 
-	chunk.used = 0
+	chunk.Used = 0
 	this.size--
 }

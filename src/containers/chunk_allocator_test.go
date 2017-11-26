@@ -10,20 +10,20 @@ func TestChunkAllocatorAlloc1(t *testing.T) {
 	allocator := NewChunkAllocator(1)
 
 	c := allocator.Alloc()
-	if c == nil {
+	if c == -1 {
 		t.Errorf("TestChunkAllocatorAlloc: should alloc ok")
 		return
 	}
 
-	if c.id != 0 {
-		t.Errorf("TestChunkAllocatorAlloc: wrong id = %d, wanted = 0", c.id)
+	if c != 0 {
+		t.Errorf("TestChunkAllocatorAlloc: wrong id = %d, wanted = 0", c)
 		return
 	}
 
-	if allocator.busyHead != 0 {
+	/*if allocator.busyHead != 0 {
 		t.Errorf("TestChunkAllocatorAlloc: wrong busyHead = %d, wanted = 0", allocator.busyHead)
 		return
-	}
+	}*/
 
 	if allocator.freeHead != -1 {
 		t.Errorf("TestChunkAllocatorAlloc: wrong freeHead = %d, wanted = -1", allocator.freeHead)
@@ -36,7 +36,7 @@ func TestChunkAllocatorAlloc1(t *testing.T) {
 	}
 
 	c = allocator.Alloc()
-	if c != nil {
+	if c != -1 {
 		t.Errorf("TestChunkAllocatorAlloc: should alloc nok")
 		return
 	}
@@ -48,20 +48,20 @@ func TestChunkAllocatorAlloc2(t *testing.T) {
 	allocator := NewChunkAllocator(2)
 
 	c := allocator.Alloc()
-	if c == nil {
+	if c == -1 {
 		t.Errorf("TestChunkAllocatorAlloc: should alloc ok")
 		return
 	}
 
-	if c.id != 0 {
-		t.Errorf("TestChunkAllocatorAlloc: wrong id = %d, wanted = 0", c.id)
+	if c != 0 {
+		t.Errorf("TestChunkAllocatorAlloc: wrong id = %d, wanted = 0", c)
 		return
 	}
 
-	if allocator.busyHead != 0 {
+	/*if allocator.busyHead != 0 {
 		t.Errorf("TestChunkAllocatorAlloc: wrong busyHead = %d, wanted = 0", allocator.busyHead)
 		return
-	}
+	}*/
 
 	if allocator.freeHead != 1 {
 		t.Errorf("TestChunkAllocatorAlloc: wrong freeHead = %d, wanted = 1", allocator.freeHead)
@@ -74,20 +74,20 @@ func TestChunkAllocatorAlloc2(t *testing.T) {
 	}
 
 	c = allocator.Alloc()
-	if c == nil {
+	if c == -1 {
 		t.Errorf("TestChunkAllocatorAlloc: should alloc ok")
 		return
 	}
 
-	if c.id != 1 {
-		t.Errorf("TestChunkAllocatorAlloc: wrong id = %d, wanted = 1", c.id)
+	if c != 1 {
+		t.Errorf("TestChunkAllocatorAlloc: wrong id = %d, wanted = 1", c)
 		return
 	}
 
-	if allocator.busyHead != 0 {
+	/*if allocator.busyHead != 0 {
 		t.Errorf("TestChunkAllocatorAlloc: wrong busyHead = %d, wanted = 1", allocator.busyHead)
 		return
-	}
+	}*/
 
 	if allocator.freeHead != -1 {
 		t.Errorf("TestChunkAllocatorAlloc: wrong freeHead = %d, wanted = -1", allocator.freeHead)
@@ -100,7 +100,7 @@ func TestChunkAllocatorAlloc2(t *testing.T) {
 	}
 
 	c = allocator.Alloc()
-	if c != nil {
+	if c != -1 {
 		t.Errorf("TestChunkAllocatorAlloc: should alloc nok")
 		return
 	}
@@ -111,13 +111,13 @@ func TestChunkAllocatorFree(t *testing.T) {
 	allocator := NewChunkAllocator(2)
 
 	c1 := allocator.Alloc()
-	if c1 == nil {
+	if c1 == -1 {
 		t.Errorf("TestChunkAllocatorAlloc: should alloc ok")
 		return
 	}
 
 	c2 := allocator.Alloc()
-	if c2 == nil {
+	if c2 == -1 {
 		t.Errorf("TestChunkAllocatorAlloc: should alloc ok")
 		return
 	}
@@ -129,10 +129,10 @@ func TestChunkAllocatorFree(t *testing.T) {
 		return
 	}
 
-	if allocator.busyHead != 1 {
+	/*if allocator.busyHead != 1 {
 		t.Errorf("TestChunkAllocatorAlloc: wrong busyHead = %d, wanted = 0", allocator.busyHead)
 		return
-	}
+	}*/
 
 	if allocator.freeHead != 0 {
 		t.Errorf("TestChunkAllocatorAlloc: wrong freeHead = %d, wanted = 0", allocator.freeHead)
@@ -146,10 +146,10 @@ func TestChunkAllocatorFree(t *testing.T) {
 		return
 	}
 
-	if allocator.busyHead != 1 {
+	/*if allocator.busyHead != 1 {
 		t.Errorf("TestChunkAllocatorAlloc: wrong busyHead = %d, wanted = 0", allocator.busyHead)
 		return
-	}
+	}*/
 
 	if allocator.freeHead != 0 {
 		t.Errorf("TestChunkAllocatorAlloc: wrong freeHead = %d, wanted = 0", allocator.freeHead)
@@ -163,10 +163,10 @@ func TestChunkAllocatorFree(t *testing.T) {
 		return
 	}
 
-	if allocator.busyHead != -1 {
+	/*if allocator.busyHead != -1 {
 		t.Errorf("TestChunkAllocatorAlloc: wrong busyHead = %d, wanted = -1", allocator.busyHead)
 		return
-	}
+	}*/
 
 	if allocator.freeHead != 0 {
 		t.Errorf("TestChunkAllocatorAlloc: wrong freeHead = %d, wanted = 0", allocator.freeHead)
