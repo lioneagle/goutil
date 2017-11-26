@@ -12,20 +12,12 @@ func ToLowerHex(ch byte) byte {
 	return "0123456789abcdef"[ch&0x0F]
 }
 
-func ToLower(ch byte) byte {
-	if IsUpper(ch) {
-		//return ch - 'A' + 'a'
-		return ch | 0x20
-	}
-	return ch
+func ToUpper(ch byte) byte {
+	return g_toupper_table[ch]
 }
 
-func ToUpper(ch byte) byte {
-	if IsLower(ch) {
-		//return ch - 'a' + 'A'
-		return ch & 0xDF
-	}
-	return ch
+func ToLower(ch byte) byte {
+	return g_tolower_table[ch]
 }
 
 func HexToByte(ch byte) byte {
@@ -58,8 +50,7 @@ func CompareNoCase(s1, s2 []byte) int {
 	return 0
 }
 
-/*
-func EqualNoCase0(s1, s2 []byte) bool {
+/*func EqualNoCase0(s1, s2 []byte) bool {
 	len1 := len(s1)
 	if len1 != len(s2) {
 		return false
@@ -79,6 +70,21 @@ func EqualNoCase0(s1, s2 []byte) bool {
 
 	return true
 }*/
+
+func EqualNoCase1(s1, s2 []byte) bool {
+	len1 := len(s1)
+	if len1 != len(s2) {
+		return false
+	}
+
+	for i := 0; i < len1; i++ {
+		if ToLower(s1[i]) != ToLower(s2[i]) {
+			return false
+		}
+	}
+
+	return true
+}
 
 func EqualNoCase(s1, s2 []byte) bool {
 	len1 := len(s1)
