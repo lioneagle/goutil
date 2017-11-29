@@ -30,7 +30,7 @@ func ReplaceFileSuffix(filename, newSuffix string) string {
 	return fmt.Sprintf("%s.%s", RemoveFileSuffix(filename), newSuffix)
 }
 
-func RemoveFileSuffix(filename) string {
+func RemoveFileSuffix(filename string) string {
 	base := filepath.Base(filename)
 	ext := filepath.Ext(base)
 	return strings.TrimSuffix(filename, ext)
