@@ -27,10 +27,22 @@ func FileEqual(filename1, filename2 string) bool {
 }
 
 func ReplaceFileSuffix(filename, newSuffix string) string {
+	return fmt.Sprintf("%s.%s", RemoveFileSuffix(filename), newSuffix)
+}
+
+func RemoveFileSuffix(filename) string {
 	base := filepath.Base(filename)
 	ext := filepath.Ext(base)
-	newName := strings.TrimSuffix(filename, ext)
-	return fmt.Sprintf("%s.%s", newName, newSuffix)
+	return strings.TrimSuffix(filename, ext)
+}
+
+func Ext(path string) string {
+	for i := len(path) - 1; i >= 0 && !os.IsPathSeparator(path[i]); i-- {
+		if path[i] == '.' {
+			return path[i:]
+		}
+	}
+	return ""
 }
 
 func GetCurrentPath() string {

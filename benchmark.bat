@@ -8,6 +8,8 @@ call env.bat
 gofmt -w src
 if not exist test_temp mkdir test_temp
 if exist .\test_temp\%1.test.exe  del .\test_temp\%1.test.exe
+md .\test_temp\%1_cpu.prof
+md .\test_temp\%1_mem.prof
 
 go test %1 -bench=%2 --benchtime 4s -cpuprofile=.\test_temp\%1_cpu.prof -memprofile=.\test_temp\%1_mem.prof %3 
 rem go test %1 -bench=%2  -cpuprofile=.\test_temp\%1_cpu.prof -memprofile=.\test_temp\%1_mem.prof %3 

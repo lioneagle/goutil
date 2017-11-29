@@ -12,11 +12,11 @@ type TimeWheelTaskData struct {
 	wheel    int32
 	slot     int32
 	interval int64
-	Data     interface{}
+	data     interface{}
 	callBack TimeWheelCallBack
 }
 
-type Slot struct {
+type slot struct {
 	head int32
 	size int32
 }
@@ -24,7 +24,7 @@ type Slot struct {
 type wheel struct {
 	currentSlot int
 	max         int64
-	slots       []Slot
+	slots       []slot
 }
 
 type TimeWheel struct {
@@ -47,19 +47,19 @@ func NewTimeWheel(timeWheelNum int, slotNum []int, delta int64, totalDataNum int
 	}
 
 	tw := &TimeWheel{delta: delta}
+	tw.wheels = make([]wheel, timeWheelNum)
 
 	max := delta
 
 	for i := 0; i < timeWheelNum; i++ {
 		max *= int64(slotNum[i])
-		v := wheel{}
+		v := &tw.wheels[i]
 		v.max = max
 
 		for j := 0; j < slotNum[i]; j++ {
-			slot := Slot{head: -1}
+			slot := slot{head: -1}
 			v.slots = append(v.slots, slot)
 		}
-		tw.wheels = append(tw.wheels, v)
 	}
 
 	tw.allocator = NewTimeWheelAllocator(totalDataNum)
@@ -81,7 +81,7 @@ func (this *TimeWheel) Add(interval int64, data interface{}, callBack TimeWheelC
 	chunk.data.wheel = int32(wheel)
 	chunk.data.slot = int32(slot)
 	chunk.data.interval = interval
-	chunk.data.Data = data
+	chunk.data.data = data
 	chunk.data.callBack = callBack
 
 	// push_back to slot
@@ -108,7 +108,10 @@ func (this *TimeWheel) calcPos(interval int64) (wheel, slot int32) {
 	wheelNum := len(this.wheels)
 	for i := 0; i < wheelNum; i++ {
 		v := &this.wheels[i]
+		//max := this.wheels[i].max
 		size := int64(len(v.slots))
+		//size := int64(len(this.wheels[i].slots))
+		//if interval < max {
 		if interval < v.max {
 			return int32(i), int32(interval % size)
 		}
@@ -145,6 +148,6 @@ func (this *TimeWheel) Remove(id int32) bool {
 	return true
 }
 
-func (this *TimeWheel) Step(current int) *Slot {
-	return nil
+func (this *TimeWheel) Step(current int) {
+	return
 }

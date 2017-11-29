@@ -94,12 +94,16 @@ func BenchmarkGoTimer4(b *testing.B) {
 func BenchmarkTimeWheelAddRemove(b *testing.B) {
 	b.StopTimer()
 	tw := NewTimeWheel(5, []int{256, 64, 64, 64, 64}, 1, 10000)
+	//tw := NewTimeWheel(8, []int{64, 64, 64, 64, 64, 64, 64, 64}, 1, 10000)
+	//tw := NewTimeWheel(4, []int{256, 256, 256, 256}, 1, 10000)
+	//tw := NewTimeWheel(3, []int{1 << 11, 1 << 11, 1 << 10}, 1, 10000)
 	b.ReportAllocs()
 	b.SetBytes(2)
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		e := tw.Add(10, 100, nil)
+		e := tw.Add(20000000, 100, nil)
+		//e := tw.Add(1, 100, nil)
 		tw.Remove(e)
 	}
 }
