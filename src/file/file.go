@@ -52,6 +52,27 @@ func GetCurrentPath() string {
 	return path
 }
 
+func RemoveExistFiles(filenames []string) error {
+	for i := 0; i < len(filenames); i++ {
+		err := RemoveExistFile(filenames[i])
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func RemoveExistFile(filename string) error {
+	ok, _ := PathOrFileIsExist(filename)
+	if ok {
+		err := os.Remove(filename)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func PathOrFileIsExist(pathOrFile string) (bool, error) {
 	_, err := os.Stat(pathOrFile)
 	if err == nil {

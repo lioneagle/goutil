@@ -219,6 +219,34 @@ func BenchmarkBytesEqual(b *testing.B) {
 	}
 }
 
+func BenchmarkBytesEqualFold1(b *testing.B) {
+	b.StopTimer()
+	s1 := []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	s2 := []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		bytes.EqualFold(s1, s2)
+	}
+}
+
+func BenchmarkBytesEqualFold2(b *testing.B) {
+	b.StopTimer()
+	s1 := []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	s2 := []byte("abcdefghijklmnopqrstuvwxyz")
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		bytes.EqualFold(s1, s2)
+	}
+}
+
 func BytesEqual2(s1 []byte, s2 []byte) bool {
 	len1 := len(s1)
 	if len1 != len(s2) {
