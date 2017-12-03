@@ -87,7 +87,7 @@ func PathOrFileIsExist(pathOrFile string) (bool, error) {
 	return false, err
 }
 
-func WriteFile(filename string, data []byte, perm os.FileMode) error {
+func AppendFile(filename string, data []byte, perm os.FileMode) error {
 	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_APPEND, perm)
 	if err != nil {
 		return err
