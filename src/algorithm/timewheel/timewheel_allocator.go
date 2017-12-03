@@ -13,6 +13,14 @@ type TimeWheelAllocator struct {
 	size     int32
 	freeHead int32
 	Chunks   []Chunk
+	stat     TimeWheelAllocatorStat
+}
+
+type TimeWheelAllocatorStat struct {
+	Alloc   int64
+	AllocOk int64
+	Free    int64
+	FreeOk  int64
 }
 
 func NewTimeWheelAllocator(capacity int32) *TimeWheelAllocator {
@@ -44,6 +52,7 @@ func (this *TimeWheelAllocator) Alloc() int32 {
 }
 
 func (this *TimeWheelAllocator) AllocEx() *Chunk {
+	this.stat.Alloc++
 	if this.size >= this.capacity {
 		return nil
 	}
@@ -62,10 +71,12 @@ func (this *TimeWheelAllocator) AllocEx() *Chunk {
 	chunk.used = 1
 
 	this.size++
+	this.stat.AllocOk++
 	return chunk
 }
 
 func (this *TimeWheelAllocator) Free(id int32) {
+	this.stat.Free++
 	if id < 0 || int(id) > len(this.Chunks) {
 		return
 	}
@@ -91,4 +102,6 @@ func (this *TimeWheelAllocator) Free(id int32) {
 
 	chunk.used = 0
 	this.size--
+
+	this.stat.FreeOk++
 }

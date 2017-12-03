@@ -91,7 +91,7 @@ func BenchmarkGoTimer4(b *testing.B) {
 	b.StopTimer()
 }
 
-func BenchmarkTimeWheelAddRemove(b *testing.B) {
+func BenchmarkTimeWheelAddRemove1(b *testing.B) {
 	b.StopTimer()
 	tw := NewTimeWheel(5, []int{256, 64, 64, 64, 64}, 1, 10000)
 	//tw := NewTimeWheel(8, []int{64, 64, 64, 64, 64, 64, 64, 64}, 1, 10000)
@@ -104,6 +104,55 @@ func BenchmarkTimeWheelAddRemove(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		e := tw.Add(20000000, 100, nil)
 		//e := tw.Add(1, 100, nil)
+		tw.Remove(e)
+	}
+}
+
+func BenchmarkTimeWheelAddRemove2(b *testing.B) {
+	b.StopTimer()
+	tw := NewTimeWheel(5, []int{256, 64, 64, 64, 64}, 1, 10000)
+	//tw := NewTimeWheel(8, []int{64, 64, 64, 64, 64, 64, 64, 64}, 1, 10000)
+	//tw := NewTimeWheel(4, []int{256, 256, 256, 256}, 1, 10000)
+	//tw := NewTimeWheel(3, []int{1 << 11, 1 << 11, 1 << 10}, 1, 10000)
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		e := tw.Add(1, 100, nil)
+		tw.Remove(e)
+	}
+}
+
+func BenchmarkTimeWheelBinaryAddRemove1(b *testing.B) {
+	b.StopTimer()
+	tw := NewTimeWheelBinaryBits(5, []int{8, 4, 4, 4, 4}, 1, 10000)
+	//tw := NewTimeWheel(8, []int{4, 4, 4, 4, 4, 4, 4, 4}, 1, 10000)
+	//tw := NewTimeWheel(4, []int{8, 8, 8, 8}, 1, 10000)
+	//tw := NewTimeWheel(3, []int{11, 11, 10}, 1, 10000)
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		e := tw.Add(20000000, 100, nil)
+		//e := tw.Add(1, 100, nil)
+		tw.Remove(e)
+	}
+}
+
+func BenchmarkTimeWheelBinaryAddRemove2(b *testing.B) {
+	b.StopTimer()
+	tw := NewTimeWheelBinaryBits(5, []int{8, 4, 4, 4, 4}, 1, 10000)
+	//tw := NewTimeWheel(8, []int{4, 4, 4, 4, 4, 4, 4, 4}, 1, 10000)
+	//tw := NewTimeWheel(4, []int{8, 8, 8, 8}, 1, 10000)
+	//tw := NewTimeWheel(3, []int{11, 11, 10}, 1, 10000)
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		e := tw.Add(1, 100, nil)
 		tw.Remove(e)
 	}
 }
