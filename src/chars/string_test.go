@@ -88,3 +88,27 @@ func TestFilterReverse(t *testing.T) {
 		}
 	}
 }
+
+func TestPackSpace(t *testing.T) {
+	funcName := "TestPackSpace"
+
+	testdata := []struct {
+		src string
+		ret string
+	}{
+		{"", ""},
+		{" anb", "anb"},
+		{" anb ", "anb"},
+		{" an b ", "an b"},
+		{" an  b ", "an b"},
+		{" an \tb ", "an b"},
+		{" an\t\tb ", "an b"},
+	}
+
+	for i, v := range testdata {
+		ret := StringPackSpace(v.src)
+		if ret != v.ret {
+			t.Errorf("%s[%d] failed, ret = %v, wanted = %v\n", funcName, i, ret, v.ret)
+		}
+	}
+}

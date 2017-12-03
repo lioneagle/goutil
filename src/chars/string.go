@@ -1,7 +1,10 @@
 package chars
 
 import (
+	"bytes"
+	"reflect"
 	"strings"
+	"unsafe"
 )
 
 func Filter(src []string, filter []string) []string {
@@ -46,4 +49,43 @@ func StringsEqual(lhs, rhs []string) bool {
 		}
 	}
 	return true
+}
+
+func ByteSlicePackSpace(src []byte) []byte {
+	var ret []byte
+	src = bytes.TrimSpace(src)
+	currentIsSpace := false
+	for i := 0; i < len(src); i++ {
+		if IsWspChar(src[i]) {
+			if currentIsSpace {
+				continue
+			}
+			currentIsSpace = true
+			ret = append(ret, ' ')
+		} else {
+			currentIsSpace = false
+			ret = append(ret, src[i])
+		}
+	}
+	return ret
+}
+
+func StringPackSpace(src string) string {
+	return ByteSliceToString(ByteSlicePackSpace(StringToByteSlice(src)))
+}
+
+func StringToByteSlice(str string) []byte {
+	strHeader := (*reflect.StringHeader)(unsafe.Pointer(&str))
+	retHeader := reflect.SliceHeader{Data: strHeader.Data, Len: strHeader.Len, Cap: strHeader.Len}
+	return *(*[]byte)(unsafe.Pointer(&retHeader))
+}
+
+func StringToByteSlice2(str string) *[]byte {
+	strHeader := (*reflect.StringHeader)(unsafe.Pointer(&str))
+	retHeader := reflect.SliceHeader{Data: strHeader.Data, Len: strHeader.Len, Cap: strHeader.Len}
+	return (*[]byte)(unsafe.Pointer(&retHeader))
+}
+
+func ByteSliceToString(bytes []byte) string {
+	return *(*string)(unsafe.Pointer(&bytes))
 }
