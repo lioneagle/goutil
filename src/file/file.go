@@ -101,3 +101,19 @@ func AppendFile(filename string, data []byte, perm os.FileMode) error {
 	}
 	return err
 }
+
+func CopyFile(dstFileName, srcFileName string) (int64, error) {
+	src, err := os.Open(srcFileName)
+	if err != nil {
+		return 0, err
+	}
+	defer src.Close()
+
+	dst, err := os.OpenFile(dstFileName, os.O_WRONLY|os.O_CREATE, 0x777)
+	if err != nil {
+		return 0, err
+	}
+	defer dst.Close()
+
+	return io.Copy(dst, src)
+}
