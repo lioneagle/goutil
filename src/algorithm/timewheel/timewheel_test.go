@@ -11,7 +11,7 @@ type record struct {
 	t2 time.Time
 }
 
-func TestGoTimer(t *testing.T) {
+func TestGoTimer1(t *testing.T) {
 	//fmt.Println("time.Now() =", time.Now())
 	//fmt.Println("time.Second =", time.Second)
 	ticker := time.NewTicker(1000000 * 1)
@@ -126,7 +126,7 @@ func BenchmarkTimeWheelAddRemove2(b *testing.B) {
 
 func BenchmarkTimeWheelBinaryAddRemove1(b *testing.B) {
 	b.StopTimer()
-	tw := NewTimeWheelBinaryBits(5, []int{8, 4, 4, 4, 4}, 1, 10000)
+	tw := NewTimeWheelBinaryBits(5, []int{8, 6, 6, 6, 6}, 1, 10000)
 	//tw := NewTimeWheel(8, []int{4, 4, 4, 4, 4, 4, 4, 4}, 1, 10000)
 	//tw := NewTimeWheel(4, []int{8, 8, 8, 8}, 1, 10000)
 	//tw := NewTimeWheel(3, []int{11, 11, 10}, 1, 10000)
@@ -135,7 +135,7 @@ func BenchmarkTimeWheelBinaryAddRemove1(b *testing.B) {
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		e := tw.Add(20000000, 100, nil)
+		e := tw.Add(20000000, nil, nil)
 		//e := tw.Add(1, 100, nil)
 		tw.Remove(e)
 	}
@@ -143,7 +143,7 @@ func BenchmarkTimeWheelBinaryAddRemove1(b *testing.B) {
 
 func BenchmarkTimeWheelBinaryAddRemove2(b *testing.B) {
 	b.StopTimer()
-	tw := NewTimeWheelBinaryBits(5, []int{8, 4, 4, 4, 4}, 1, 10000)
+	tw := NewTimeWheelBinaryBits(5, []int{8, 6, 6, 6, 6}, 1, 10000)
 	//tw := NewTimeWheel(8, []int{4, 4, 4, 4, 4, 4, 4, 4}, 1, 10000)
 	//tw := NewTimeWheel(4, []int{8, 8, 8, 8}, 1, 10000)
 	//tw := NewTimeWheel(3, []int{11, 11, 10}, 1, 10000)
@@ -152,7 +152,7 @@ func BenchmarkTimeWheelBinaryAddRemove2(b *testing.B) {
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		e := tw.Add(1, 100, nil)
+		e := tw.Add(1, nil, nil)
 		tw.Remove(e)
 	}
 }

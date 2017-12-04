@@ -6,7 +6,7 @@ import (
 	//"time"
 )
 
-type TimeWheelCallBack func(val interface{}) bool
+type TimeWheelCallBack func(val interface{})
 
 type TimeWheelTaskData struct {
 	wheel    int32
@@ -17,21 +17,23 @@ type TimeWheelTaskData struct {
 }
 
 type slot struct {
-	head int32
-	size int32
+	head     int32
+	size     int32
+	interval int32
 }
 
 type wheel struct {
-	currentSlot int
-	max         int64
-	slots       []slot
+	max   int64
+	slots []slot
 }
 
 type TimeWheel struct {
 	isBinaryBits bool
 	size         int32
+	currentWheel int32
+	currentSlot  int32
 	delta        int64
-	last         int64
+	current      int64
 	wheels       []wheel
 	wheelBits    []uint32
 	wheelMasks   []int32
@@ -42,12 +44,14 @@ type TimeWheel struct {
 }
 
 type TimeWheelStat struct {
-	Add      int64
-	AddOk    int64
-	Remove   int64
-	RemoveOk int64
-	Step     int64
-	Expire   int64
+	Add             int64
+	AddOk           int64
+	Remove          int64
+	RemoveOk        int64
+	Step            int64
+	Expire          int64
+	ExpireBeforeAdd int64
+	Post            int64
 }
 
 func NewTimeWheel(timeWheelNum int, slotNum []int, delta int64, totalDataNum int32) *TimeWheel {
@@ -107,6 +111,17 @@ func (this *TimeWheel) Size() int32 {
 
 func (this *TimeWheel) Add(interval int64, data interface{}, callBack TimeWheelCallBack) int32 {
 	this.stat.Add++
+
+	if interval < this.current {
+		this.stat.Expire++
+		this.stat.ExpireBeforeAdd++
+		if callBack != nil {
+			this.stat.Post++
+			callBack(data)
+			return -2
+		}
+	}
+
 	chunk := this.allocator.AllocEx()
 	if chunk == nil {
 		return -1
@@ -206,7 +221,24 @@ func (this *TimeWheel) Remove(id int32) bool {
 	return true
 }
 
-func (this *TimeWheel) Step(current int) {
+func (this *TimeWheel) Step(current int64) {
 	this.stat.Step++
+
+	if current < this.current {
+		return
+	}
+
+	wheelNum := len(this.wheels)
+	for i := 0; i < wheelNum; i++ {
+		wheelIndex = (this.currentWheel + i) % wheelNum
+		slotIndex = this.currentSlot
+
+		if interval < this.wheels[i].max {
+			return int32(i), int32(interval) & this.wheelMasks[i]
+		}
+
+		interval >>= this.wheelBits[i]
+	}
+
 	return
 }
