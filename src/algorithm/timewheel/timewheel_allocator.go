@@ -17,30 +17,35 @@ type TimeWheelAllocator struct {
 }
 
 type TimeWheelAllocatorStat struct {
-	Alloc   int64
-	AllocOk int64
-	Free    int64
-	FreeOk  int64
+	Alloc   uint64
+	AllocOk uint64
+	Free    uint64
+	FreeOk  uint64
+	FreeAll uint64
 }
 
 func NewTimeWheelAllocator(capacity int32) *TimeWheelAllocator {
 	allocator := &TimeWheelAllocator{capacity: capacity}
 	allocator.Chunks = make([]Chunk, capacity)
 
-	allocator.Chunks[0].id = 0
-	allocator.Chunks[0].used = 0
-	allocator.Chunks[0].prev = capacity - 1
-	allocator.Chunks[0].next = 1
-
-	for i := int32(1); i < capacity; i++ {
-		allocator.Chunks[i].id = i
-		allocator.Chunks[i].prev = i - 1
-		allocator.Chunks[i].next = i + 1
-	}
-
-	allocator.Chunks[capacity-1].next = 0
+	allocator.init()
 
 	return allocator
+}
+
+func (this *TimeWheelAllocator) init() {
+	this.Chunks[0].id = 0
+	this.Chunks[0].used = 0
+	this.Chunks[0].prev = this.capacity - 1
+	this.Chunks[0].next = 1
+
+	for i := int32(1); i < this.capacity; i++ {
+		this.Chunks[i].id = i
+		this.Chunks[i].prev = i - 1
+		this.Chunks[i].next = i + 1
+	}
+
+	this.Chunks[this.capacity-1].next = 0
 }
 
 func (this *TimeWheelAllocator) Alloc() int32 {
@@ -104,4 +109,9 @@ func (this *TimeWheelAllocator) Free(id int32) {
 	this.size--
 
 	this.stat.FreeOk++
+}
+
+func (this *TimeWheelAllocator) FreeAll() {
+	this.stat.FreeAll++
+	this.init()
 }
