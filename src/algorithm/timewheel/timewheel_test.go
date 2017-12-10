@@ -42,7 +42,12 @@ func TestTimeWheelAddOk(t *testing.T) {
 		{59, 59, 23, 2, 23},
 	}
 
-	statWanted := &TimeWheelStat{Add: 1, AddOk: 1, InternalAdd: 1, InternalAddOk: 1}
+	statWanted := &TimeWheelStat{
+		Add:           1,
+		AddOk:         1,
+		InternalAdd:   1,
+		InternalAddOk: 1,
+	}
 	prefix := "TestTimeWheelAddOk"
 
 	tick := int64(10)
@@ -92,7 +97,12 @@ func TestTimeWheelBinaryAddOk(t *testing.T) {
 		{63, 63, 15, 2, 15},
 	}
 
-	statWanted := &TimeWheelStat{Add: 1, AddOk: 1, InternalAdd: 1, InternalAddOk: 1}
+	statWanted := &TimeWheelStat{
+		Add:           1,
+		AddOk:         1,
+		InternalAdd:   1,
+		InternalAddOk: 1,
+	}
 	prefix := "TestTimeWheelBinaryAddOk"
 
 	tick := int64(10)
@@ -161,7 +171,12 @@ func TestTimeWheelBinaryAddNOk(t *testing.T) {
 		t.Errorf("%s failed: ret = %d, wanted = -2\n", prefix, ret)
 	}
 
-	statWanted1 := &TimeWheelStat{Add: 1, Expire: 1, ExpireBeforeAdd: 1, Post: 1}
+	statWanted1 := &TimeWheelStat{
+		Add:             1,
+		Expire:          1,
+		ExpireBeforeAdd: 1,
+		Post:            1,
+	}
 	checkStat(t, &tw.stat, statWanted1, prefix, 0)
 
 	tw.stat.Clear()
@@ -194,7 +209,16 @@ func TestTimeWheelBinaryRemoveOk1(t *testing.T) {
 		t.Errorf("%s failed: ret = false, wanted = true\n", prefix)
 	}
 
-	statWanted1 := &TimeWheelStat{Add: 1, AddOk: 1, InternalAdd: 1, InternalAddOk: 1, Remove: 1, RemoveOk: 1, InternalRemove: 1, InternalRemoveOk: 1}
+	statWanted1 := &TimeWheelStat{
+		Add:              1,
+		AddOk:            1,
+		InternalAdd:      1,
+		InternalAddOk:    1,
+		Remove:           1,
+		RemoveOk:         1,
+		InternalRemove:   1,
+		InternalRemoveOk: 1,
+	}
 	checkStat(t, &tw.stat, statWanted1, prefix, 0)
 
 	tw.RemoveAll()
@@ -223,7 +247,16 @@ func TestTimeWheelBinaryRemoveOk2(t *testing.T) {
 		t.Errorf("%s failed: ret = false, wanted = true\n", prefix)
 	}
 
-	statWanted1 := &TimeWheelStat{Add: 2, AddOk: 2, InternalAdd: 2, InternalAddOk: 2, Remove: 1, RemoveOk: 1, InternalRemove: 1, InternalRemoveOk: 1}
+	statWanted1 := &TimeWheelStat{
+		Add:              2,
+		AddOk:            2,
+		InternalAdd:      2,
+		InternalAddOk:    2,
+		Remove:           1,
+		RemoveOk:         1,
+		InternalRemove:   1,
+		InternalRemoveOk: 1,
+	}
 	checkStat(t, &tw.stat, statWanted1, prefix, 0)
 
 	tw.RemoveAll()
@@ -251,7 +284,16 @@ func TestTimeWheelBinaryRemoveOk3(t *testing.T) {
 		t.Errorf("%s failed: ret = false, wanted = true\n", prefix)
 	}
 
-	statWanted1 := &TimeWheelStat{Add: 2, AddOk: 2, InternalAdd: 2, InternalAddOk: 2, Remove: 1, RemoveOk: 1, InternalRemove: 1, InternalRemoveOk: 1}
+	statWanted1 := &TimeWheelStat{
+		Add:              2,
+		AddOk:            2,
+		InternalAdd:      2,
+		InternalAddOk:    2,
+		Remove:           1,
+		RemoveOk:         1,
+		InternalRemove:   1,
+		InternalRemoveOk: 1,
+	}
 	checkStat(t, &tw.stat, statWanted1, prefix, 0)
 
 	tw.RemoveAll()
@@ -279,7 +321,16 @@ func TestTimeWheelBinaryRemoveOk4(t *testing.T) {
 		t.Errorf("%s failed: ret = false, wanted = true\n", prefix)
 	}
 
-	statWanted1 := &TimeWheelStat{Add: 2, AddOk: 2, InternalAdd: 2, InternalAddOk: 2, Remove: 1, RemoveOk: 1, InternalRemove: 1, InternalRemoveOk: 1}
+	statWanted1 := &TimeWheelStat{
+		Add:              2,
+		AddOk:            2,
+		InternalAdd:      2,
+		InternalAddOk:    2,
+		Remove:           1,
+		RemoveOk:         1,
+		InternalRemove:   1,
+		InternalRemoveOk: 1,
+	}
 	checkStat(t, &tw.stat, statWanted1, prefix, 0)
 
 	tw.RemoveAll()
@@ -305,7 +356,14 @@ func TestTimeWheelStep1(t *testing.T) {
 
 	tw.Step(start + tick)
 
-	statWanted1 := &TimeWheelStat{Add: 2, AddOk: 2, InternalAdd: 2, InternalAddOk: 2, Expire: 2, Step: 1}
+	statWanted1 := &TimeWheelStat{
+		Add:           2,
+		AddOk:         2,
+		InternalAdd:   2,
+		InternalAddOk: 2,
+		Expire:        2,
+		Step:          1,
+	}
 	checkStat(t, &tw.stat, statWanted1, prefix, 0)
 
 	tw.RemoveAll()
@@ -348,6 +406,10 @@ func TestTimeWheelStep2(t *testing.T) {
 
 	tw.RemoveAll()
 
+	if tw.size != 0 {
+		t.Errorf("%s failed: tw.size = %d, wanted >=0\n", prefix, tw.size)
+	}
+
 }
 
 func TestGoTimer1(t *testing.T) {
@@ -381,7 +443,7 @@ func TestGoTimer2(t *testing.T) {
 
 }
 
-func BenchmarkGoTimer(b *testing.B) {
+func BenchmarkGoTimer1(b *testing.B) {
 	b.StopTimer()
 	b.ReportAllocs()
 	b.SetBytes(2)

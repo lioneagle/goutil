@@ -333,6 +333,8 @@ func (this *TimeWheel) moveSlot(slot *slot) {
 				this.stat.Post++
 				chunk.data.callBack(chunk.data)
 			}
+			this.allocator.Free(chunk.id)
+			this.size--
 		} else {
 			this.internalAdd(interval, chunk)
 		}
@@ -357,6 +359,7 @@ func (this *TimeWheel) expireSlot(slot *slot) {
 		}
 		index = chunk.next
 		this.allocator.Free(chunk.id)
+		this.size--
 	}
 
 	slot.head = -1
