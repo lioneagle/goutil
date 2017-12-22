@@ -1,14 +1,14 @@
 package stream
 
 import (
-	"bytes"
 	"fmt"
 
+	"buffer"
 	"chars"
 )
 
 type Writer struct {
-	buf bytes.Buffer
+	buf buffer.ByteBuffer
 }
 
 func (this *Writer) Write(format string, args ...interface{}) {
