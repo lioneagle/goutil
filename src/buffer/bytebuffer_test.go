@@ -58,3 +58,17 @@ func BenchmarkByteBufferWrite(b *testing.B) {
 		buf.Write(src)
 	}
 }
+
+func BenchmarkByteBufferWriteString(b *testing.B) {
+	b.StopTimer()
+	buf := NewByteBuffer(make([]byte, 1024*100))
+	src := "foobarbaz"
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		buf.Reset()
+		buf.WriteString(src)
+	}
+}
