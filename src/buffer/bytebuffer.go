@@ -1,7 +1,7 @@
 package buffer
 
 import (
-	"chars"
+	"github.com/lioneagle/goutil/src/chars"
 )
 
 type ByteBuffer struct {

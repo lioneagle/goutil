@@ -3,8 +3,8 @@ package stream
 import (
 	"fmt"
 
-	"buffer"
-	"chars"
+	"github.com/lioneagle/goutil/src/buffer"
+	"github.com/lioneagle/goutil/src/chars"
 )
 
 type Writer struct {
