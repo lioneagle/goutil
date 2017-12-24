@@ -1,4 +1,4 @@
-package algorithm
+package timewheel
 
 type Chunk struct {
 	id   int32

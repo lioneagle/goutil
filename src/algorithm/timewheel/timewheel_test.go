@@ -1,4 +1,4 @@
-package algorithm
+package timewheel
 
 import (
 	//"fmt"
@@ -357,12 +357,14 @@ func TestTimeWheelStep1(t *testing.T) {
 	tw.Step(start + tick)
 
 	statWanted1 := &TimeWheelStat{
-		Add:           2,
-		AddOk:         2,
-		InternalAdd:   2,
-		InternalAddOk: 2,
-		Expire:        2,
-		Step:          1,
+		Add:              2,
+		AddOk:            2,
+		InternalAdd:      2,
+		InternalAddOk:    2,
+		InternalRemove:   2,
+		InternalRemoveOk: 2,
+		Expire:           2,
+		Step:             1,
 	}
 	checkStat(t, &tw.stat, statWanted1, prefix, 0)
 
@@ -375,31 +377,44 @@ func TestTimeWheelStep2(t *testing.T) {
 
 	tick := int64(10)
 
-	tw := NewTimeWheel(3, []int{10, 10, 3}, tick, 0, 1000)
+	tw := NewTimeWheel(3, []int{100, 10, 3}, tick, 0, 1000)
 
-	tm1 := tw.Add(9*tick, nil, func(interface{}) {})
+	tm1 := tw.Add(5*tick, nil, func(interface{}) {})
 	if tm1 < 0 {
 		t.Errorf("%s failed: tm = %d, wanted >=0\n", prefix, tm1)
 	}
 
-	tm2 := tw.Add(19*tick, nil, func(interface{}) {})
+	tw.Step(3 * tick)
+
+	tm2 := tw.Add(3*tick, nil, func(interface{}) {})
 	if tm2 < 0 {
 		t.Errorf("%s failed: tm = %d, wanted >=0\n", prefix, tm2)
 	}
 
-	tw.Step(19 * tick)
+	tw.Step(4 * tick)
+
+	tm3 := tw.Add(250*tick, nil, func(interface{}) {})
+	if tm3 < 0 {
+		t.Errorf("%s failed: tm = %d, wanted >=0\n", prefix, tm3)
+	}
+
+	tw.Step(100 * tick)
+
+	tw.Step(254 * tick)
+
+	//fmt.Println("tw =", tw)
 
 	statWanted1 := &TimeWheelStat{
-		Add:              2,
-		AddOk:            2,
-		InternalAdd:      3,
-		InternalAddOk:    3,
-		InternalRemove:   1,
-		InternalRemoveOk: 1,
-		Expire:           2,
-		Post:             2,
-		Step:             1,
-		MoveWheels:       1,
+		Add:              3,
+		AddOk:            3,
+		InternalAdd:      4,
+		InternalAddOk:    4,
+		InternalRemove:   4,
+		InternalRemoveOk: 4,
+		Expire:           3,
+		Post:             3,
+		Step:             4,
+		MoveWheels:       2,
 		MoveSlot:         1,
 	}
 	checkStat(t, &tw.stat, statWanted1, prefix, 0)

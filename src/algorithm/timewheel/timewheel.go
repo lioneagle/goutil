@@ -1,8 +1,9 @@
-package algorithm
+package timewheel
 
 import (
 	_ "container/list"
-	//"fmt"
+	"fmt"
+	//"time"
 	//"sync"
 )
 
@@ -11,7 +12,10 @@ type TimeWheelCallBack func(val interface{})
 type TimeWheelTaskData struct {
 	wheel    int32
 	slot     int32
+	duration int64
 	ticks    int64
+	chunkId  int32
+	isCycle  bool
 	data     interface{}
 	callBack TimeWheelCallBack
 }
@@ -27,6 +31,16 @@ type wheel struct {
 	slots       []slot
 }
 
+func (this *wheel) String() string {
+	ret := fmt.Sprintf("currentSlot = %d\n", this.currentSlot)
+	for i, v := range this.slots {
+		if v.size > 0 {
+			ret += fmt.Sprintf("slot[%d]: size = %d\n", i, v.size)
+		}
+	}
+	return ret
+}
+
 type TimeWheel struct {
 	isBinaryBits bool
 	size         int32
@@ -34,10 +48,11 @@ type TimeWheel struct {
 	currentTicks int64
 	maxTicks     int64
 	wheels       []wheel
-	wheelBits    []uint32
-	wheelMasks   []int32
-	allocator    *TimeWheelAllocator
-	stat         TimeWheelStat
+	//wheelBits      []uint32
+	wheelTotalBits  []uint32
+	wheelTotalMasks []int32
+	allocator       *TimeWheelAllocator
+	stat            TimeWheelStat
 
 	//mutex  sync.Mutex
 }
@@ -91,12 +106,22 @@ func NewTimeWheel(timeWheelNum int, slotNum []int, delta, currentTicks int64, to
 
 	for i := 0; i < timeWheelNum; i++ {
 		v := &tw.wheels[i]
-		v.max = delta * int64(slotNum[i])
 		tw.maxTicks *= int64(slotNum[i])
+		v.max = tw.maxTicks
 
 		for j := 0; j < slotNum[i]; j++ {
 			slot := slot{head: -1}
 			v.slots = append(v.slots, slot)
+		}
+	}
+
+	ticks := (currentTicks / delta)
+	for i := 0; i < timeWheelNum; i++ {
+		size := int64(len(tw.wheels[i].slots))
+		tw.wheels[i].currentSlot = int32(ticks % size)
+		ticks /= size
+		if ticks == 0 {
+			break
 		}
 	}
 
@@ -118,10 +143,13 @@ func NewTimeWheelBinaryBits(timeWheelNum int, slotNumBit []int, delta, currentTi
 	}
 
 	tw.isBinaryBits = true
+	bits := 0
 
 	for i := 0; i < len(slotNumBit); i++ {
-		tw.wheelBits = append(tw.wheelBits, uint32(slotNumBit[i]))
-		tw.wheelMasks = append(tw.wheelMasks, int32(1<<uint32(slotNumBit[i])-1))
+		bits += slotNumBit[i]
+		//tw.wheelBits = append(tw.wheelBits, uint32(slotNumBit[i]))
+		tw.wheelTotalBits = append(tw.wheelTotalBits, uint32(bits))
+		tw.wheelTotalMasks = append(tw.wheelTotalMasks, int32(1<<uint32(slotNumBit[i])-1))
 	}
 
 	return tw
@@ -132,6 +160,14 @@ func (this *TimeWheel) Size() int32 {
 }
 
 func (this *TimeWheel) Add(interval int64, data interface{}, callBack TimeWheelCallBack) int32 {
+	return this.add(interval, data, callBack, false)
+}
+
+func (this *TimeWheel) AddCycle(interval int64, data interface{}, callBack TimeWheelCallBack) int32 {
+	return this.add(interval, data, callBack, true)
+}
+
+func (this *TimeWheel) add(interval int64, data interface{}, callBack TimeWheelCallBack, isCycle bool) int32 {
 	this.stat.Add++
 
 	if interval <= 0 {
@@ -153,9 +189,12 @@ func (this *TimeWheel) Add(interval int64, data interface{}, callBack TimeWheelC
 		return -1
 	}
 
+	chunk.data.duration = interval
 	chunk.data.ticks = interval + this.currentTicks
 	chunk.data.data = data
 	chunk.data.callBack = callBack
+	chunk.data.isCycle = isCycle
+	chunk.data.chunkId = chunk.id
 
 	this.internalAdd(interval, chunk)
 
@@ -203,25 +242,43 @@ func (this *TimeWheel) slotAppendChunk(slot *slot, chunk *Chunk) {
 }
 
 func (this *TimeWheel) calcPos(interval int64) (wheel, slot int32) {
-	wheelNum := len(this.wheels)
-	for i := 0; i < wheelNum; i++ {
-		size := int64(len(this.wheels[i].slots))
-		if interval < this.wheels[i].max {
-			return int32(i), int32((interval / this.tick) % size)
-		}
-		interval /= size
+	//*
+	if interval < this.wheels[0].max {
+		return 0, int32(((interval + this.currentTicks) / this.tick) % int64(len(this.wheels[0].slots)))
 	}
-	return -1, -1
+
+	wheelNum := len(this.wheels)
+	for i := 1; i < wheelNum; i++ {
+		if interval < this.wheels[i].max {
+			return int32(i), int32(((interval + this.currentTicks) / this.wheels[i-1].max) % int64(len(this.wheels[i].slots)))
+		}
+	}
+	return -1, -1 //*/
+
+	/*
+		wheelNum := len(this.wheels)
+		ticks := (interval + this.currentTicks)
+
+		for i := 0; i < wheelNum; i++ {
+			size := int64(len(this.wheels[i].slots))
+			if interval < this.wheels[i].max {
+				return int32(i), int32((ticks / this.tick) % size)
+			}
+			ticks /= size
+		}
+		return -1, -1 //*/
 }
 
 func (this *TimeWheel) calcPosBinaryBits(interval int64) (wheel, slot int32) {
-	wheelNum := len(this.wheels)
-	for i := 0; i < wheelNum; i++ {
-		if interval < this.wheels[i].max {
-			return int32(i), int32(interval/this.tick) & this.wheelMasks[i]
-		}
+	if interval < this.wheels[0].max {
+		return 0, int32((interval+this.currentTicks)/this.tick) & this.wheelTotalMasks[0]
+	}
 
-		interval >>= this.wheelBits[i]
+	wheelNum := len(this.wheels)
+	for i := 1; i < wheelNum; i++ {
+		if interval < this.wheels[i].max {
+			return int32(i), (int32((interval+this.currentTicks)/this.tick) >> this.wheelTotalBits[i-1]) & this.wheelTotalMasks[i]
+		}
 	}
 	return -1, -1
 }
@@ -257,6 +314,7 @@ func (this *TimeWheel) internalRemove(chunk *Chunk) {
 			slot.head = chunk.next
 		}
 	}
+
 	slot.size--
 
 	this.stat.InternalRemoveOk++
@@ -265,7 +323,7 @@ func (this *TimeWheel) internalRemove(chunk *Chunk) {
 func (this *TimeWheel) Step(current int64) {
 	this.stat.Step++
 
-	if current < this.currentTicks {
+	if current < (this.currentTicks + this.tick) {
 		return
 	}
 
@@ -274,8 +332,6 @@ func (this *TimeWheel) Step(current int64) {
 	for i := int64(0); i < ticks; i++ {
 		this.StepOne()
 	}
-
-	this.currentTicks = current
 }
 
 func (this *TimeWheel) StepOne() {
@@ -303,6 +359,7 @@ func (this *TimeWheel) moveWheels() {
 		wheel := &this.wheels[i]
 		slotIndex := (wheel.currentSlot + 1) % int32(len(wheel.slots))
 		slot := &wheel.slots[slotIndex]
+		wheel.currentSlot = slotIndex
 		if slot.size == 0 {
 			return
 		}
@@ -328,13 +385,7 @@ func (this *TimeWheel) moveSlot(slot *slot) {
 
 		interval := chunk.data.ticks - this.currentTicks
 		if interval <= 0 {
-			this.stat.Expire++
-			if chunk.data.callBack != nil {
-				this.stat.Post++
-				chunk.data.callBack(chunk.data)
-			}
-			this.allocator.Free(chunk.id)
-			this.size--
+			this.expireChunk(chunk)
 		} else {
 			this.internalAdd(interval, chunk)
 		}
@@ -352,18 +403,28 @@ func (this *TimeWheel) expireSlot(slot *slot) {
 		if chunk.used == 0 {
 			panic("chunk should be used")
 		}
-		this.stat.Expire++
-		if chunk.data.callBack != nil {
-			this.stat.Post++
-			chunk.data.callBack(chunk.data.data)
-		}
 		index = chunk.next
-		this.allocator.Free(chunk.id)
-		this.size--
+		this.expireChunk(chunk)
+	}
+}
+
+func (this *TimeWheel) expireChunk(chunk *Chunk) {
+	this.stat.Expire++
+	if chunk.data.callBack != nil {
+		this.stat.Post++
+		chunk.data.callBack(chunk.data.data)
 	}
 
-	slot.head = -1
-	slot.size = 0
+	this.internalRemove(chunk)
+
+	if chunk.data.isCycle {
+		chunk.data.ticks = chunk.data.duration + this.currentTicks
+		this.internalAdd(chunk.data.duration, chunk)
+		return
+	}
+
+	this.allocator.Free(chunk.id)
+	this.size--
 }
 
 func (this *TimeWheel) RemoveAll() {
@@ -377,4 +438,17 @@ func (this *TimeWheel) RemoveAll() {
 		}
 	}
 	this.allocator.FreeAll()
+}
+
+func (this *TimeWheel) String() string {
+	ret := fmt.Sprintf("------------------------ TimeWheel ------------------------\n")
+	ret += fmt.Sprintf("size = %d, currentTicks = %d, \n", this.size, this.currentTicks)
+	ret += fmt.Sprintf("tick = %d, maxTicks = %d\n", this.tick, this.maxTicks)
+
+	for i, v := range this.wheels {
+		ret += fmt.Sprintf("wheel[%d]: ", i)
+		ret += v.String()
+	}
+
+	return ret
 }
