@@ -1,27 +1,27 @@
 package implwin
 
 import (
-	"core"
+	"draw"
 	"win"
 )
 
 type SolidColorBrushWin struct {
 	hBrush win.HBRUSH
-	color  core.Color
+	color  draw.Color
 }
 
-func NewSolidColorBrush(color core.Color) (*SolidColorBrushWin, error) {
+func NewSolidColorBrush(color draw.Color) (*SolidColorBrushWin, error) {
 	lb := &win.LOGBRUSH{LbStyle: win.BS_SOLID, LbColor: win.COLORREF(color)}
 
 	hBrush := win.CreateBrushIndirect(lb)
 	if hBrush == 0 {
-		return nil, core.NewError("CreateBrushIndirect failed")
+		return nil, draw.NewError("CreateBrushIndirect failed")
 	}
 
 	return &SolidColorBrushWin{hBrush: hBrush, color: color}, nil
 }
 
-func (this *SolidColorBrushWin) Color() core.Color {
+func (this *SolidColorBrushWin) Color() draw.Color {
 	return this.color
 }
 

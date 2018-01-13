@@ -1,7 +1,7 @@
 package implwin
 
 import (
-	"core"
+	"draw"
 	"win"
 )
 
@@ -31,8 +31,8 @@ func (this *nullPenWin) handle() win.HPEN {
 	return this.hPen
 }
 
-func (this *nullPenWin) Style() core.PenStyle {
-	return core.PenStyle{}
+func (this *nullPenWin) Style() draw.PenStyle {
+	return draw.PenStyle{}
 }
 
 func (this *nullPenWin) Width() int {

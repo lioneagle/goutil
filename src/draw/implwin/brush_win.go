@@ -1,12 +1,12 @@
 package implwin
 
 import (
-	"core"
+	"draw"
 	"win"
 )
 
 type BrushWin interface {
-	core.Brush
+	draw.Brush
 	handle() win.HBRUSH
 	logbrush() *win.LOGBRUSH
 }

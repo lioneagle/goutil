@@ -1,4 +1,4 @@
-package core
+package draw
 
 type Image interface {
 	BeginPaint(canvas Canvas) error

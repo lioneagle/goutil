@@ -1,4 +1,4 @@
-package core
+package draw
 
 type Graphic interface {
 	Draw(canvas Canvas) error

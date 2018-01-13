@@ -1,4 +1,4 @@
-package core
+package draw
 
 type Canvas interface {
 	DrawLine(pen Pen, from, to Point) error

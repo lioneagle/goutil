@@ -1,27 +1,27 @@
 package implwin
 
 import (
-	"core"
+	"draw"
 	"win"
 )
 
 type GeometricPenWin struct {
 	hPen  win.HPEN
-	style core.PenStyle
-	brush core.Brush
+	style draw.PenStyle
+	brush draw.Brush
 	width int
 }
 
-func NewGeometricPenWin(style core.PenStyle, width int, brush BrushWin) (*GeometricPenWin, error) {
+func NewGeometricPenWin(style draw.PenStyle, width int, brush BrushWin) (*GeometricPenWin, error) {
 	if brush == nil {
-		return nil, core.NewError("brush cannot be nil")
+		return nil, draw.NewError("brush cannot be nil")
 	}
-	style.Type = core.PEN_TYPE_GEOMETRIC
+	style.Type = draw.PEN_TYPE_GEOMETRIC
 	winPenStyle := getPenStyleWin(style)
 
 	hPen := win.ExtCreatePen(winPenStyle, uint32(width), brush.logbrush(), 0, nil)
 	if hPen == 0 {
-		return nil, core.NewError("ExtCreatePen failed")
+		return nil, draw.NewError("ExtCreatePen failed")
 	}
 
 	return &GeometricPenWin{
@@ -43,7 +43,7 @@ func (this *GeometricPenWin) handle() win.HPEN {
 	return this.hPen
 }
 
-func (this *GeometricPenWin) Style() core.PenStyle {
+func (this *GeometricPenWin) Style() draw.PenStyle {
 	return this.style
 }
 
@@ -51,6 +51,6 @@ func (this *GeometricPenWin) Width() int {
 	return this.width
 }
 
-func (this *GeometricPenWin) Brush() core.Brush {
+func (this *GeometricPenWin) Brush() draw.Brush {
 	return this.brush
 }

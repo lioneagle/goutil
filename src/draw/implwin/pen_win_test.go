@@ -1,20 +1,21 @@
 package implwin
 
 import (
-	"core"
 	"fmt"
 	"testing"
+
+	"draw"
 	"win"
 )
 
 func TestGetPenStyleWin(t *testing.T) {
 	testdata := []struct {
-		style    core.PenStyle
+		style    draw.PenStyle
 		styleWin uint32
 	}{
-		{core.PenStyle{}, win.PS_COSMETIC | win.PS_SOLID | win.PS_ENDCAP_ROUND | win.PS_JOIN_ROUND},
-		{core.PenStyle{core.PEN_TYPE_GEOMETRIC, core.PEN_DASH, core.PEN_CAP_SQUARE, core.PEN_JOIN_MITER}, win.PS_GEOMETRIC | win.PS_DASH | win.PS_ENDCAP_SQUARE | win.PS_JOIN_MITER},
-		{core.PenStyle{core.PEN_TYPE_COSMETIC, core.PEN_DASH_DOT_DOT, core.PEN_CAP_FLAT, core.PEN_JOIN_BEVEL}, win.PS_COSMETIC | win.PS_DASHDOTDOT | win.PS_ENDCAP_FLAT | win.PS_JOIN_BEVEL},
+		{draw.PenStyle{}, win.PS_COSMETIC | win.PS_SOLID | win.PS_ENDCAP_ROUND | win.PS_JOIN_ROUND},
+		{draw.PenStyle{draw.PEN_TYPE_GEOMETRIC, draw.PEN_DASH, draw.PEN_CAP_SQUARE, draw.PEN_JOIN_MITER}, win.PS_GEOMETRIC | win.PS_DASH | win.PS_ENDCAP_SQUARE | win.PS_JOIN_MITER},
+		{draw.PenStyle{draw.PEN_TYPE_COSMETIC, draw.PEN_DASH_DOT_DOT, draw.PEN_CAP_FLAT, draw.PEN_JOIN_BEVEL}, win.PS_COSMETIC | win.PS_DASHDOTDOT | win.PS_ENDCAP_FLAT | win.PS_JOIN_BEVEL},
 	}
 
 	prefix := "TestGetPenStyleWin"

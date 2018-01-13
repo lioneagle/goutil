@@ -1,37 +1,38 @@
 package implwin
 
 import (
-	"core"
 	"fmt"
+
+	"draw"
 	"win"
 )
 
 type BitmapWin struct {
 	hBmp       win.HBITMAP
 	hPackedDIB win.HGLOBAL
-	size       core.Size
+	size       draw.Size
 	oldHandle  win.HGDIOBJ
 	hdc        win.HDC
 }
 
-func NewBitmap(size core.Size) (bmp *BitmapWin, err error) {
+func NewBitmap(size draw.Size) (bmp *BitmapWin, err error) {
 	bmp = &BitmapWin{}
 	bmp.hBmp = win.CreateBitmap(int32(size.Width), int32(size.Height), 1, 32, nil)
 	if bmp.hBmp == 0 {
-		return nil, core.NewError("CreateBitmap failed")
+		return nil, draw.NewError("CreateBitmap failed")
 	}
 
 	return bmp, nil
 }
 
-func (this *BitmapWin) BeginPaint(canvas core.Canvas) error {
+func (this *BitmapWin) BeginPaint(canvas draw.Canvas) error {
 	if this.hBmp == 0 {
-		return core.NewError("hBmp is invalid")
+		return draw.NewError("hBmp is invalid")
 	}
 	canvas_win, _ := canvas.(*CanvasWin)
 	this.oldHandle = win.SelectObject(canvas_win.HDC(), win.HGDIOBJ(this.hBmp))
 	if this.oldHandle == 0 {
-		return core.NewError("SelectObject failed")
+		return draw.NewError("SelectObject failed")
 	}
 
 	this.hdc = canvas_win.HDC()
@@ -53,11 +54,11 @@ func (this *BitmapWin) Dispose() {
 	}
 }
 
-func (this *BitmapWin) Size() core.Size {
+func (this *BitmapWin) Size() draw.Size {
 	return this.size
 }
 
-func (this *BitmapWin) Draw(canvas core.Canvas) error {
+func (this *BitmapWin) Draw(canvas draw.Canvas) error {
 	return nil
 }
 
@@ -66,18 +67,18 @@ func (this *BitmapWin) SaveToFile(filename, format string) error {
 
 	err := win.GdipCreateBitmapFromHBITMAP(this.hBmp, 0, &bitmap)
 	if err != nil {
-		return core.NewError(fmt.Sprintf("GdipCreateBitmapFromHBITMAP failed, err =", err.Error()))
+		return draw.NewError(fmt.Sprintf("GdipCreateBitmapFromHBITMAP failed, err =", err.Error()))
 	}
 	defer win.GdipDisposeImage(&bitmap.GpImage)
 
 	clsid, _ := win.GetEncoderClsid(fmt.Sprintf("image/%s", format))
 	if clsid == nil {
-		return core.NewError(fmt.Sprintf("Do not support %s", format))
+		return draw.NewError(fmt.Sprintf("Do not support %s", format))
 	}
 
 	err = win.GdipSaveImageToFile(&bitmap.GpImage, filename, clsid, nil)
 	if err != nil {
-		return core.NewError(fmt.Sprintf("GdipSaveImageToFile failed, err =", err.Error()))
+		return draw.NewError(fmt.Sprintf("GdipSaveImageToFile failed, err =", err.Error()))
 	}
 
 	return nil

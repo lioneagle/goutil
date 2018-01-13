@@ -1,4 +1,4 @@
-package core
+package draw
 
 type Point struct {
 	X int
