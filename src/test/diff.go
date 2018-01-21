@@ -22,10 +22,7 @@ func DiffEx(label string, actual, wanted interface{}) (bool, string) {
 }
 
 func Diff(actual, wanted interface{}) (bool, string) {
-	buf := buffer.NewByteBuffer(nil)
-	w := &diffWriter{writer: buf, label: funcName(2)}
-	ok := w.diff(reflect.ValueOf(actual), reflect.ValueOf(wanted))
-	return ok, buf.String()
+	return DiffEx(funcName(2), actual, wanted)
 }
 
 func (this *diffWriter) diff(actual, wanted reflect.Value) bool {
@@ -52,9 +49,34 @@ func (this *diffWriter) diff(actual, wanted reflect.Value) bool {
 	}
 
 	switch kind := typeOfActual.Kind(); kind {
-	case reflect.Int:
-		//fmt.Println("enter Int")
+	case reflect.Bool:
+		if a, b := actual.Bool(), wanted.Bool(); a != b {
+			this.print(a, b)
+			return false
+		}
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		if a, b := actual.Int(), wanted.Int(); a != b {
+			this.print(a, b)
+			return false
+		}
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		if a, b := actual.Uint(), wanted.Uint(); a != b {
+			this.print(a, b)
+			return false
+		}
+	case reflect.Float32, reflect.Float64:
+		if a, b := actual.Float(), wanted.Float(); a != b {
+			this.print(a, b)
+			return false
+		}
+	case reflect.Complex64:
+	case reflect.Complex128:
+		if a, b := actual.Complex(), wanted.Complex(); a != b {
+			this.print(a, b)
+			return false
+		}
+	case reflect.String:
+		if a, b := actual.String(), wanted.String(); a != b {
 			this.print(a, b)
 			return false
 		}
@@ -157,7 +179,6 @@ func (this *diffWriter) diff(actual, wanted reflect.Value) bool {
 	default:
 		fmt.Println("enter Default")
 		if actual != wanted {
-			this.printf("Actual: %v, Wanted: %v\n", actual, wanted)
 			return false
 		}
 	}

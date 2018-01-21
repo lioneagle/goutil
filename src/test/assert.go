@@ -54,7 +54,7 @@ func TestGroup(t *testing.T, testdata interface{}, fn func(interface{}) interfac
 			if typeOfFiled == typeOfRet1 {
 
 				w := &diffWriter{writer: buf, label: label1}
-				ok := w.diff(val1.Field(j), ret1[0].Elem())
+				ok := w.diff(ret1[0].Elem(), val1.Field(j))
 				if !ok {
 					ret = false
 					//return false, buf.String()
@@ -70,7 +70,67 @@ func TestGroup(t *testing.T, testdata interface{}, fn func(interface{}) interfac
 func EXPECT_TRUE(t *testing.T, condition bool, format string, args ...interface{}) {
 	if !condition {
 		_, file, line, _ := runtime.Caller(1)
-		t.Errorf("%s:%d", filepath.Base(file), line)
-		//t.FailNow()
+		t.Errorf("%s:%d\nactual = false, wanted = true\n%s", filepath.Base(file), line, fmt.Sprintf(format, args...))
+	}
+}
+
+func ASSERT_TRUE(t *testing.T, condition bool, format string, args ...interface{}) {
+	if !condition {
+		_, file, line, _ := runtime.Caller(1)
+		t.Errorf("%s:%d\nactual = false, wanted = true\n%s", filepath.Base(file), line, fmt.Sprintf(format, args...))
+		t.FailNow()
+	}
+}
+
+func EXPECT_FALSE(t *testing.T, condition bool, format string, args ...interface{}) {
+	if condition {
+		_, file, line, _ := runtime.Caller(1)
+		t.Errorf("%s:%d\nactual = true, wanted = false\n%s", filepath.Base(file), line, fmt.Sprintf(format, args...))
+	}
+}
+
+func ASSERT_FALSE(t *testing.T, condition bool, format string, args ...interface{}) {
+	if condition {
+		_, file, line, _ := runtime.Caller(1)
+		t.Errorf("%s:%d\nactual = true, wanted = false\n%s", filepath.Base(file), line, fmt.Sprintf(format, args...))
+		t.FailNow()
+	}
+}
+
+func EXPECT_EQ(t *testing.T, actual, wanted interface{}, format string, args ...interface{}) {
+	equal, result := DiffEx("", actual, wanted)
+
+	if !equal {
+		_, file, line, _ := runtime.Caller(1)
+		t.Errorf("%s:%d\n%s%s", filepath.Base(file), line, result, fmt.Sprintf(format, args...))
+	}
+}
+
+func ASSERT_EQ(t *testing.T, actual, wanted interface{}, format string, args ...interface{}) {
+	equal, result := DiffEx("", actual, wanted)
+
+	if !equal {
+		_, file, line, _ := runtime.Caller(1)
+		t.Errorf("%s:%d\n%s%s", filepath.Base(file), line, result, fmt.Sprintf(format, args...))
+		t.FailNow()
+	}
+}
+
+func EXPECT_NE(t *testing.T, actual, wanted interface{}, format string, args ...interface{}) {
+	equal, _ := DiffEx("", actual, wanted)
+
+	if equal {
+		_, file, line, _ := runtime.Caller(1)
+		t.Errorf("%s:%d\nshould not be equal", filepath.Base(file), line)
+	}
+}
+
+func ASSERT_NE(t *testing.T, actual, wanted interface{}, format string, args ...interface{}) {
+	equal, _ := DiffEx("", actual, wanted)
+
+	if equal {
+		_, file, line, _ := runtime.Caller(1)
+		t.Errorf("%s:%d\nshould not be equal", filepath.Base(file), line)
+		t.FailNow()
 	}
 }
