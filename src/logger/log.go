@@ -57,7 +57,7 @@ func NewLogger(out io.Writer) *Logger {
 func (this *Logger) init() {
 	this.level = WARNING
 	this.stackTraceLevel = EMERGENCY
-	this.showShortFile = true
+	//this.showShortFile = true
 	this.shortFileNameDepth = 1
 	this.showPackage = true
 	this.showFuncName = false
