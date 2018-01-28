@@ -26,7 +26,23 @@ func FileEqual(filename1, filename2 string) bool {
 		return false
 	}
 
-	return bytes.Equal(file1, file2)
+	if len(file1) != len(file2) {
+		logger.Error("different len, len(%s) = %d, len(%s) = %d", filename1, len(file1), filename2, len(file2))
+		return false
+	}
+
+	ret := bytes.Equal(file1, file2)
+
+	if !ret {
+		for i := 0; i < len(file1); i++ {
+			if file1[i] != file2[i] {
+				logger.Error("first diffrent char is %d at position %d", file1[i], i)
+				break
+			}
+		}
+	}
+
+	return ret
 }
 
 func ReplaceFileSuffix(filename, newSuffix string) string {
