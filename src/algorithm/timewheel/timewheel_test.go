@@ -1,10 +1,12 @@
 package timewheel
 
 import (
-	//"fmt"
+	"fmt"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/lioneagle/goutil/src/test"
 )
 
 type record struct {
@@ -26,7 +28,7 @@ func checkStat(t *testing.T, stat, wanted *TimeWheelStat, prefix string, index i
 }
 
 func TestTimeWheelAddOk(t *testing.T) {
-	wanted := []struct {
+	testdata := []struct {
 		sceond int64
 		minute int64
 		hour   int64
@@ -48,40 +50,33 @@ func TestTimeWheelAddOk(t *testing.T) {
 		InternalAdd:   1,
 		InternalAddOk: 1,
 	}
-	prefix := "TestTimeWheelAddOk"
 
 	tick := int64(10)
-
 	tw := NewTimeWheel(3, []int{60, 60, 24}, tick, 0, 1000)
 
-	for i, v := range wanted {
-		tw.RemoveAll()
-		tw.stat.Clear()
-		interval := v.sceond + v.minute*60 + v.hour*3600
-		interval *= tick
+	for i, v := range testdata {
+		v := v
 
-		ret := tw.Add(interval, nil, nil)
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			//t.Parallel()
 
-		if ret < 0 {
-			t.Errorf("%s[%d] failed: ret = %d, wanted = 0\n", prefix, i, ret)
-			continue
-		}
+			tw.RemoveAll()
+			tw.stat.Clear()
+			interval := v.sceond + v.minute*60 + v.hour*3600
+			interval *= tick
 
-		if tw.allocator.Chunks[ret].data.wheel != v.wheel {
-			t.Errorf("%s[%d] failed: wheel = %d, wanted = %d\n", prefix, i, tw.allocator.Chunks[ret].data.wheel, v.wheel)
-		}
+			ret := tw.Add(interval, nil, nil)
 
-		if tw.allocator.Chunks[ret].data.slot != v.slot {
-			t.Errorf("%s[%d] failed: slot = %d, wanted = %d\n", prefix, i, tw.allocator.Chunks[ret].data.slot, v.slot)
-		}
-
-		checkStat(t, &tw.stat, statWanted, prefix, i)
+			test.ASSERT_TRUE(t, ret >= 0, "")
+			test.EXPECT_EQ(t, tw.allocator.Chunks[ret].data.wheel, v.wheel, "")
+			test.EXPECT_EQ(t, tw.allocator.Chunks[ret].data.slot, v.slot, "")
+			test.EXPECT_EQ(t, tw.stat, *statWanted, "")
+		})
 	}
-
 }
 
 func TestTimeWheelBinaryAddOk(t *testing.T) {
-	wanted := []struct {
+	testdata := []struct {
 		sceond int64
 		minute int64
 		hour   int64
@@ -103,73 +98,59 @@ func TestTimeWheelBinaryAddOk(t *testing.T) {
 		InternalAdd:   1,
 		InternalAddOk: 1,
 	}
-	prefix := "TestTimeWheelBinaryAddOk"
 
 	tick := int64(10)
 
 	tw := NewTimeWheelBinaryBits(3, []int{6, 6, 4}, tick, 0, 1000)
 
-	for i, v := range wanted {
-		tw.RemoveAll()
-		tw.stat.Clear()
-		interval := v.sceond + v.minute*64 + v.hour*64*64
-		interval *= tick
+	for i, v := range testdata {
+		v := v
 
-		ret := tw.Add(interval, nil, nil)
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			//t.Parallel()
 
-		if ret < 0 {
-			t.Errorf("%s[%d] failed: ret = %d, wanted = 0\n", prefix, i, ret)
-			continue
-		}
+			tw.RemoveAll()
+			tw.stat.Clear()
+			interval := v.sceond + v.minute*64 + v.hour*64*64
+			interval *= tick
 
-		if tw.allocator.Chunks[ret].data.wheel != v.wheel {
-			t.Errorf("%s[%d] failed: wheel = %d, wanted = %d\n", prefix, i, tw.allocator.Chunks[ret].data.wheel, v.wheel)
-		}
+			ret := tw.Add(interval, nil, nil)
 
-		if tw.allocator.Chunks[ret].data.slot != v.slot {
-			t.Errorf("%s[%d] failed: slot = %d, wanted = %d\n", prefix, i, tw.allocator.Chunks[ret].data.slot, v.slot)
-		}
-
-		checkStat(t, &tw.stat, statWanted, prefix, i)
+			test.ASSERT_TRUE(t, ret >= 0, "")
+			test.EXPECT_EQ(t, tw.allocator.Chunks[ret].data.wheel, v.wheel, "")
+			test.EXPECT_EQ(t, tw.allocator.Chunks[ret].data.slot, v.slot, "")
+			test.EXPECT_EQ(t, tw.stat, *statWanted, "")
+		})
 	}
-
 }
 
 func TestTimeWheelAddNOk(t *testing.T) {
-	prefix := "TestTimeWheelBinaryAddNOk"
 	tw := NewTimeWheel(3, []int{60, 60, 24}, 1, 0, 1000)
 
 	ret := tw.Add(0, nil, nil)
-	if ret != -2 {
-		t.Errorf("%s failed: ret = %d, wanted = -2\n", prefix, ret)
-	}
+	test.EXPECT_EQ(t, ret, int32(-2), "")
 
 	statWanted1 := &TimeWheelStat{Add: 1, Expire: 1, ExpireBeforeAdd: 1}
-	checkStat(t, &tw.stat, statWanted1, prefix, 0)
+	test.EXPECT_EQ(t, tw.stat, *statWanted1, "")
 
 	tw.stat.Clear()
 
 	ret = tw.Add(60*60*24, nil, nil)
-	if ret != -1 {
-		t.Errorf("%s failed: ret = %d, wanted = -1\n", prefix, ret)
-	}
+	test.EXPECT_EQ(t, ret, int32(-1), "")
 
 	statWanted2 := &TimeWheelStat{Add: 1}
-	checkStat(t, &tw.stat, statWanted2, prefix, 1)
+	test.EXPECT_EQ(t, tw.stat, *statWanted2, "")
 
 	tw.RemoveAll()
 }
 
 func TestTimeWheelBinaryAddNOk(t *testing.T) {
-	prefix := "TestTimeWheelAddNOk"
 	delta := int64(10)
 
 	tw := NewTimeWheelBinaryBits(3, []int{6, 6, 4}, delta, 0, 1000)
 	ret := tw.Add(0, nil, func(interface{}) {})
 
-	if ret != -2 {
-		t.Errorf("%s failed: ret = %d, wanted = -2\n", prefix, ret)
-	}
+	test.EXPECT_EQ(t, ret, int32(-2), "")
 
 	statWanted1 := &TimeWheelStat{
 		Add:             1,
@@ -177,37 +158,29 @@ func TestTimeWheelBinaryAddNOk(t *testing.T) {
 		ExpireBeforeAdd: 1,
 		Post:            1,
 	}
-	checkStat(t, &tw.stat, statWanted1, prefix, 0)
+	test.EXPECT_EQ(t, tw.stat, *statWanted1, "")
 
 	tw.stat.Clear()
 
 	ret = tw.Add((1<<16)*delta, nil, nil)
-	if ret != -1 {
-		t.Errorf("%s failed: ret = %d, wanted = -1\n", prefix, ret)
-	}
+	test.EXPECT_EQ(t, ret, int32(-1), "")
 
 	statWanted2 := &TimeWheelStat{Add: 1}
-	checkStat(t, &tw.stat, statWanted2, prefix, 1)
+	test.EXPECT_EQ(t, tw.stat, *statWanted2, "")
 
 	tw.RemoveAll()
 }
 
 func TestTimeWheelBinaryRemoveOk1(t *testing.T) {
-	prefix := "TestTimeWheelBinaryRemoveOk"
-
 	tick := int64(10)
 
 	tw := NewTimeWheelBinaryBits(3, []int{6, 6, 4}, tick, 0, 1000)
 
 	tm := tw.Add(10*tick, nil, nil)
-	if tm < 0 {
-		t.Errorf("%s failed: tm = %d, wanted >=0\n", prefix, tm)
-	}
+	test.EXPECT_TRUE(t, tm >= 0, "")
 
 	ret := tw.Remove(tm)
-	if !ret {
-		t.Errorf("%s failed: ret = false, wanted = true\n", prefix)
-	}
+	test.EXPECT_TRUE(t, ret, "")
 
 	statWanted1 := &TimeWheelStat{
 		Add:              1,
@@ -219,33 +192,25 @@ func TestTimeWheelBinaryRemoveOk1(t *testing.T) {
 		InternalRemove:   1,
 		InternalRemoveOk: 1,
 	}
-	checkStat(t, &tw.stat, statWanted1, prefix, 0)
+	test.EXPECT_EQ(t, tw.stat, *statWanted1, "")
 
 	tw.RemoveAll()
 
 }
 
 func TestTimeWheelBinaryRemoveOk2(t *testing.T) {
-	prefix := "TestTimeWheelBinaryRemoveOk"
-
 	tick := int64(10)
 
 	tw := NewTimeWheelBinaryBits(3, []int{6, 6, 4}, tick, 0, 1000)
 
 	tm1 := tw.Add(10*tick, nil, nil)
-	if tm1 < 0 {
-		t.Errorf("%s failed: tm1 = %d, wanted >=0\n", prefix, tm1)
-	}
+	test.EXPECT_TRUE(t, tm1 >= 0, "")
 
 	tm2 := tw.Add(20*tick, nil, nil)
-	if tm2 < 0 {
-		t.Errorf("%s failed: tm2 = %d, wanted >=0\n", prefix, tm2)
-	}
+	test.EXPECT_TRUE(t, tm2 >= 0, "")
 
 	ret := tw.Remove(tm1)
-	if !ret {
-		t.Errorf("%s failed: ret = false, wanted = true\n", prefix)
-	}
+	test.EXPECT_TRUE(t, ret, "")
 
 	statWanted1 := &TimeWheelStat{
 		Add:              2,
@@ -257,32 +222,24 @@ func TestTimeWheelBinaryRemoveOk2(t *testing.T) {
 		InternalRemove:   1,
 		InternalRemoveOk: 1,
 	}
-	checkStat(t, &tw.stat, statWanted1, prefix, 0)
+	test.EXPECT_EQ(t, tw.stat, *statWanted1, "")
 
 	tw.RemoveAll()
 }
 
 func TestTimeWheelBinaryRemoveOk3(t *testing.T) {
-	prefix := "TestTimeWheelBinaryRemoveOk"
-
 	tick := int64(10)
 
 	tw := NewTimeWheelBinaryBits(3, []int{6, 6, 4}, tick, 0, 1000)
 
 	tm1 := tw.Add(10*tick, nil, nil)
-	if tm1 < 0 {
-		t.Errorf("%s failed: tm1 = %d, wanted >=0\n", prefix, tm1)
-	}
+	test.EXPECT_TRUE(t, tm1 >= 0, "")
 
 	tm2 := tw.Add(10*tick, nil, nil)
-	if tm2 < 0 {
-		t.Errorf("%s failed: tm2 = %d, wanted >=0\n", prefix, tm2)
-	}
+	test.EXPECT_TRUE(t, tm2 >= 0, "")
 
 	ret := tw.Remove(tm1)
-	if !ret {
-		t.Errorf("%s failed: ret = false, wanted = true\n", prefix)
-	}
+	test.EXPECT_TRUE(t, ret, "")
 
 	statWanted1 := &TimeWheelStat{
 		Add:              2,
@@ -294,32 +251,24 @@ func TestTimeWheelBinaryRemoveOk3(t *testing.T) {
 		InternalRemove:   1,
 		InternalRemoveOk: 1,
 	}
-	checkStat(t, &tw.stat, statWanted1, prefix, 0)
+	test.EXPECT_EQ(t, tw.stat, *statWanted1, "")
 
 	tw.RemoveAll()
 }
 
 func TestTimeWheelBinaryRemoveOk4(t *testing.T) {
-	prefix := "TestTimeWheelBinaryRemoveOk"
-
 	tick := int64(10)
 
 	tw := NewTimeWheelBinaryBits(3, []int{6, 6, 4}, tick, 0, 1000)
 
 	tm1 := tw.Add(10*tick, nil, nil)
-	if tm1 < 0 {
-		t.Errorf("%s failed: tm1 = %d, wanted >=0\n", prefix, tm1)
-	}
+	test.EXPECT_TRUE(t, tm1 >= 0, "")
 
 	tm2 := tw.Add(10*tick, nil, nil)
-	if tm2 < 0 {
-		t.Errorf("%s failed: tm2 = %d, wanted >=0\n", prefix, tm2)
-	}
+	test.EXPECT_TRUE(t, tm2 >= 0, "")
 
 	ret := tw.Remove(tm2)
-	if !ret {
-		t.Errorf("%s failed: ret = false, wanted = true\n", prefix)
-	}
+	test.EXPECT_TRUE(t, ret, "")
 
 	statWanted1 := &TimeWheelStat{
 		Add:              2,
@@ -331,28 +280,22 @@ func TestTimeWheelBinaryRemoveOk4(t *testing.T) {
 		InternalRemove:   1,
 		InternalRemoveOk: 1,
 	}
-	checkStat(t, &tw.stat, statWanted1, prefix, 0)
+	test.EXPECT_EQ(t, tw.stat, *statWanted1, "")
 
 	tw.RemoveAll()
 }
 
 func TestTimeWheelStep1(t *testing.T) {
-	prefix := "TestTimeWheelStep1"
-
 	tick := int64(10)
 	start := int64(234)
 
 	tw := NewTimeWheel(3, []int{60, 60, 24}, tick, start, 1000)
 
 	tm1 := tw.Add(1*tick, nil, nil)
-	if tm1 < 0 {
-		t.Errorf("%s failed: tm = %d, wanted >=0\n", prefix, tm1)
-	}
+	test.EXPECT_TRUE(t, tm1 >= 0, "")
 
 	tm2 := tw.Add(1*tick, nil, nil)
-	if tm2 < 0 {
-		t.Errorf("%s failed: tm = %d, wanted >=0\n", prefix, tm2)
-	}
+	test.EXPECT_TRUE(t, tm2 >= 0, "")
 
 	tw.Step(start + tick)
 
@@ -366,37 +309,29 @@ func TestTimeWheelStep1(t *testing.T) {
 		Expire:           2,
 		Step:             1,
 	}
-	checkStat(t, &tw.stat, statWanted1, prefix, 0)
+	test.EXPECT_EQ(t, tw.stat, *statWanted1, "")
 
 	tw.RemoveAll()
 
 }
 
 func TestTimeWheelStep2(t *testing.T) {
-	prefix := "TestTimeWheelStep1"
-
 	tick := int64(10)
 
 	tw := NewTimeWheel(3, []int{100, 10, 3}, tick, 0, 1000)
 
 	tm1 := tw.Add(5*tick, nil, func(interface{}) {})
-	if tm1 < 0 {
-		t.Errorf("%s failed: tm = %d, wanted >=0\n", prefix, tm1)
-	}
+	test.EXPECT_TRUE(t, tm1 >= 0, "")
 
 	tw.Step(3 * tick)
 
 	tm2 := tw.Add(3*tick, nil, func(interface{}) {})
-	if tm2 < 0 {
-		t.Errorf("%s failed: tm = %d, wanted >=0\n", prefix, tm2)
-	}
+	test.EXPECT_TRUE(t, tm2 >= 0, "")
 
 	tw.Step(4 * tick)
 
 	tm3 := tw.Add(250*tick, nil, func(interface{}) {})
-	if tm3 < 0 {
-		t.Errorf("%s failed: tm = %d, wanted >=0\n", prefix, tm3)
-	}
+	test.EXPECT_TRUE(t, tm3 >= 0, "")
 
 	tw.Step(100 * tick)
 
@@ -417,13 +352,11 @@ func TestTimeWheelStep2(t *testing.T) {
 		MoveWheels:       2,
 		MoveSlot:         1,
 	}
-	checkStat(t, &tw.stat, statWanted1, prefix, 0)
+	test.EXPECT_EQ(t, tw.stat, *statWanted1, "")
 
 	tw.RemoveAll()
 
-	if tw.size != 0 {
-		t.Errorf("%s failed: tw.size = %d, wanted >=0\n", prefix, tw.size)
-	}
+	test.EXPECT_TRUE(t, tw.size >= 0, "")
 
 }
 

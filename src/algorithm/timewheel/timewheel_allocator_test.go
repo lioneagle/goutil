@@ -3,149 +3,62 @@ package timewheel
 import (
 	//"fmt"
 	"testing"
+
+	"github.com/lioneagle/goutil/src/test"
 )
 
 func TestTimeWheelAllocatorAlloc1(t *testing.T) {
-
 	allocator := NewTimeWheelAllocator(1)
-	funcName := "TestTimeWheelAllocatorAlloc1"
 
 	c := allocator.Alloc()
-	if c == -1 {
-		t.Errorf("%s: should alloc ok", funcName)
-		return
-	}
-
-	if c != 0 {
-		t.Errorf("%s: wrong id = %d, wanted = 0", funcName, c)
-		return
-	}
-
-	if allocator.freeHead != -1 {
-		t.Errorf("%s: wrong freeHead = %d, wanted = -1", funcName, allocator.freeHead)
-		return
-	}
-
-	if allocator.size != 1 {
-		t.Errorf("%s: wrong size = %d, wanted = 1", funcName, allocator.size)
-		return
-	}
+	test.ASSERT_NE(t, c, int32(-1), "should alloc ok")
+	test.ASSERT_EQ(t, c, int32(0), "wrong id")
+	test.ASSERT_EQ(t, allocator.freeHead, int32(-1), "wrong freeHead")
+	test.ASSERT_EQ(t, allocator.size, int32(1), "wrong size")
 
 	c = allocator.Alloc()
-	if c != -1 {
-		t.Errorf("%s: should alloc nok", funcName)
-		return
-	}
-
+	test.ASSERT_EQ(t, c, int32(-1), "should alloc nok")
 }
 
 func TestTimeWheelAllocatorAlloc2(t *testing.T) {
-
 	allocator := NewTimeWheelAllocator(2)
-	funcName := "TestTimeWheelAllocatorAlloc2"
 
 	c := allocator.Alloc()
-	if c == -1 {
-		t.Errorf("%s: should alloc ok", funcName)
-		return
-	}
-
-	if c != 0 {
-		t.Errorf("%s: wrong id = %d, wanted = 0", funcName, c)
-		return
-	}
-
-	if allocator.freeHead != 1 {
-		t.Errorf("%s: wrong freeHead = %d, wanted = 1", funcName, allocator.freeHead)
-		return
-	}
-
-	if allocator.size != 1 {
-		t.Errorf("%s: wrong size = %d, wanted = 1", funcName, allocator.size)
-		return
-	}
+	test.ASSERT_NE(t, c, int32(-1), "should alloc ok")
+	test.ASSERT_EQ(t, c, int32(0), "wrong id")
+	test.ASSERT_EQ(t, allocator.freeHead, int32(1), "wrong freeHead")
+	test.ASSERT_EQ(t, allocator.size, int32(1), "wrong size")
 
 	c = allocator.Alloc()
-	if c == -1 {
-		t.Errorf("%s: should alloc ok", funcName)
-		return
-	}
-
-	if c != 1 {
-		t.Errorf("%s: wrong id = %d, wanted = 1", funcName, c)
-		return
-	}
-
-	if allocator.freeHead != -1 {
-		t.Errorf("%s: wrong freeHead = %d, wanted = -1", funcName, allocator.freeHead)
-		return
-	}
-
-	if allocator.size != 2 {
-		t.Errorf("%s: wrong size = %d, wanted = 2", funcName, allocator.size)
-		return
-	}
+	test.ASSERT_NE(t, c, int32(-1), "should alloc ok")
+	test.ASSERT_EQ(t, c, int32(1), "wrong id")
+	test.ASSERT_EQ(t, allocator.freeHead, int32(-1), "wrong freeHead")
+	test.ASSERT_EQ(t, allocator.size, int32(2), "wrong size")
 
 	c = allocator.Alloc()
-	if c != -1 {
-		t.Errorf("%s: should alloc nok", funcName)
-		return
-	}
-
+	test.ASSERT_EQ(t, c, int32(-1), "should alloc nok")
 }
 
 func TestTimeWheelAllocatorFree(t *testing.T) {
 	allocator := NewTimeWheelAllocator(2)
-	funcName := "TestTimeWheelAllocatorFree"
 
 	c1 := allocator.Alloc()
-	if c1 == -1 {
-		t.Errorf("%s: should alloc ok", funcName)
-		return
-	}
+	test.ASSERT_NE(t, c1, int32(-1), "should alloc ok")
 
 	c2 := allocator.Alloc()
-	if c2 == -1 {
-		t.Errorf("%s: should alloc ok", funcName)
-		return
-	}
+	test.ASSERT_NE(t, c2, int32(-1), "should alloc ok")
 
 	allocator.Free(c1)
-
-	if allocator.size != 1 {
-		t.Errorf("%s: wrong size = %d, wanted = 1", funcName, allocator.size)
-		return
-	}
-
-	if allocator.freeHead != 0 {
-		t.Errorf("%s: wrong freeHead = %d, wanted = 0", funcName, allocator.freeHead)
-		return
-	}
+	test.ASSERT_EQ(t, allocator.size, int32(1), "wrong size")
+	test.ASSERT_EQ(t, allocator.freeHead, int32(0), "wrong freeHead")
 
 	allocator.Free(c1)
-
-	if allocator.size != 1 {
-		t.Errorf("%s: wrong size = %d, wanted = 1", funcName, allocator.size)
-		return
-	}
-
-	if allocator.freeHead != 0 {
-		t.Errorf("%s: wrong freeHead = %d, wanted = 0", funcName, allocator.freeHead)
-		return
-	}
+	test.ASSERT_EQ(t, allocator.size, int32(1), "wrong size")
+	test.ASSERT_EQ(t, allocator.freeHead, int32(0), "wrong freeHead")
 
 	allocator.Free(c2)
-
-	if allocator.size != 0 {
-		t.Errorf("%s: wrong size = %d, wanted = 0", funcName, allocator.size)
-		return
-	}
-
-	if allocator.freeHead != 0 {
-		t.Errorf("%s: wrong freeHead = %d, wanted = 0", funcName, allocator.freeHead)
-		return
-	}
-
+	test.ASSERT_EQ(t, allocator.size, int32(0), "wrong size")
+	test.ASSERT_EQ(t, allocator.freeHead, int32(0), "wrong freeHead")
 }
 
 func BenchmarkTimeWheelAllocatorAllocFree(b *testing.B) {
