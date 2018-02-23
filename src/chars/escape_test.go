@@ -2,12 +2,14 @@ package chars
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
+
+	"github.com/lioneagle/goutil/src/test"
 )
 
 func TestUnescape(t *testing.T) {
-
-	wanted := []struct {
+	testdata := []struct {
 		escaped   string
 		unescaped string
 	}{
@@ -20,17 +22,19 @@ func TestUnescape(t *testing.T) {
 		{"ac%", "ac%"},
 	}
 
-	for i, v := range wanted {
-		u := Unescape([]byte(v.escaped))
-		if bytes.Compare(u, []byte(v.unescaped)) != 0 {
-			t.Errorf("TestUnescape[%d] failed, ret = %s, wanted = %s\n", i, string(u), v.unescaped)
-		}
+	for i, v := range testdata {
+		v := v
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			u := Unescape([]byte(v.escaped))
+			test.EXPECT_EQ(t, string(u), v.unescaped, "")
+		})
 	}
 }
 
 func TestEscape(t *testing.T) {
-
-	wanted := []struct {
+	testdata := []struct {
 		name        string
 		isInCharset func(ch byte) bool
 	}{
@@ -68,11 +72,14 @@ func TestEscape(t *testing.T) {
 
 	chars := makeFullCharset()
 
-	for i, v := range wanted {
-		u := Escape(chars, v.isInCharset)
-		if !bytes.Equal(Unescape(u), chars) {
-			t.Errorf("TestEscape[%d]: %s failed\n", i, v.name)
-		}
+	for i, v := range testdata {
+		v := v
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			u := Escape(chars, v.isInCharset)
+			test.EXPECT_TRUE(t, bytes.Equal(Unescape(u), chars), "")
+		})
 	}
 }
 

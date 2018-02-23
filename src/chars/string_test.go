@@ -1,12 +1,13 @@
 package chars
 
 import (
+	"fmt"
 	"testing"
+
+	"github.com/lioneagle/goutil/src/test"
 )
 
 func TestStringsEqual(t *testing.T) {
-	funcName := "TestStringsEqual"
-
 	testdata := []struct {
 		lhs []string
 		rhs []string
@@ -21,16 +22,17 @@ func TestStringsEqual(t *testing.T) {
 	}
 
 	for i, v := range testdata {
-		ret := StringsEqual(v.lhs, v.rhs)
-		if ret != v.ret {
-			t.Errorf("%s[%d] failed, ret = %v, wanted = %v\n", funcName, i, ret, v.ret)
-		}
+		v := v
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			ret := StringsEqual(v.lhs, v.rhs)
+			test.EXPECT_EQ(t, ret, v.ret, "")
+		})
 	}
 }
 
 func TestContains(t *testing.T) {
-	funcName := "TestContains"
-
 	testdata := []struct {
 		src    string
 		filter []string
@@ -44,16 +46,17 @@ func TestContains(t *testing.T) {
 	}
 
 	for i, v := range testdata {
-		ret := Contains(v.src, v.filter)
-		if ret != v.ret {
-			t.Errorf("%s[%d] failed, ret = %v, wanted = %v\n", funcName, i, ret, v.ret)
-		}
+		v := v
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			ret := Contains(v.src, v.filter)
+			test.EXPECT_EQ(t, ret, v.ret, "")
+		})
 	}
 }
 
 func TestFilter(t *testing.T) {
-	funcName := "TestFilter"
-
 	testdata := []struct {
 		src    []string
 		filter []string
@@ -63,16 +66,17 @@ func TestFilter(t *testing.T) {
 	}
 
 	for i, v := range testdata {
-		ret := Filter(v.src, v.filter)
-		if !StringsEqual(ret, v.ret) {
-			t.Errorf("%s[%d] failed, ret = %v, wanted = %v\n", funcName, i, ret, v.ret)
-		}
+		v := v
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			ret := Filter(v.src, v.filter)
+			test.EXPECT_TRUE(t, StringsEqual(ret, v.ret), "ret = %v, wanted = %v", ret, v.ret)
+		})
 	}
 }
 
 func TestFilterReverse(t *testing.T) {
-	funcName := "TestFilterReverse"
-
 	testdata := []struct {
 		src    []string
 		filter []string
@@ -82,16 +86,17 @@ func TestFilterReverse(t *testing.T) {
 	}
 
 	for i, v := range testdata {
-		ret := FilterReverse(v.src, v.filter)
-		if !StringsEqual(ret, v.ret) {
-			t.Errorf("%s[%d] failed, ret = %v, wanted = %v\n", funcName, i, ret, v.ret)
-		}
+		v := v
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			ret := FilterReverse(v.src, v.filter)
+			test.EXPECT_TRUE(t, StringsEqual(ret, v.ret), "ret = %v, wanted = %v", ret, v.ret)
+		})
 	}
 }
 
 func TestPackSpace(t *testing.T) {
-	funcName := "TestPackSpace"
-
 	testdata := []struct {
 		src string
 		ret string
@@ -106,9 +111,12 @@ func TestPackSpace(t *testing.T) {
 	}
 
 	for i, v := range testdata {
-		ret := StringPackSpace(v.src)
-		if ret != v.ret {
-			t.Errorf("%s[%d] failed, ret = %v, wanted = %v\n", funcName, i, ret, v.ret)
-		}
+		v := v
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			ret := StringPackSpace(v.src)
+			test.EXPECT_EQ(t, ret, v.ret, "")
+		})
 	}
 }

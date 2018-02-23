@@ -2,19 +2,23 @@ package chars
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 	"unsafe"
+
+	"github.com/lioneagle/goutil/src/test"
 )
 
 func TestToLowerHex(t *testing.T) {
 	src := []byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}
 	wanted := []byte("0123456789abcdef")
 
-	for i, v := range src {
-		u := ToLowerHex(v)
-		if u != wanted[i] {
-			t.Errorf("TestToLowerHex[%d] failed, ret = %c, wanted = %c\n", i, u, wanted[i])
-		}
+	for i, _ := range src {
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			test.EXPECT_EQ(t, ToLowerHex(src[i]), wanted[i], "")
+		})
 	}
 }
 
@@ -22,16 +26,16 @@ func TestToUpper(t *testing.T) {
 	src := []byte(";[]abcdefghigklmnopqrstuvwxyz012-+")
 	wanted := []byte(";[]ABCDEFGHIGKLMNOPQRSTUVWXYZ012-+")
 
-	for i, v := range src {
-		u := ToUpper(v)
-		if u != wanted[i] {
-			t.Errorf("TestToUpper[%d] failed, ret = %c, wanted = %c\n", i, u, wanted[i])
-		}
+	for i, _ := range src {
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			test.EXPECT_EQ(t, ToUpper(src[i]), wanted[i], "")
+		})
 	}
 }
 
 func TestCompareNoCase(t *testing.T) {
-
 	testdata := []struct {
 		s1  string
 		s2  string
@@ -46,21 +50,24 @@ func TestCompareNoCase(t *testing.T) {
 	}
 
 	for i, v := range testdata {
-		u := CompareNoCase([]byte(v.s1), []byte(v.s2))
-		if u < 0 {
-			u = -1
-		} else if u > 0 {
-			u = 1
-		}
-		if u != v.ret {
-			t.Errorf("TestCompareNoCase[%d] failed, ret = %d, wanted = %d\n", i, u, v.ret)
-		}
+		v := v
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			u := CompareNoCase([]byte(v.s1), []byte(v.s2))
+			if u < 0 {
+				u = -1
+			} else if u > 0 {
+				u = 1
+			}
+
+			test.EXPECT_EQ(t, u, v.ret, "")
+		})
 	}
 }
 
 func TestEqualNoCase(t *testing.T) {
-
-	wanted := []struct {
+	testdata := []struct {
 		s1  string
 		s2  string
 		ret bool
@@ -73,11 +80,14 @@ func TestEqualNoCase(t *testing.T) {
 		{"089+=abcdefghigklmnopqrstuvwxyz123", "089+=ABCDEFGHIGKLMNOPQRSTUVWXYZ123", true},
 	}
 
-	for i, v := range wanted {
-		u := EqualNoCase([]byte(v.s1), []byte(v.s2))
-		if u != v.ret {
-			t.Errorf("TestEqualNoCase[%d] failed, ret = %v, wanted = %v\n", i, u, v.ret)
-		}
+	for i, v := range testdata {
+		v := v
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			u := EqualNoCase([]byte(v.s1), []byte(v.s2))
+			test.EXPECT_EQ(t, u, v.ret, "")
+		})
 	}
 }
 
