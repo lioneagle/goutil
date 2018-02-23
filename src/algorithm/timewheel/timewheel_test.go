@@ -2,7 +2,6 @@ package timewheel
 
 import (
 	"fmt"
-	"reflect"
 	"testing"
 	"time"
 
@@ -12,19 +11,6 @@ import (
 type record struct {
 	t1 time.Time
 	t2 time.Time
-}
-
-func checkStat(t *testing.T, stat, wanted *TimeWheelStat, prefix string, index int) {
-	lhs := reflect.ValueOf(*stat)
-	rhs := reflect.ValueOf(*wanted)
-	typeOf := lhs.Type()
-	for i := 0; i < lhs.NumField(); i++ {
-		f1 := lhs.Field(i)
-		f2 := rhs.Field(i)
-		if f1.Interface() != f2.Interface() {
-			t.Errorf("%s[%d] failed: stat.%s = %v, wanted = %v\n", prefix, index, typeOf.Field(i).Name, f1.Interface(), f2.Interface())
-		}
-	}
 }
 
 func TestTimeWheelAddOk(t *testing.T) {
