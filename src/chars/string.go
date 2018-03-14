@@ -3,6 +3,7 @@ package chars
 import (
 	"bytes"
 	"reflect"
+	"strconv"
 	"strings"
 	"unsafe"
 )
@@ -88,4 +89,8 @@ func StringToByteSlice2(str string) *[]byte {
 
 func ByteSliceToString(bytes []byte) string {
 	return *(*string)(unsafe.Pointer(&bytes))
+}
+
+func IsPrintAscii(ch byte) bool {
+	return ch < 128 && strconv.IsPrint(rune(ch))
 }
