@@ -37,6 +37,10 @@ func (this *Indent) Enter() {
 	this.EnterIndent(this.DefaultIndent)
 }
 
+func (this *Indent) SetReturnString(ret string) {
+	this.returnString = ret
+}
+
 func (this *Indent) EnterIndent(indent int) {
 	if !this.UseTab {
 		this.Stack = append(this.Stack, this.Stack[len(this.Stack)-1]+indent)
