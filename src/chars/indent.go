@@ -7,6 +7,7 @@ import (
 )
 
 type Indent struct {
+	UseTab        bool
 	DefaultIndent int
 	Stack         []int
 	returnString  string
@@ -37,7 +38,11 @@ func (this *Indent) Enter() {
 }
 
 func (this *Indent) EnterIndent(indent int) {
-	this.Stack = append(this.Stack, this.Stack[len(this.Stack)-1]+indent)
+	if !this.UseTab {
+		this.Stack = append(this.Stack, this.Stack[len(this.Stack)-1]+indent)
+	} else {
+		this.Stack = append(this.Stack, this.Stack[len(this.Stack)-1]+1)
+	}
 }
 
 func (this *Indent) Exit() {
@@ -46,8 +51,14 @@ func (this *Indent) Exit() {
 
 func (this *Indent) printIndent(w io.Writer) {
 	num := this.Stack[len(this.Stack)-1]
-	for i := 0; i < num; i++ {
-		fmt.Fprint(w, " ")
+	if this.UseTab {
+		for i := 0; i < num; i++ {
+			fmt.Fprint(w, "\t")
+		}
+	} else {
+		for i := 0; i < num; i++ {
+			fmt.Fprint(w, " ")
+		}
 	}
 }
 
