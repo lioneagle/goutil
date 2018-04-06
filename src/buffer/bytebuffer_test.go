@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/lioneagle/goutil/src/chars"
 	"github.com/lioneagle/goutil/src/test"
 )
 
@@ -141,5 +142,19 @@ func BenchmarkByteBufferWriteString(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		buf.Reset()
 		buf.WriteString(src)
+	}
+}
+
+func BenchmarkByteBufferWriteEscape(b *testing.B) {
+	b.StopTimer()
+	buf := NewByteBuffer(make([]byte, 1024*100))
+	src := []byte("1234567abc")
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		buf.Reset()
+		buf.WriteEscape(src, &chars.Charset0, chars.MASK_DIGIT)
 	}
 }

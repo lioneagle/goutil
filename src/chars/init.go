@@ -16,7 +16,7 @@ func init() {
 
 func toLower(ch byte) byte {
 	//if IsUpper(ch) {
-	if (charset0[ch] & MASK_UPPER) != 0 {
+	if (Charset0[ch] & MASK_UPPER) != 0 {
 		//return ch - 'A' + 'a'
 		return ch | 0x20
 	}
@@ -25,7 +25,7 @@ func toLower(ch byte) byte {
 
 func toUpper(ch byte) byte {
 	//if IsLower(ch) {
-	if (charset0[ch] & MASK_LOWER) != 0 {
+	if (Charset0[ch] & MASK_LOWER) != 0 {
 		//return ch - 'a' + 'A'
 		return ch & 0xDF
 	}

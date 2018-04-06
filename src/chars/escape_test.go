@@ -89,3 +89,31 @@ func makeFullCharset() (ret []byte) {
 	}
 	return ret
 }
+
+func BenchmarkEscape(b *testing.B) {
+	b.StopTimer()
+
+	src := []byte("1234567abc")
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		Escape(src, IsDigit)
+	}
+}
+
+func BenchmarkEscapeEx(b *testing.B) {
+	b.StopTimer()
+
+	src := []byte("1234567abc")
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		EscapeEx(src, &Charset0, MASK_DIGIT)
+	}
+}

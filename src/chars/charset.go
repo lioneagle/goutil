@@ -1,6 +1,6 @@
 package chars
 
-var charset0 = [256]uint32{
+var Charset0 = [256]uint32{
 	0x00206000, /* position 000 */
 	0x00206000, /* position 001 */
 	0x00206000, /* position 002 */
@@ -292,33 +292,33 @@ const (
 	MASK_URI_REG_NAME      uint32 = (0x20000000)
 )
 
-func IsDigit(ch byte) bool          { return (charset0[ch] & MASK_DIGIT) != 0 }
-func IsAlpha(ch byte) bool          { return (charset0[ch] & MASK_ALPHA) != 0 }
-func IsLower(ch byte) bool          { return (charset0[ch] & MASK_LOWER) != 0 }
-func IsUpper(ch byte) bool          { return (charset0[ch] & MASK_UPPER) != 0 }
-func IsAlphanum(ch byte) bool       { return (charset0[ch] & MASK_ALPHANUM) != 0 }
-func IsLowerHexAlpha(ch byte) bool  { return (charset0[ch] & MASK_LOWER_HEX_ALPHA) != 0 }
-func IsUpperHexAlpha(ch byte) bool  { return (charset0[ch] & MASK_UPPER_HEX_ALPHA) != 0 }
-func IsLowerHex(ch byte) bool       { return (charset0[ch] & MASK_LOWER_HEX) != 0 }
-func IsUpperHex(ch byte) bool       { return (charset0[ch] & MASK_UPPER_HEX) != 0 }
-func IsHex(ch byte) bool            { return (charset0[ch] & MASK_HEX) != 0 }
-func IsCrlfChar(ch byte) bool       { return (charset0[ch] & MASK_CRLF_CHAR) != 0 }
-func IsWspChar(ch byte) bool        { return (charset0[ch] & MASK_WSP_CHAR) != 0 }
-func IsLwsChar(ch byte) bool        { return (charset0[ch] & MASK_LWS_CHAR) != 0 }
-func IsAscii(ch byte) bool          { return (charset0[ch] & MASK_ASCII) != 0 }
-func IsUtf8N1(ch byte) bool         { return (charset0[ch] & MASK_UTF8_N1) != 0 }
-func IsUtf8N2(ch byte) bool         { return (charset0[ch] & MASK_UTF8_N2) != 0 }
-func IsUtf8N3(ch byte) bool         { return (charset0[ch] & MASK_UTF8_N3) != 0 }
-func IsUtf8N4(ch byte) bool         { return (charset0[ch] & MASK_UTF8_N4) != 0 }
-func IsUtf8N5(ch byte) bool         { return (charset0[ch] & MASK_UTF8_N5) != 0 }
-func IsUtf8N6(ch byte) bool         { return (charset0[ch] & MASK_UTF8_N6) != 0 }
-func IsUtf8Cont(ch byte) bool       { return (charset0[ch] & MASK_UTF8_CONT) != 0 }
-func IsUtf8Char(ch byte) bool       { return (charset0[ch] & MASK_UTF8_CHAR) != 0 }
-func IsHostname(ch byte) bool       { return (charset0[ch] & MASK_HOSTNAME) != 0 }
-func IsUriUnreserved(ch byte) bool  { return (charset0[ch] & MASK_URI_UNRESERVED) != 0 }
-func IsUriReserved(ch byte) bool    { return (charset0[ch] & MASK_URI_RESERVED) != 0 }
-func IsUriScheme(ch byte) bool      { return (charset0[ch] & MASK_URI_SCHEME) != 0 }
-func IsUriUric(ch byte) bool        { return (charset0[ch] & MASK_URI_URIC) != 0 }
-func IsUriUricNoSlash(ch byte) bool { return (charset0[ch] & MASK_URI_URIC_NO_SLASH) != 0 }
-func IsUriPchar(ch byte) bool       { return (charset0[ch] & MASK_URI_PCHAR) != 0 }
-func IsUriRegName(ch byte) bool     { return (charset0[ch] & MASK_URI_REG_NAME) != 0 }
+func IsDigit(ch byte) bool          { return (Charset0[ch] & MASK_DIGIT) != 0 }
+func IsAlpha(ch byte) bool          { return (Charset0[ch] & MASK_ALPHA) != 0 }
+func IsLower(ch byte) bool          { return (Charset0[ch] & MASK_LOWER) != 0 }
+func IsUpper(ch byte) bool          { return (Charset0[ch] & MASK_UPPER) != 0 }
+func IsAlphanum(ch byte) bool       { return (Charset0[ch] & MASK_ALPHANUM) != 0 }
+func IsLowerHexAlpha(ch byte) bool  { return (Charset0[ch] & MASK_LOWER_HEX_ALPHA) != 0 }
+func IsUpperHexAlpha(ch byte) bool  { return (Charset0[ch] & MASK_UPPER_HEX_ALPHA) != 0 }
+func IsLowerHex(ch byte) bool       { return (Charset0[ch] & MASK_LOWER_HEX) != 0 }
+func IsUpperHex(ch byte) bool       { return (Charset0[ch] & MASK_UPPER_HEX) != 0 }
+func IsHex(ch byte) bool            { return (Charset0[ch] & MASK_HEX) != 0 }
+func IsCrlfChar(ch byte) bool       { return (Charset0[ch] & MASK_CRLF_CHAR) != 0 }
+func IsWspChar(ch byte) bool        { return (Charset0[ch] & MASK_WSP_CHAR) != 0 }
+func IsLwsChar(ch byte) bool        { return (Charset0[ch] & MASK_LWS_CHAR) != 0 }
+func IsAscii(ch byte) bool          { return (Charset0[ch] & MASK_ASCII) != 0 }
+func IsUtf8N1(ch byte) bool         { return (Charset0[ch] & MASK_UTF8_N1) != 0 }
+func IsUtf8N2(ch byte) bool         { return (Charset0[ch] & MASK_UTF8_N2) != 0 }
+func IsUtf8N3(ch byte) bool         { return (Charset0[ch] & MASK_UTF8_N3) != 0 }
+func IsUtf8N4(ch byte) bool         { return (Charset0[ch] & MASK_UTF8_N4) != 0 }
+func IsUtf8N5(ch byte) bool         { return (Charset0[ch] & MASK_UTF8_N5) != 0 }
+func IsUtf8N6(ch byte) bool         { return (Charset0[ch] & MASK_UTF8_N6) != 0 }
+func IsUtf8Cont(ch byte) bool       { return (Charset0[ch] & MASK_UTF8_CONT) != 0 }
+func IsUtf8Char(ch byte) bool       { return (Charset0[ch] & MASK_UTF8_CHAR) != 0 }
+func IsHostname(ch byte) bool       { return (Charset0[ch] & MASK_HOSTNAME) != 0 }
+func IsUriUnreserved(ch byte) bool  { return (Charset0[ch] & MASK_URI_UNRESERVED) != 0 }
+func IsUriReserved(ch byte) bool    { return (Charset0[ch] & MASK_URI_RESERVED) != 0 }
+func IsUriScheme(ch byte) bool      { return (Charset0[ch] & MASK_URI_SCHEME) != 0 }
+func IsUriUric(ch byte) bool        { return (Charset0[ch] & MASK_URI_URIC) != 0 }
+func IsUriUricNoSlash(ch byte) bool { return (Charset0[ch] & MASK_URI_URIC_NO_SLASH) != 0 }
+func IsUriPchar(ch byte) bool       { return (Charset0[ch] & MASK_URI_PCHAR) != 0 }
+func IsUriRegName(ch byte) bool     { return (Charset0[ch] & MASK_URI_REG_NAME) != 0 }

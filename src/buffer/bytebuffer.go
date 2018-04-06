@@ -45,6 +45,13 @@ func (this *ByteBuffer) WriteByte(val byte) error {
 	return nil
 }
 
+func (this *ByteBuffer) WriteByteN(val byte, num int) error {
+	for i := 0; i < num; i++ {
+		this.data = append(this.data, val)
+	}
+	return nil
+}
+
 func (this *ByteBuffer) Write(val []byte) (int, error) {
 	this.data = append(this.data, val...)
 	return len(val), nil
@@ -52,6 +59,20 @@ func (this *ByteBuffer) Write(val []byte) (int, error) {
 
 func (this *ByteBuffer) WriteString(val string) (int, error) {
 	this.data = append(this.data, val...)
+	return len(val), nil
+}
+
+func (this *ByteBuffer) WriteEscape(val []byte, charset *[256]uint32, mask uint32) (int, error) {
+	charset1 := charset
+	for _, v := range val {
+		if (charset1[v] & mask) != 0 {
+			this.WriteByte(v)
+		} else {
+			this.WriteByte('%')
+			this.WriteByte(chars.ToUpperHex(v >> 4))
+			this.WriteByte(chars.ToUpperHex(v))
+		}
+	}
 	return len(val), nil
 }
 

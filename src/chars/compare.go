@@ -22,12 +22,12 @@ func ToLower(ch byte) byte {
 
 func HexToByte(ch byte) byte {
 	//if IsDigit(ch) {
-	if (charset0[ch] & MASK_DIGIT) != 0 {
+	if (Charset0[ch] & MASK_DIGIT) != 0 {
 		//return ch - '0'
 		return ch & 0x0F
 	}
 	//if IsLowerHexAlpha(ch) {
-	if (charset0[ch] & MASK_LOWER_HEX_ALPHA) != 0 {
+	if (Charset0[ch] & MASK_LOWER_HEX_ALPHA) != 0 {
 		return ch - 'a' + 10
 	}
 	return ch - 'A' + 10

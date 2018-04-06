@@ -91,7 +91,7 @@ func TestEqualNoCase(t *testing.T) {
 	}
 }
 
-func BenchmarkEqualNoCase_Equal1(b *testing.B) {
+func BenchmarkEqualNoCase_Equal_1(b *testing.B) {
 	b.StopTimer()
 	var s1 = []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	var s2 = []byte("abcdefghijklmnopqrstuvwxyz")
@@ -104,7 +104,7 @@ func BenchmarkEqualNoCase_Equal1(b *testing.B) {
 	}
 }
 
-func BenchmarkEqualNoCase_Equal2(b *testing.B) {
+func BenchmarkEqualNoCase_Equal_2(b *testing.B) {
 	b.StopTimer()
 	s1 := []byte("abcdefghijklmnopqrstuvwxyz")
 	s2 := []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
@@ -118,7 +118,7 @@ func BenchmarkEqualNoCase_Equal2(b *testing.B) {
 	}
 }
 
-func BenchmarkEqualNoCase_Equal3(b *testing.B) {
+func BenchmarkEqualNoCase_Equal_3(b *testing.B) {
 	b.StopTimer()
 	s1 := []byte("abcdefghijklmnopqrstuvwxyz")
 	s2 := []byte("abcdefghijklmnopqrstuvwxyz")
@@ -132,7 +132,7 @@ func BenchmarkEqualNoCase_Equal3(b *testing.B) {
 	}
 }
 
-func BenchmarkEqualNoCase_Equal4(b *testing.B) {
+func BenchmarkEqualNoCase_Equal_4(b *testing.B) {
 	b.StopTimer()
 	s1 := []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	s2 := []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
@@ -146,7 +146,7 @@ func BenchmarkEqualNoCase_Equal4(b *testing.B) {
 	}
 }
 
-func BenchmarkEqualNoCase_Equal5(b *testing.B) {
+func BenchmarkEqualNoCase_Equal_5(b *testing.B) {
 	b.StopTimer()
 	s1 := []byte("abcdefghijklMnopqrstuvwxyz")
 	s2 := []byte("abcdefghijklmnopqrstuvwxyz")
@@ -160,7 +160,7 @@ func BenchmarkEqualNoCase_Equal5(b *testing.B) {
 	}
 }
 
-func BenchmarkEqualNoCase1_Equal1(b *testing.B) {
+func BenchmarkEqualNoCase1_Equal_1(b *testing.B) {
 	b.StopTimer()
 	var s1 = []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	var s2 = []byte("abcdefghijklmnopqrstuvwxyz")
@@ -173,7 +173,7 @@ func BenchmarkEqualNoCase1_Equal1(b *testing.B) {
 	}
 }
 
-func BenchmarkEqualNoCase1_Equal2(b *testing.B) {
+func BenchmarkEqualNoCase1_Equal_2(b *testing.B) {
 	b.StopTimer()
 	s1 := []byte("abcdefghijklmnopqrstuvwxyz")
 	s2 := []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
@@ -187,7 +187,7 @@ func BenchmarkEqualNoCase1_Equal2(b *testing.B) {
 	}
 }
 
-func BenchmarkEqualNoCase1_Equal3(b *testing.B) {
+func BenchmarkEqualNoCase1_Equal_3(b *testing.B) {
 	b.StopTimer()
 	s1 := []byte("abcdefghijklmnopqrstuvwxyz")
 	s2 := []byte("abcdefghijklmnopqrstuvwxyz")
@@ -201,7 +201,7 @@ func BenchmarkEqualNoCase1_Equal3(b *testing.B) {
 	}
 }
 
-func BenchmarkEqualNoCase1_Equal4(b *testing.B) {
+func BenchmarkEqualNoCase1_Equal_4(b *testing.B) {
 	b.StopTimer()
 	s1 := []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	s2 := []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZ")

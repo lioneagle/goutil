@@ -54,3 +54,42 @@ func NeedEscape(src []byte, inCharset IsInCharset) bool {
 	}
 	return false
 }
+
+func EscapeEx(src []byte, charset *[256]uint32, mask uint32) (dst []byte) {
+	if !NeedEscapeEx(src, charset, mask) {
+		return src
+	}
+
+	charset1 := charset
+
+	for _, v := range src {
+		if (charset1[v] & mask) != 0 {
+			dst = append(dst, v)
+		} else {
+			dst = append(dst, '%', ToUpperHex(v>>4), ToUpperHex(v))
+		}
+	}
+
+	return dst
+}
+
+func NeedEscapeEx(src []byte, charset *[256]uint32, mask uint32) bool {
+	charset1 := charset
+	for _, v := range src {
+		if (charset1[v] & mask) == 0 {
+			return true
+		}
+	}
+	return false
+}
+
+func NeedEscapeNum(src []byte, charset *[256]uint32, mask uint32) int {
+	charset1 := charset
+	num := 0
+	for _, v := range src {
+		if (charset1[v] & mask) == 0 {
+			num++
+		}
+	}
+	return num
+}
