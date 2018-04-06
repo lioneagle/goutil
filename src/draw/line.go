@@ -5,7 +5,7 @@ type LineGraphic struct {
 	to     Point
 	text   *Text
 	style  LineStyle
-	parent Graphic
+	parent IGraphic
 }
 
 type LineType uint32
@@ -21,22 +21,22 @@ type ArrowStyle struct {
 	inverseDirection bool
 }
 
-func (this *LineGraphic) Draw(canvas Canvas) error {
+func (this *LineGraphic) Draw(canvas ICanvas) error {
 	return nil
 }
 
-func (this *LineGraphic) Add(child Graphic) error {
+func (this *LineGraphic) Add(child IGraphic) error {
 	return nil
 }
 
-func (this *LineGraphic) Remove(child Graphic) error {
+func (this *LineGraphic) Remove(child IGraphic) error {
 	return nil
 }
 
-func (this *LineGraphic) Parent() Graphic {
+func (this *LineGraphic) Parent() IGraphic {
 	return this.parent
 }
 
-func (this *LineGraphic) Level(child Graphic) int {
+func (this *LineGraphic) Level(child IGraphic) int {
 	return this.style.level
 }

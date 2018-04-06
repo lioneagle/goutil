@@ -1,5 +1,5 @@
 package draw
 
-type Brush interface {
+type IBrush interface {
 	Dispose()
 }

@@ -6,7 +6,7 @@ import (
 )
 
 type BrushWin interface {
-	draw.Brush
+	draw.IBrush
 	handle() win.HBRUSH
 	logbrush() *win.LOGBRUSH
 }

@@ -25,7 +25,7 @@ func NewBitmap(size draw.Size) (bmp *BitmapWin, err error) {
 	return bmp, nil
 }
 
-func (this *BitmapWin) BeginPaint(canvas draw.Canvas) error {
+func (this *BitmapWin) BeginPaint(canvas draw.ICanvas) error {
 	if this.hBmp == 0 {
 		return draw.NewError("hBmp is invalid")
 	}
@@ -58,7 +58,7 @@ func (this *BitmapWin) Size() draw.Size {
 	return this.size
 }
 
-func (this *BitmapWin) Draw(canvas draw.Canvas) error {
+func (this *BitmapWin) Draw(canvas draw.ICanvas) error {
 	return nil
 }
 

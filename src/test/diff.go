@@ -1,12 +1,11 @@
 package test
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"reflect"
 	"runtime"
-
-	"github.com/lioneagle/goutil/src/buffer"
 )
 
 type diffWriter struct {
@@ -15,7 +14,7 @@ type diffWriter struct {
 }
 
 func DiffEx(label string, actual, wanted interface{}) (bool, string) {
-	buf := buffer.NewByteBuffer(nil)
+	buf := bytes.NewBuffer(nil)
 	w := &diffWriter{writer: buf, label: label}
 	ok := w.diff(reflect.ValueOf(actual), reflect.ValueOf(wanted))
 	return ok, buf.String()

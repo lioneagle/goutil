@@ -1,9 +1,9 @@
 package draw
 
-type Graphic interface {
-	Draw(canvas Canvas) error
-	Add(child Graphic) error
-	Remove(child Graphic) error
-	Parent() Graphic
+type IGraphic interface {
+	Draw(canvas ICanvas) error
+	Add(child IGraphic) error
+	Remove(child IGraphic) error
+	Parent() IGraphic
 	Level() int
 }

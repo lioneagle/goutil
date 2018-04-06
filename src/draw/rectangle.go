@@ -3,8 +3,8 @@ package draw
 type RectangleGraphic struct {
 	rect   Rectangle
 	Style  RectangStyle
-	childs []Graphic
-	parent Graphic
+	childs []IGraphic
+	parent IGraphic
 	text   *Text
 }
 
@@ -17,22 +17,22 @@ type RectangStyle struct {
 	BorderWidth int
 }
 
-func (this *RectangleGraphic) Draw(canvas Canvas) error {
+func (this *RectangleGraphic) Draw(canvas ICanvas) error {
 	return nil
 }
 
-func (this *RectangleGraphic) Add(child Graphic) error {
+func (this *RectangleGraphic) Add(child IGraphic) error {
 	return nil
 }
 
-func (this *RectangleGraphic) Remove(child Graphic) error {
+func (this *RectangleGraphic) Remove(child IGraphic) error {
 	return nil
 }
 
-func (this *RectangleGraphic) Parent() Graphic {
+func (this *RectangleGraphic) Parent() IGraphic {
 	return this.parent
 }
 
-func (this *RectangleGraphic) Level(child Graphic) int {
+func (this *RectangleGraphic) Level(child IGraphic) int {
 	return this.Style.Level
 }

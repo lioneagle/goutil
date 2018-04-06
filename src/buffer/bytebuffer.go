@@ -55,11 +55,19 @@ func (this *ByteBuffer) WriteString(val string) (int, error) {
 	return len(val), nil
 }
 
-func (this *ByteBuffer) Writef(format string, args ...interface{}) {
+func (this *ByteBuffer) Print(args ...interface{}) {
+	fmt.Fprint(this, args...)
+}
+
+func (this *ByteBuffer) Printf(format string, args ...interface{}) {
 	fmt.Fprintf(this, format, args...)
 }
 
-func (this *ByteBuffer) Writeln(format string, args ...interface{}) {
+func (this *ByteBuffer) Println(args ...interface{}) {
+	fmt.Fprintln(this, args...)
+}
+
+func (this *ByteBuffer) Printfln(format string, args ...interface{}) {
 	fmt.Fprintf(this, format, args...)
 	fmt.Fprintln(this)
 }

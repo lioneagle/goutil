@@ -1,13 +1,12 @@
 package test
 
 import (
+	"bytes"
 	"fmt"
 	"path/filepath"
 	"reflect"
 	"runtime"
 	"testing"
-
-	"github.com/lioneagle/goutil/src/buffer"
 )
 
 func TestGroup(t *testing.T, testdata interface{}, fn func(interface{}) interface{}) (bool, string) {
@@ -31,7 +30,7 @@ func TestGroup(t *testing.T, testdata interface{}, fn func(interface{}) interfac
 	fn1 := reflect.ValueOf(fn)
 
 	ret := true
-	buf := buffer.NewByteBuffer(nil)
+	buf := bytes.NewBuffer(nil)
 
 	for i := 0; i < n; i++ {
 		val1 := valueOfTestData.Index(i)

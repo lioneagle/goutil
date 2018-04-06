@@ -34,9 +34,9 @@ func TestBytesBufferWrite(t *testing.T) {
 	}
 }
 
-func TestBytesBufferWritef(t *testing.T) {
+func TestBytesBufferPrintf(t *testing.T) {
 	buf := NewByteBuffer(nil)
-	buf.Writef("abc_%d", 101)
+	buf.Printf("abc_%d", 101)
 	wanted := "abc_101"
 
 	str := buf.String()
@@ -44,11 +44,11 @@ func TestBytesBufferWritef(t *testing.T) {
 	test.EXPECT_EQ(t, str, wanted, "")
 }
 
-func TestWriterWriteln(t *testing.T) {
+func TestWriterPrintfln(t *testing.T) {
 	buf := NewByteBuffer(nil)
 	buf.WriteByte(';')
 	buf.WriteString("cde")
-	buf.Writeln("abc_%d", 101)
+	buf.Printfln("abc_%d", 101)
 	wanted := ";cdeabc_101" + fmt.Sprintln()
 
 	str := buf.String()

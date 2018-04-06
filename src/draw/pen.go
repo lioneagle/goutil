@@ -37,7 +37,7 @@ type PenStyle struct {
 	JoinStyle byte
 }
 
-type Pen interface {
+type IPen interface {
 	Dispose()
 	Width() int
 	Style() PenStyle

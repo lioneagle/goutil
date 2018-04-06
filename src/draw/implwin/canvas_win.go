@@ -67,7 +67,7 @@ func (this *CanvasWin) Dispose() {
 	}
 }
 
-func (this *CanvasWin) DrawLine(pen draw.Pen, from, to draw.Point) error {
+func (this *CanvasWin) DrawLine(pen draw.IPen, from, to draw.Point) error {
 	if !win.MoveToEx(this.hdc, int32(from.X), int32(from.Y), nil) {
 		return draw.NewError("MoveToEx failed")
 	}
@@ -80,23 +80,23 @@ func (this *CanvasWin) DrawLine(pen draw.Pen, from, to draw.Point) error {
 	})
 }
 
-func (this *CanvasWin) DrawImage(image draw.Image, location draw.Point) error {
+func (this *CanvasWin) DrawImage(image draw.IImage, location draw.Point) error {
 	return nil
 }
 
-func (this *CanvasWin) PaintImage(image draw.Image, f func() error) error {
+func (this *CanvasWin) PaintImage(image draw.IImage, f func() error) error {
 	return nil
 }
 
-func (this *CanvasWin) DrawRectangle(pen draw.Pen, rect draw.Rectangle) error {
+func (this *CanvasWin) DrawRectangle(pen draw.IPen, rect draw.Rectangle) error {
 	return this.drawRectangle(NullBrushWin(), pen, rect, 0)
 }
 
-func (this *CanvasWin) FillRectangle(brush draw.Brush, rect draw.Rectangle) error {
+func (this *CanvasWin) FillRectangle(brush draw.IBrush, rect draw.Rectangle) error {
 	return this.drawRectangle(brush, NullPenWin(), rect, 1)
 }
 
-func (this *CanvasWin) drawRectangle(brush draw.Brush, pen draw.Pen, rect draw.Rectangle, sizeCorrection int) error {
+func (this *CanvasWin) drawRectangle(brush draw.IBrush, pen draw.IPen, rect draw.Rectangle, sizeCorrection int) error {
 	win_pen, _ := pen.(PenWin)
 	win_brush, _ := brush.(BrushWin)
 	return this.withBrushAndPen(win_brush, win_pen, func() error {
@@ -112,15 +112,15 @@ func (this *CanvasWin) drawRectangle(brush draw.Brush, pen draw.Pen, rect draw.R
 	})
 }
 
-func (this *CanvasWin) DrawEllipse(pen draw.Pen, rect draw.Rectangle) error {
+func (this *CanvasWin) DrawEllipse(pen draw.IPen, rect draw.Rectangle) error {
 	return this.drawEllipse(NullBrushWin(), pen, rect, 0)
 }
 
-func (this *CanvasWin) FillEllipse(brush draw.Brush, rect draw.Rectangle) error {
+func (this *CanvasWin) FillEllipse(brush draw.IBrush, rect draw.Rectangle) error {
 	return this.drawEllipse(brush, NullPenWin(), rect, 1)
 }
 
-func (this *CanvasWin) drawEllipse(brush draw.Brush, pen draw.Pen, rect draw.Rectangle, sizeCorrection int) error {
+func (this *CanvasWin) drawEllipse(brush draw.IBrush, pen draw.IPen, rect draw.Rectangle, sizeCorrection int) error {
 	win_pen, _ := pen.(PenWin)
 	win_brush, _ := brush.(BrushWin)
 	return this.withBrushAndPen(win_brush, win_pen, func() error {
@@ -136,11 +136,11 @@ func (this *CanvasWin) drawEllipse(brush draw.Brush, pen draw.Pen, rect draw.Rec
 	})
 }
 
-func (this *CanvasWin) DrawCircle(pen draw.Pen, center draw.Point, radius int) error {
+func (this *CanvasWin) DrawCircle(pen draw.IPen, center draw.Point, radius int) error {
 	return this.drawEllipse(NullBrushWin(), pen, draw.Rectangle{center.X - radius, center.Y - radius, 2 * radius, 2 * radius}, 0)
 }
 
-func (this *CanvasWin) FillCircle(brush draw.Brush, center draw.Point, radius int) error {
+func (this *CanvasWin) FillCircle(brush draw.IBrush, center draw.Point, radius int) error {
 	return this.drawEllipse(brush, NullPenWin(), draw.Rectangle{center.X - radius, center.Y - radius, 2 * radius, 2 * radius}, 1)
 }
 

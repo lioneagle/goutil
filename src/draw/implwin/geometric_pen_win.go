@@ -8,7 +8,7 @@ import (
 type GeometricPenWin struct {
 	hPen  win.HPEN
 	style draw.PenStyle
-	brush draw.Brush
+	brush draw.IBrush
 	width int
 }
 
@@ -51,6 +51,6 @@ func (this *GeometricPenWin) Width() int {
 	return this.width
 }
 
-func (this *GeometricPenWin) Brush() draw.Brush {
+func (this *GeometricPenWin) Brush() draw.IBrush {
 	return this.brush
 }

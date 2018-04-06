@@ -3,14 +3,13 @@ package chars
 import (
 	"fmt"
 	"io"
-	"runtime"
 )
 
 type Indent struct {
 	UseTab        bool
 	DefaultIndent int
 	Stack         []int
-	returnString  string
+	returns       Return
 }
 
 func NewIndent(initIndent, defaultIndent int) *Indent {
@@ -23,14 +22,7 @@ func (this *Indent) Init(initIndent, defaultIndent int) {
 	this.DefaultIndent = defaultIndent
 	this.Stack = nil
 	this.Stack = append(this.Stack, initIndent)
-
-	if runtime.GOOS == "windows" {
-		this.returnString = "\r\n"
-	} else if runtime.GOOS == "windows" {
-		this.returnString = "\r"
-	} else {
-		this.returnString = "\n"
-	}
+	this.returns.Init()
 }
 
 func (this *Indent) Enter() {
@@ -38,7 +30,7 @@ func (this *Indent) Enter() {
 }
 
 func (this *Indent) SetReturnString(ret string) {
-	this.returnString = ret
+	this.returns.SetReturnString(ret)
 }
 
 func (this *Indent) EnterIndent(indent int) {
@@ -93,5 +85,5 @@ func (this *Indent) Fprintfln(w io.Writer, format string, args ...interface{}) {
 }
 
 func (this *Indent) PrintReturn(w io.Writer) {
-	fmt.Fprint(w, this.returnString)
+	fmt.Fprint(w, this.returns.returnString)
 }

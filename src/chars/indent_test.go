@@ -1,10 +1,10 @@
 package chars
 
 import (
+	"bytes"
 	"fmt"
 	"testing"
 
-	"github.com/lioneagle/goutil/src/buffer"
 	"github.com/lioneagle/goutil/src/test"
 )
 
@@ -32,8 +32,8 @@ func TestIndent(t *testing.T) {
 				indent.Exit()
 			}
 
-			buf := buffer.NewByteBuffer(nil)
-			indent.Print(buf)
+			buf := bytes.NewBuffer(nil)
+			indent.Fprint(buf)
 
 			test.EXPECT_EQ(t, buf.String(), v.dest, "")
 		})

@@ -6,7 +6,7 @@ import (
 )
 
 type PenWin interface {
-	draw.Pen
+	draw.IPen
 	handle() win.HPEN
 }
 
