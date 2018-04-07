@@ -117,3 +117,17 @@ func BenchmarkEscapeEx(b *testing.B) {
 		EscapeEx(src, &Charset0, MASK_DIGIT)
 	}
 }
+
+func BenchmarkUnescape(b *testing.B) {
+	b.StopTimer()
+
+	src := []byte("1234567%31%32%33")
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		Unescape(src)
+	}
+}

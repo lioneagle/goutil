@@ -15,7 +15,7 @@ func Unescape(src []byte) (dst []byte) {
 
 	for i := 0; i < len1; {
 		if (src[i] == '%') && ((i + 2) < len1) && IsHex(src[i+1]) && IsHex(src[i+2]) {
-			dst = append(dst, unescapeToByte(src[i:]))
+			dst = append(dst, UnescapeToByteEx(src[i+1], src[i+2]))
 			i += 3
 		} else {
 			dst = append(dst, src[i])
@@ -26,8 +26,12 @@ func Unescape(src []byte) (dst []byte) {
 	return dst
 }
 
-func unescapeToByte(src []byte) byte {
+func UnescapeToByte(src []byte) byte {
 	return HexToByte(src[1])<<4 | HexToByte(src[2])
+}
+
+func UnescapeToByteEx(v1, v2 byte) byte {
+	return HexToByte(v1)<<4 | HexToByte(v2)
 }
 
 func Escape(src []byte, inCharset IsInCharset) (dst []byte) {
