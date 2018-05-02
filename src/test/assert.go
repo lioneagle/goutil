@@ -120,7 +120,7 @@ func EXPECT_NE(t *testing.T, actual, wanted interface{}, format string, args ...
 
 	if equal {
 		_, file, line, _ := runtime.Caller(1)
-		t.Errorf("%s:%d\nshould not be equal", filepath.Base(file), line)
+		t.Errorf("%s:%d\nshould not be equal\n%s", filepath.Base(file), line, fmt.Sprintf(format, args...))
 	}
 }
 
@@ -129,7 +129,7 @@ func ASSERT_NE(t *testing.T, actual, wanted interface{}, format string, args ...
 
 	if equal {
 		_, file, line, _ := runtime.Caller(1)
-		t.Errorf("%s:%d\nshould not be equal", filepath.Base(file), line)
+		t.Errorf("%s:%d\nshould not be equal\n%s", filepath.Base(file), line, fmt.Sprintf(format, args...))
 		t.FailNow()
 	}
 }

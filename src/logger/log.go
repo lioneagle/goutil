@@ -71,6 +71,34 @@ func (this *Logger) SetStackTraceLevel(level Level) {
 	this.stackTraceLevel = level
 }
 
+func (this *Logger) ShowShortFileName() {
+	this.showShortFile = true
+}
+
+func (this *Logger) SetShortFileNameDepth(depth int) {
+	this.shortFileNameDepth = depth
+}
+
+func (this *Logger) ShowFullFileName() {
+	this.showShortFile = false
+}
+
+func (this *Logger) ShowFuncName() {
+	this.showFuncName = true
+}
+
+func (this *Logger) HideFuncName() {
+	this.showFuncName = false
+}
+
+func (this *Logger) ShowPackage() {
+	this.showPackage = true
+}
+
+func (this *Logger) HidePackage() {
+	this.showPackage = false
+}
+
 func (this *Logger) log(level Level, msg string, args ...interface{}) {
 	if level > this.level {
 		return
@@ -254,4 +282,32 @@ func SetLevel(level Level) {
 
 func SetStackTraceLevel(level Level) {
 	getDefaultLogger().SetStackTraceLevel(level)
+}
+
+func ShowShortFileName() {
+	getDefaultLogger().ShowShortFileName()
+}
+
+func SetShortFileNameDepth(depth int) {
+	getDefaultLogger().SetShortFileNameDepth(depth)
+}
+
+func ShowFullFileName() {
+	getDefaultLogger().ShowFullFileName()
+}
+
+func ShowFuncName() {
+	getDefaultLogger().ShowFuncName()
+}
+
+func HideFuncName() {
+	getDefaultLogger().HideFuncName()
+}
+
+func ShowPackage() {
+	getDefaultLogger().ShowPackage()
+}
+
+func HidePackage() {
+	getDefaultLogger().HidePackage()
 }

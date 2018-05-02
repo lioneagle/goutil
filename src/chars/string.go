@@ -8,6 +8,26 @@ import (
 	"unsafe"
 )
 
+func Exists(src []string, name string) bool {
+	for i := 0; i < len(src); i++ {
+		if name == src[i] {
+			return true
+		}
+	}
+	return false
+}
+
+func Remove(src []string, name string) []string {
+	for i := 0; i < len(src); i++ {
+		if name == src[i] {
+			src[i] = src[len(src)-1]
+			src = src[:len(src)-1]
+			break
+		}
+	}
+	return src
+}
+
 func Filter(src []string, filter []string) []string {
 	var ret []string
 
