@@ -81,16 +81,17 @@ func (this *diffWriter) diff(actual, wanted reflect.Value) bool {
 		}
 	case reflect.Array:
 		//fmt.Println("enter Array")
+		ret := true
 		n := actual.Len()
 		for i := 0; i < n; i++ {
-			if !this.reLabel(fmt.Sprintf("[%d]", i)).diff(actual.Index(i), wanted.Index(i)) {
-				//return false
+			if !this.reLabel(fmt.Sprintf("[%d].", i)).diff(actual.Index(i), wanted.Index(i)) {
+				ret = false
 			}
 		}
+		return ret
 	case reflect.Chan:
 		//fmt.Println("enter Chan")
 		if a, b := actual.Pointer(), wanted.Pointer(); a != b {
-			//this.printf("Actual: 0x%x, Wanted: 0x%x\n", a, b)
 			this.print(a, b)
 			return false
 		}
@@ -123,7 +124,8 @@ func (this *diffWriter) diff(actual, wanted reflect.Value) bool {
 					}
 				}
 
-				this.printf("actual = %v, wanted = %v\n", s1, s2)
+				//this.printf("actual = %v, wanted = %v\n", s1, s2)
+				this.print(s1, s2)
 
 				return false
 			}
@@ -137,7 +139,6 @@ func (this *diffWriter) diff(actual, wanted reflect.Value) bool {
 		//fmt.Println("enter Ptr")
 		switch {
 		case actual.IsNil() && !wanted.IsNil():
-			//this.printf("Actual: nil, Wanted: %v\n", wanted)
 			this.print(nil, wanted)
 			return false
 		case !actual.IsNil() && wanted.IsNil():
@@ -153,14 +154,23 @@ func (this *diffWriter) diff(actual, wanted reflect.Value) bool {
 		len1 := actual.Len()
 		len2 := wanted.Len()
 		if len1 != len2 {
-			this.printf("actual: len = %v, wanted: len = %v\n", len1, len2)
+			if (!actual.IsNil() && actual.Index(0).Kind() == reflect.Uint8) ||
+				(!wanted.IsNil() && wanted.Index(0).Kind() == reflect.Uint8) {
+				this.printf("actual: %v(%q), wanted: %v(%q)\n", actual, actual, wanted, wanted)
+			} else {
+				this.printf("actual: len = %v, wanted: len = %v\n", len1, len2)
+			}
 			return false
 		}
+
+		ret := true
 		for i := 0; i < len1; i++ {
-			if !this.reLabel(fmt.Sprintf("[%d]", i)).diff(actual.Index(i), wanted.Index(i)) {
-				//return false
+			//fmt.Printf("actual.Index(%d) = %#v, wanted.Index(%d) = %#v\n", i, actual.Index(i), i, wanted.Index(i))
+			if !this.reLabel(fmt.Sprintf("[%d].", i)).diff(actual.Index(i), wanted.Index(i)) {
+				ret = false
 			}
 		}
+		return ret
 	case reflect.Struct:
 		//fmt.Println("enter Struct")
 		ret := true
@@ -175,9 +185,17 @@ func (this *diffWriter) diff(actual, wanted reflect.Value) bool {
 		}
 		return ret
 
+	case reflect.Func:
+		if actual.Addr().Elem().Pointer() == wanted.Addr().Elem().Pointer() {
+			return true
+		}
+		this.print(actual.Addr().Elem(), wanted.Addr().Elem())
+		return false
+
 	default:
-		fmt.Println("enter Default")
+		//fmt.Println("enter Default, typeOfActual.Kind() =", typeOfActual.Kind())
 		if actual != wanted {
+			this.print(actual, wanted)
 			return false
 		}
 	}
