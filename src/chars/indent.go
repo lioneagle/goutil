@@ -80,7 +80,7 @@ func (this *Indent) Fprintf(w io.Writer, format string, args ...interface{}) {
 func (this *Indent) Fprintfln(w io.Writer, format string, args ...interface{}) {
 	this.printIndent(w)
 	fmt.Fprintf(w, format, args...)
-	fmt.Fprint(w)
+	//fmt.Fprint(w)
 	this.PrintReturn(w)
 }
 
