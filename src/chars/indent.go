@@ -46,6 +46,10 @@ func (this *Indent) Exit() {
 }
 
 func (this *Indent) printIndent(w io.Writer) {
+	if len(this.Stack) <= 0 {
+		return
+	}
+
 	num := this.Stack[len(this.Stack)-1]
 	if this.UseTab {
 		for i := 0; i < num; i++ {
