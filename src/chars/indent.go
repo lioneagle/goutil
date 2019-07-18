@@ -5,6 +5,13 @@ import (
 	"io"
 )
 
+func PrintIndent(w io.Writer, indent int) {
+	if indent <= 0 {
+		return
+	}
+	fmt.Fprintf(w, fmt.Sprintf("%%%ds", indent), "")
+}
+
 type Indent struct {
 	UseTab        bool
 	DefaultIndent int
@@ -34,14 +41,25 @@ func (this *Indent) SetReturnString(ret string) {
 }
 
 func (this *Indent) EnterIndent(indent int) {
-	if !this.UseTab {
-		this.Stack = append(this.Stack, this.Stack[len(this.Stack)-1]+indent)
+	if len(this.Stack) == 0 {
+		if !this.UseTab {
+			this.Stack = append(this.Stack, indent)
+		} else {
+			this.Stack = append(this.Stack, 1)
+		}
 	} else {
-		this.Stack = append(this.Stack, this.Stack[len(this.Stack)-1]+1)
+		if !this.UseTab {
+			this.Stack = append(this.Stack, this.Stack[len(this.Stack)-1]+indent)
+		} else {
+			this.Stack = append(this.Stack, this.Stack[len(this.Stack)-1]+1)
+		}
 	}
 }
 
 func (this *Indent) Exit() {
+	if len(this.Stack) == 0 {
+		return
+	}
 	this.Stack = this.Stack[:len(this.Stack)-1]
 }
 
