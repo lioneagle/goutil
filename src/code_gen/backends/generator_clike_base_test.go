@@ -157,3 +157,133 @@ func TestCGeneratorGenStruct(t *testing.T) {
 
 	test.EXPECT_TRUE(t, file.FileEqual(standard_file, output_file), "file "+filepath.Base(standard_file)+" not equal")
 }
+
+func TestCGeneratorGenSingleChoice(t *testing.T) {
+	standard_file, output_file := test.GenTestFileNames("../test_data/", "test_standard", "test_output", "clike_genertator_gen_if.c")
+
+	outputFile, err := os.Create(output_file)
+	if err != nil {
+		logger.Error("cannot open file %s", output_file)
+		return
+	}
+	defer outputFile.Close()
+
+	config := NewCConfig()
+	generator := NewCLikeGeneratorBase(outputFile, config)
+
+	choice := model.NewSingleChoice()
+	choice.SetCondition("i < 100")
+	choice.SetComment("generate if, left brace at next line")
+	choice.SetCodeTrue(model.NewSentence("x += 5;"))
+	choice.Accept(generator)
+
+	choice.SetCodeFalse(model.NewSentence("x -= 3;"))
+	choice.Accept(generator)
+
+	generator.PrintReturn(outputFile)
+
+	config.SetBraceAtNextLine(false)
+
+	choice.SetCodeTrue(model.NewSentence("y++;"))
+	choice.SetComment("generate if, left brace at same line")
+	choice.SetCodeFalse(nil)
+	choice.Accept(generator)
+
+	choice.SetCodeFalse(model.NewSentence("y -= 2;"))
+	choice.Accept(generator)
+
+	test.EXPECT_TRUE(t, file.FileEqual(standard_file, output_file), "file "+filepath.Base(standard_file)+" not equal")
+}
+
+func TestCGeneratorGenFor(t *testing.T) {
+	standard_file, output_file := test.GenTestFileNames("../test_data/", "test_standard", "test_output", "clike_genertator_gen_repeat_as_for.c")
+
+	outputFile, err := os.Create(output_file)
+	if err != nil {
+		logger.Error("cannot open file %s", output_file)
+		return
+	}
+	defer outputFile.Close()
+
+	config := NewCConfig()
+	generator := NewCLikeGeneratorBase(outputFile, config)
+
+	repeat := model.NewRepeat()
+	repeat.SetComment("generate for, left brace at next line")
+	repeat.SetCondition("i = 0; i < 100; i++")
+	repeat.SetCode(model.NewSentence("x += 5;"))
+	repeat.SetAcceptType(model.REPEAT_TYPE_FOR)
+	repeat.Accept(generator)
+
+	generator.PrintReturn(outputFile)
+
+	config.SetBraceAtNextLine(false)
+
+	repeat.SetComment("generate for, left brace at same line")
+	repeat.SetCode(model.NewSentence("y++;"))
+	repeat.Accept(generator)
+
+	test.EXPECT_TRUE(t, file.FileEqual(standard_file, output_file), "file "+filepath.Base(standard_file)+" not equal")
+}
+
+func TestCGeneratorGenWhile(t *testing.T) {
+	standard_file, output_file := test.GenTestFileNames("../test_data/", "test_standard", "test_output", "clike_genertator_gen_repeat_as_while.c")
+
+	outputFile, err := os.Create(output_file)
+	if err != nil {
+		logger.Error("cannot open file %s", output_file)
+		return
+	}
+	defer outputFile.Close()
+
+	config := NewCConfig()
+	generator := NewCLikeGeneratorBase(outputFile, config)
+
+	repeat := model.NewRepeat()
+	repeat.SetComment("generate while, left brace at next line")
+	repeat.SetCondition("i < 100")
+	repeat.SetCode(model.NewSentence("x += 5;"))
+	repeat.SetAcceptType(model.REPEAT_TYPE_WHILE)
+	repeat.Accept(generator)
+
+	generator.PrintReturn(outputFile)
+
+	config.SetBraceAtNextLine(false)
+
+	repeat.SetComment("generate while, left brace at same line")
+	repeat.SetCode(model.NewSentence("y++;"))
+	repeat.Accept(generator)
+
+	test.EXPECT_TRUE(t, file.FileEqual(standard_file, output_file), "file "+filepath.Base(standard_file)+" not equal")
+}
+
+func TestCGeneratorGenDoWhile(t *testing.T) {
+	standard_file, output_file := test.GenTestFileNames("../test_data/", "test_standard", "test_output", "clike_genertator_gen_repeat_as_do_while.c")
+
+	outputFile, err := os.Create(output_file)
+	if err != nil {
+		logger.Error("cannot open file %s", output_file)
+		return
+	}
+	defer outputFile.Close()
+
+	config := NewCConfig()
+	generator := NewCLikeGeneratorBase(outputFile, config)
+
+	repeat := model.NewRepeat()
+	repeat.SetComment("generate do/while, left brace at next line")
+	repeat.SetCondition("i < 200")
+	repeat.SetCode(model.NewSentence("x += 5;"))
+	repeat.SetAcceptType(model.REPEAT_TYPE_DO_WHILE)
+	repeat.Accept(generator)
+
+	generator.PrintReturn(outputFile)
+
+	config.SetBraceAtNextLine(false)
+
+	repeat.SetComment("generate do/while, left brace at same line")
+	repeat.SetCode(model.NewSentence("y++;"))
+	repeat.Accept(generator)
+
+	test.EXPECT_TRUE(t, file.FileEqual(standard_file, output_file), "file "+filepath.Base(standard_file)+" not equal")
+}

@@ -1,4 +1,4 @@
-typedef enum tag_ATTR_TYPE
+typedef enum tagATTR_TYPE
 {
     name  = 100, // name of book
     value = 100, // value of book
@@ -8,7 +8,7 @@ typedef enum tag_ATTR_TYPE
  * braceAtNextLine = false
  */
 
-typedef enum tag_ATTR_TYPE {
+typedef enum tagATTR_TYPE {
     name   = 100,  /* name of book */
     value  = 100,  /* value of book */
     note   = 10,   /* note of book */

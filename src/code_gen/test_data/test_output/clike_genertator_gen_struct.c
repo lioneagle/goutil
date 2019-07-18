@@ -1,4 +1,4 @@
-typedef struct tag_ATTR_TYPE
+typedef struct tagATTR_TYPE
 {
     /* -------- public begin -------- */
 
@@ -9,7 +9,7 @@ typedef struct tag_ATTR_TYPE
     /* -------- public end -------- */
 }ATTR_TYPE;
 
-typedef struct tag_ATTR_TYPE {
+typedef struct tagATTR_TYPE {
     /* -------- public begin -------- */
 
     int name;  // name of book

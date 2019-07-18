@@ -34,13 +34,14 @@ func (this *CLikeGeneratorBase) Init(w io.Writer, config CConfig) {
 	this.Indent.Init(0, 4)
 }
 
-func (this *CLikeGeneratorBase) genBlockBegin(indent int) {
+func (this *CLikeGeneratorBase) genBlockBegin(indent int, spaceBeforBrace int) {
 	if this.config.BraceAtNextLine() {
 		this.PrintReturn(this.w)
 		this.Fprintln(this.w, "{")
 
 	} else {
-		fmt.Fprintln(this.w, " {")
+		chars.PrintIndent(this.w, spaceBeforBrace)
+		fmt.Fprintln(this.w, "{")
 	}
 
 	this.EnterIndent(indent)
@@ -52,6 +53,10 @@ func (this *CLikeGeneratorBase) genBlockEnd() {
 }
 
 func (this *CLikeGeneratorBase) genSingleLineCommentWithoutIndent(comment string) {
+	if len(comment) == 0 {
+		return
+	}
+
 	if this.config.VarUseSingleLineComment() {
 		fmt.Fprintf(this.w, "// %s", comment)
 	} else {
@@ -112,7 +117,7 @@ func (this *CLikeGeneratorBase) GenMultiLineComment(comment string) {
 }
 
 func (this *CLikeGeneratorBase) VisitBlockBegin(val *model.Block) {
-	this.genBlockBegin(this.config.Indent().Block)
+	this.genBlockBegin(this.config.Indent().Block, 1)
 }
 
 func (this *CLikeGeneratorBase) VisitBlockEnd(val *model.Block) {
@@ -124,8 +129,8 @@ func (this *CLikeGeneratorBase) VisitSentence(val *model.Sentence) {
 }
 
 func (this *CLikeGeneratorBase) VisitStructBegin(val *model.Struct) {
-	this.Fprintf(this.w, "typedef struct tag_%s", val.GetName())
-	this.genBlockBegin(this.config.Indent().Struct)
+	this.Fprintf(this.w, "typedef struct tag%s", val.GetName())
+	this.genBlockBegin(this.config.Indent().Struct, 1)
 }
 
 func (this *CLikeGeneratorBase) VisitStructEnd(val *model.Struct) {
@@ -186,8 +191,8 @@ func (this *CLikeGeneratorBase) VisitStructFieldVarListEnd(val *model.VarList) {
 }
 
 func (this *CLikeGeneratorBase) VisitConstsBegin(val *model.ConstList) {
-	this.Fprintf(this.w, "typedef enum tag_%s", val.GetName())
-	this.genBlockBegin(this.config.Indent().Enum)
+	this.Fprintf(this.w, "typedef enum tag%s", val.GetName())
+	this.genBlockBegin(this.config.Indent().Enum, 1)
 
 	this.maxTypeNameLen = val.GetMaxTypeNameLen()
 	this.maxNameLen = val.GetMaxNameLen()
@@ -218,4 +223,74 @@ func (this *CLikeGeneratorBase) VisitConst(val *model.Var) {
 func (this *CLikeGeneratorBase) VisitConstsEnd(val *model.ConstList) {
 	this.Exit()
 	this.Fprintfln(this.w, "}%s;", val.GetName())
+}
+
+func (this *CLikeGeneratorBase) VisitSingleChoiceBegin(val *model.SingleChoice) {
+	this.GenMultiLineComment(val.GetComment())
+
+	this.Fprint(this.w, "if (")
+	fmt.Fprintf(this.w, val.GetCondition())
+	fmt.Fprint(this.w, ")")
+	this.genBlockBegin(this.config.Indent().If, 1)
+}
+
+func (this *CLikeGeneratorBase) VisitSingleChoiceEnd(val *model.SingleChoice) {
+	this.PrintReturn(this.w)
+}
+
+func (this *CLikeGeneratorBase) VisitSingleChoiceTrueBegin(val *model.SingleChoice) {
+	// do nothing now
+}
+
+func (this *CLikeGeneratorBase) VisitSingleChoiceTrueEnd(val *model.SingleChoice) {
+	this.Exit()
+	this.Fprint(this.w, "}")
+}
+
+func (this *CLikeGeneratorBase) VisitSingleChoiceFalseBegin(val *model.SingleChoice) {
+	if !this.config.BraceAtNextLine() {
+		fmt.Fprintf(this.w, " else {")
+		this.PrintReturn(this.w)
+	} else {
+		this.PrintReturn(this.w)
+		this.Fprintln(this.w, "else")
+		this.Fprintln(this.w, "{")
+	}
+	this.EnterIndent(this.config.Indent().If)
+}
+
+func (this *CLikeGeneratorBase) VisitSingleChoiceFalseEnd(val *model.SingleChoice) {
+	this.Exit()
+	this.Fprint(this.w, "}")
+}
+
+func (this *CLikeGeneratorBase) VisitRepeatAsForBegin(val *model.Repeat) {
+	this.GenMultiLineComment(val.GetComment())
+	this.Fprintf(this.w, "for (%s)", val.GetCondition())
+	this.genBlockBegin(this.config.Indent().For, 1)
+}
+
+func (this *CLikeGeneratorBase) VisitRepeatAsForEnd(val *model.Repeat) {
+	this.genBlockEnd()
+}
+
+func (this *CLikeGeneratorBase) VisitRepeatAsWhileBegin(val *model.Repeat) {
+	this.GenMultiLineComment(val.GetComment())
+	this.Fprintf(this.w, "while (%s)", val.GetCondition())
+	this.genBlockBegin(this.config.Indent().While, 1)
+}
+
+func (this *CLikeGeneratorBase) VisitRepeatAsWhileEnd(val *model.Repeat) {
+	this.genBlockEnd()
+}
+
+func (this *CLikeGeneratorBase) VisitRepeatAsDoWhileBegin(val *model.Repeat) {
+	this.GenMultiLineComment(val.GetComment())
+	this.Fprint(this.w, "do")
+	this.genBlockBegin(this.config.Indent().DoWhile, 0)
+}
+
+func (this *CLikeGeneratorBase) VisitRepeatAsDoWhileEnd(val *model.Repeat) {
+	this.Exit()
+	this.Fprintfln(this.w, "}while(%s);", val.GetCondition())
 }
