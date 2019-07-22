@@ -4,6 +4,8 @@ type CodeVisitor interface {
 	//VisitPacakge(val *Package)
 	//VisitPacakgeList(val *PackageList)
 
+	VisitComment(val *Comment)
+
 	VisitStructBegin(val *Struct)
 	VisitStructRangePublicBegin(val *Struct)
 	VisitStructRangePublicEnd(val *Struct)
@@ -43,15 +45,30 @@ type CodeVisitor interface {
 
 	VisitRepeatAsDoWhileBegin(val *Repeat)
 	VisitRepeatAsDoWhileEnd(val *Repeat)
+
+	VisitParamVarFirst(val *Var)
+	VisitParamVarNonFirstBegin()
+	VisitParamVarNonFirst(val *Var)
+	VisitParamVarNonFirstEnd()
+
+	VisitFuncDeclare(val *Function)
+	VisitFuncDefine(val *Function)
+
+	VisitFuncNoReturn()
+	VisitFuncReturnFirst(val *Var)
+	VisitFuncReturnNonFirst(val *Var)
 }
 
 type NullCodeVisitor struct {
 }
 
+func (this *NullCodeVisitor) VisitComment(val *Comment) {}
+
 //func (this *NullCodeVisitor) VisitPacakge(val *Package)         {}
 //func (this *NullCodeVisitor) VisitPacakgeList(val *PackageList) {}
 //func (this *NullCodeVisitor) VisitVar(val *Var)                 {}
 //func (this *NullCodeVisitor) VisitConst(val *Const)             {}
+
 func (this *NullCodeVisitor) VisitBlockBegin(val *Block) {}
 
 //func (this *NullCodeVisitor) VisitBlock(val *Block)             {}
@@ -83,3 +100,12 @@ func (this *NullCodeVisitor) VisitRepeatAsWhileBegin(val *Repeat)           {}
 func (this *NullCodeVisitor) VisitRepeatAsWhileEnd(val *Repeat)             {}
 func (this *NullCodeVisitor) VisitRepeatAsDoWhileBegin(val *Repeat)         {}
 func (this *NullCodeVisitor) VisitRepeatAsDoWhileEnd(val *Repeat)           {}
+func (this *NullCodeVisitor) VisitParamVarFirst(val *Var)                   {}
+func (this *NullCodeVisitor) VisitParamVarNonFirstBegin()                   {}
+func (this *NullCodeVisitor) VisitParamVarNonFirst(val *Var)                {}
+func (this *NullCodeVisitor) VisitParamVarNonFirstEnd()                     {}
+func (this *NullCodeVisitor) VisitFuncDeclare(val *Function)                {}
+func (this *NullCodeVisitor) VisitFuncDefine(val *Function)                 {}
+func (this *NullCodeVisitor) VisitFuncNoReturn()                            {}
+func (this *NullCodeVisitor) VisitFuncReturnFirst(val *Var)                 {}
+func (this *NullCodeVisitor) VisitFuncReturnNonFirst(val *Var)              {}

@@ -57,11 +57,8 @@ func (this *Struct) acceptVisitRange(visitor CodeVisitor, structRange *StructRan
 	if structRange == nil {
 		return
 	}
-	visitor.VisitStructFieldVarListBegin(structRange.fields)
-	for _, v := range structRange.fields.vars {
-		visitor.VisitStructFieldVar(v)
-	}
-	visitor.VisitStructFieldVarListEnd(structRange.fields)
+
+	structRange.fields.AcceptAsStructField(visitor)
 
 	//TODO: typedef and methods will be supported in future
 }

@@ -116,6 +116,14 @@ func (this *CLikeGeneratorBase) GenMultiLineComment(comment string) {
 	}
 }
 
+func (this *CLikeGeneratorBase) VisitComment(val *model.Comment) {
+	if val.IsSingleLine() {
+		this.genSingleLineCommentWithoutIndent(val.GetComment())
+	} else {
+		this.GenMultiLineComment(val.GetComment())
+	}
+}
+
 func (this *CLikeGeneratorBase) VisitBlockBegin(val *model.Block) {
 	this.genBlockBegin(this.config.Indent().Block, 1)
 }
@@ -293,4 +301,63 @@ func (this *CLikeGeneratorBase) VisitRepeatAsDoWhileBegin(val *model.Repeat) {
 func (this *CLikeGeneratorBase) VisitRepeatAsDoWhileEnd(val *model.Repeat) {
 	this.Exit()
 	this.Fprintfln(this.w, "}while(%s);", val.GetCondition())
+}
+
+func (this *CLikeGeneratorBase) VisitParamVarFirst(val *model.Var) {
+	if this.config.ParamsInOneLine() {
+		fmt.Fprintf(this.w, "%s %s", val.GetTypeName(), val.GetName())
+	} else {
+		this.Fprintf(this.w, "%s %s", val.GetTypeName(), val.GetName())
+	}
+}
+
+func (this *CLikeGeneratorBase) VisitParamVarNonFirstBegin() {
+	this.EnterIndent(this.config.Indent().FuncParam)
+}
+
+func (this *CLikeGeneratorBase) VisitParamVarNonFirst(val *model.Var) {
+	if this.config.ParamsInOneLine() {
+		fmt.Fprintf(this.w, ", %s %s", val.GetTypeName(), val.GetName())
+	} else {
+		fmt.Fprint(this.w, ",")
+		this.PrintReturn(this.w)
+		this.Fprintf(this.w, "%s %s", val.GetTypeName(), val.GetName())
+	}
+}
+
+func (this *CLikeGeneratorBase) VisitParamVarNonFirstEnd() {
+	this.Exit()
+}
+
+func (this *CLikeGeneratorBase) VisitFuncDeclare(val *model.Function) {
+	this.visitFuncDeclareBase(val)
+	fmt.Fprint(this.w, ";")
+	this.PrintReturn(this.w)
+
+}
+
+func (this *CLikeGeneratorBase) VisitFuncDefine(val *model.Function) {
+	this.visitFuncDeclareBase(val)
+	val.GetBody().Accept(this)
+}
+
+func (this *CLikeGeneratorBase) VisitFuncNoReturn() {
+	this.Fprint(this.w, "void ")
+}
+
+func (this *CLikeGeneratorBase) visitFuncDeclareBase(val *model.Function) {
+	this.GenMultiLineComment(val.GetComment())
+	val.GetReturnList().AcceptAsFuncReturns(this)
+	fmt.Fprintf(this.w, "%s(", val.GetName())
+	val.GetParams().AcceptAsParmList(this)
+	fmt.Fprint(this.w, ")")
+
+}
+
+func (this *CLikeGeneratorBase) VisitFuncReturnFirst(val *model.Var) {
+	fmt.Fprintf(this.w, "%s ", val.GetTypeName())
+}
+
+func (this *CLikeGeneratorBase) VisitFuncReturnNonFirst(val *model.Var) {
+
 }

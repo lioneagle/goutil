@@ -287,3 +287,175 @@ func TestCGeneratorGenDoWhile(t *testing.T) {
 
 	test.EXPECT_TRUE(t, file.FileEqual(standard_file, output_file), "file "+filepath.Base(standard_file)+" not equal")
 }
+
+func TestCGeneratorGenParamList(t *testing.T) {
+	standard_file, output_file := test.GenTestFileNames("../test_data/", "test_standard", "test_output", "clike_genertator_gen_param_list.c")
+
+	outputFile, err := os.Create(output_file)
+	if err != nil {
+		logger.Error("cannot open file %s", output_file)
+		return
+	}
+	defer outputFile.Close()
+
+	config := NewCConfig()
+	generator := NewCLikeGeneratorBase(outputFile, config)
+
+	params := model.NewVarList()
+
+	vars := []struct {
+		name     string
+		typeName string
+		comment  string
+	}{
+		{"name", "int", "name of book"},
+		{"value", "int", "value of book"},
+		{"note", "int", "note of book"},
+	}
+
+	for _, v := range vars {
+		var1 := model.NewVar()
+		var1.SetName(v.name)
+		var1.SetTypeName(v.typeName)
+		var1.SetComment(v.comment)
+		params.Append(var1)
+	}
+
+	params.AcceptAsParmList(generator)
+
+	generator.PrintReturn(outputFile)
+
+	config.SetParamsInOneLine(false)
+
+	params.AcceptAsParmList(generator)
+
+	test.EXPECT_TRUE(t, file.FileEqual(standard_file, output_file), "file "+filepath.Base(standard_file)+" not equal")
+}
+
+func TestCGeneratorGenFunctionDeclare(t *testing.T) {
+	standard_file, output_file := test.GenTestFileNames("../test_data/", "test_standard", "test_output", "clike_genertator_gen_func_declare.c")
+
+	outputFile, err := os.Create(output_file)
+	if err != nil {
+		logger.Error("cannot open file %s", output_file)
+		return
+	}
+	defer outputFile.Close()
+
+	config := NewCConfig()
+	generator := NewCLikeGeneratorBase(outputFile, config)
+
+	func1 := model.NewFunction()
+
+	vars := []struct {
+		name     string
+		typeName string
+		comment  string
+	}{
+		{"context", "Context*", "context for parsing"},
+		{"src", "char const*", "source to parse"},
+		{"len", "int", "length of source"},
+	}
+
+	for _, v := range vars {
+		var1 := model.NewVar()
+		var1.SetName(v.name)
+		var1.SetTypeName(v.typeName)
+		var1.SetComment(v.comment)
+		func1.AppendParam(var1)
+	}
+
+	func1.SetName("parse")
+
+	ret := model.NewVar()
+	ret.SetTypeName("int")
+	func1.AppendReturnType(ret)
+
+	func1.SetComment(`
+	    NAME: parse
+	    PARAMS: 
+	    context -- context for parsing
+	    src     -- source to parse
+	    len     -- length of source
+	    RETURN:
+	    length parsed
+	    NOTE: create for test
+	    `)
+
+	func1.AcceptAsDeclare(generator)
+
+	generator.PrintReturn(outputFile)
+
+	config.SetParamsInOneLine(false)
+	config.SetBraceAtNextLine(false)
+	config.SetMultiLineCommentDecorate(true)
+
+	func1.AcceptAsDeclare(generator)
+
+	test.EXPECT_TRUE(t, file.FileEqual(standard_file, output_file), "file "+filepath.Base(standard_file)+" not equal")
+}
+
+func TestCGeneratorGenFunctionDefine(t *testing.T) {
+	standard_file, output_file := test.GenTestFileNames("../test_data/", "test_standard", "test_output", "clike_genertator_gen_func_define.c")
+
+	outputFile, err := os.Create(output_file)
+	if err != nil {
+		logger.Error("cannot open file %s", output_file)
+		return
+	}
+	defer outputFile.Close()
+
+	config := NewCConfig()
+	generator := NewCLikeGeneratorBase(outputFile, config)
+
+	func1 := model.NewFunction()
+
+	vars := []struct {
+		name     string
+		typeName string
+		comment  string
+	}{
+		{"context", "Context*", "context for parsing"},
+		{"src", "char const*", "source to parse"},
+		{"len", "int", "length of source"},
+	}
+
+	for _, v := range vars {
+		var1 := model.NewVar()
+		var1.SetName(v.name)
+		var1.SetTypeName(v.typeName)
+		var1.SetComment(v.comment)
+		func1.AppendParam(var1)
+	}
+
+	func1.SetName("parse")
+
+	func1.AppendCode(model.NewSentence("return 0;"))
+
+	ret := model.NewVar()
+	ret.SetTypeName("int")
+	func1.AppendReturnType(ret)
+
+	func1.SetComment(`
+	    NAME: parse
+	    PARAMS: 
+	    context -- context for parsing
+	    src     -- source to parse
+	    len     -- length of source
+	    RETURN:
+	    length parsed
+	    NOTE: create for test
+	    `)
+
+	func1.AcceptAsDefine(generator)
+
+	generator.PrintReturn(outputFile)
+
+	config.SetParamsInOneLine(false)
+	config.SetBraceAtNextLine(false)
+	config.SetMultiLineCommentDecorate(true)
+
+	func1.AcceptAsDefine(generator)
+
+	test.EXPECT_TRUE(t, file.FileEqual(standard_file, output_file), "file "+filepath.Base(standard_file)+" not equal")
+}

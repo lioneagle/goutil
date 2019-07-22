@@ -61,6 +61,47 @@ func NewVarList() *VarList {
 	return &VarList{}
 }
 
+func (this *VarList) AcceptAsFuncReturns(visitor CodeVisitor) {
+	if len(this.vars) <= 0 {
+		visitor.VisitFuncNoReturn()
+		return
+	}
+
+	visitor.VisitFuncReturnFirst(this.vars[0])
+	for _, v := range this.vars {
+		visitor.VisitFuncReturnNonFirst(v)
+	}
+}
+
+func (this *VarList) AcceptAsStructField(visitor CodeVisitor) {
+	if len(this.vars) <= 0 {
+		return
+	}
+
+	visitor.VisitStructFieldVarListBegin(this)
+	for _, v := range this.vars {
+		visitor.VisitStructFieldVar(v)
+	}
+	visitor.VisitStructFieldVarListEnd(this)
+}
+
+func (this *VarList) AcceptAsParmList(visitor CodeVisitor) {
+	if len(this.vars) <= 0 {
+		return
+	}
+	visitor.VisitParamVarFirst(this.vars[0])
+
+	if len(this.vars) == 1 {
+		return
+	}
+
+	visitor.VisitParamVarNonFirstBegin()
+	for i := 1; i < len(this.vars); i++ {
+		visitor.VisitParamVarNonFirst(this.vars[i])
+	}
+	visitor.VisitParamVarNonFirstEnd()
+}
+
 func (this *VarList) Append(val *Var) {
 	//fmt.Println("this =", this)
 	//fmt.Println("this.Vars =", this.Vars)
