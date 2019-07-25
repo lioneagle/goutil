@@ -321,13 +321,13 @@ func TestCGeneratorGenParamList(t *testing.T) {
 		params.Append(var1)
 	}
 
-	params.AcceptAsParmList(generator)
+	params.AcceptAsFuncParmList(generator)
 
 	generator.PrintReturn(outputFile)
 
 	config.SetParamsInOneLine(false)
 
-	params.AcceptAsParmList(generator)
+	params.AcceptAsFuncParmList(generator)
 
 	test.EXPECT_TRUE(t, file.FileEqual(standard_file, output_file), "file "+filepath.Base(standard_file)+" not equal")
 }
@@ -456,6 +456,78 @@ func TestCGeneratorGenFunctionDefine(t *testing.T) {
 	config.SetMultiLineCommentDecorate(true)
 
 	func1.AcceptAsDefine(generator)
+
+	test.EXPECT_TRUE(t, file.FileEqual(standard_file, output_file), "file "+filepath.Base(standard_file)+" not equal")
+}
+
+func TestCGeneratorGenMacroDefine(t *testing.T) {
+	standard_file, output_file := test.GenTestFileNames("../test_data/", "test_standard", "test_output", "clike_genertator_gen_macro_define.c")
+
+	outputFile, err := os.Create(output_file)
+	if err != nil {
+		logger.Error("cannot open file %s", output_file)
+		return
+	}
+	defer outputFile.Close()
+
+	config := NewCConfig()
+	generator := NewCLikeGeneratorBase(outputFile, config)
+
+	macro := model.NewMacro()
+
+	vars := []struct {
+		name     string
+		typeName string
+		comment  string
+	}{
+		{"context", "Context*", "context for parsing"},
+		{"src", "char const*", "source to parse"},
+		{"len", "int", "length of source"},
+	}
+
+	for _, v := range vars {
+		var1 := model.NewVar()
+		var1.SetName(v.name)
+		var1.SetTypeName(v.typeName)
+		var1.SetComment(v.comment)
+		macro.AppendParam(var1)
+	}
+
+	macro.SetName("PARSE")
+
+	macro.SetBody(model.NewSentence("do{return 0;}while(0)"))
+
+	macro.SetComment(`
+	    NAME: parse
+	    PARAMS: 
+	    context -- context for parsing
+	    src     -- source to parse
+	    len     -- length of source
+	    RETURN:
+	    length parsed
+	    NOTE: create for test
+	    `)
+
+	macro.Accept(generator)
+
+	generator.PrintReturn(outputFile)
+
+	config.SetParamsInOneLine(false)
+	config.SetBraceAtNextLine(false)
+	config.SetMultiLineCommentDecorate(true)
+
+	codes := model.NewSentenceList()
+	codes.Append(model.NewSentence("x = 1;"))
+	codes.Append(model.NewSentence("y = 2;"))
+	codes.Append(model.NewSentence("return 1;"))
+
+	repeat := model.NewRepeat()
+	repeat.SetCode(codes)
+	repeat.SetAcceptType(model.REPEAT_TYPE_DO_WHILE)
+
+	macro.SetBody(repeat)
+
+	macro.Accept(generator)
 
 	test.EXPECT_TRUE(t, file.FileEqual(standard_file, output_file), "file "+filepath.Base(standard_file)+" not equal")
 }

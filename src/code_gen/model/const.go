@@ -52,14 +52,22 @@ func (this *ConstList) GetMaxValueLen() int {
 }
 
 type ConstGroup struct {
-	Name   string
-	Consts []*ConstList
+	name   string
+	consts []*ConstList
 }
 
 func NewConstGroup() *ConstGroup {
 	return &ConstGroup{}
 }
 
+func (this *ConstGroup) GetName() string {
+	return this.name
+}
+
+func (this *ConstGroup) SetName(val string) {
+	this.name = val
+}
+
 func (this *ConstGroup) AppendConstList(val *ConstList) {
-	this.Consts = append(this.Consts, val)
+	this.consts = append(this.consts, val)
 }

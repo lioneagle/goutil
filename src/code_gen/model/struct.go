@@ -15,8 +15,8 @@ func NewStructRange() *StructRange {
 }
 
 type Struct struct {
-	name      string
 	isGeneric bool
+	name      string
 
 	genericTypes *TypeList
 
@@ -126,7 +126,7 @@ func (this *Struct) getRangePrivate() *StructRange {
 }
 
 type StructList struct {
-	Structs []*Struct
+	structs []*Struct
 }
 
 func NewStructList() *StructList {
@@ -134,5 +134,5 @@ func NewStructList() *StructList {
 }
 
 func (this *StructList) Append(val *Struct) {
-	this.Structs = append(this.Structs, val)
+	this.structs = append(this.structs, val)
 }

@@ -46,10 +46,10 @@ type CodeVisitor interface {
 	VisitRepeatAsDoWhileBegin(val *Repeat)
 	VisitRepeatAsDoWhileEnd(val *Repeat)
 
-	VisitParamVarFirst(val *Var)
-	VisitParamVarNonFirstBegin()
-	VisitParamVarNonFirst(val *Var)
-	VisitParamVarNonFirstEnd()
+	VisitFuncParamVarFirst(val *Var)
+	VisitFuncParamVarNonFirstBegin()
+	VisitFuncParamVarNonFirst(val *Var)
+	VisitFuncParamVarNonFirstEnd()
 
 	VisitFuncDeclare(val *Function)
 	VisitFuncDefine(val *Function)
@@ -57,6 +57,12 @@ type CodeVisitor interface {
 	VisitFuncNoReturn()
 	VisitFuncReturnFirst(val *Var)
 	VisitFuncReturnNonFirst(val *Var)
+
+	VisitMacroParamVarFirst(val *Var)
+	VisitMacroParamVarNonFirstBegin()
+	VisitMacroParamVarNonFirst(val *Var)
+	VisitMacroParamVarNonFirstEnd()
+	VisitMacro(val *Macro)
 }
 
 type NullCodeVisitor struct {
@@ -100,12 +106,13 @@ func (this *NullCodeVisitor) VisitRepeatAsWhileBegin(val *Repeat)           {}
 func (this *NullCodeVisitor) VisitRepeatAsWhileEnd(val *Repeat)             {}
 func (this *NullCodeVisitor) VisitRepeatAsDoWhileBegin(val *Repeat)         {}
 func (this *NullCodeVisitor) VisitRepeatAsDoWhileEnd(val *Repeat)           {}
-func (this *NullCodeVisitor) VisitParamVarFirst(val *Var)                   {}
-func (this *NullCodeVisitor) VisitParamVarNonFirstBegin()                   {}
-func (this *NullCodeVisitor) VisitParamVarNonFirst(val *Var)                {}
-func (this *NullCodeVisitor) VisitParamVarNonFirstEnd()                     {}
+func (this *NullCodeVisitor) VisitFuncParamVarFirst(val *Var)               {}
+func (this *NullCodeVisitor) VisitFuncParamVarNonFirstBegin()               {}
+func (this *NullCodeVisitor) VisitFuncParamVarNonFirst(val *Var)            {}
+func (this *NullCodeVisitor) VisitFuncParamVarNonFirstEnd()                 {}
 func (this *NullCodeVisitor) VisitFuncDeclare(val *Function)                {}
 func (this *NullCodeVisitor) VisitFuncDefine(val *Function)                 {}
 func (this *NullCodeVisitor) VisitFuncNoReturn()                            {}
 func (this *NullCodeVisitor) VisitFuncReturnFirst(val *Var)                 {}
 func (this *NullCodeVisitor) VisitFuncReturnNonFirst(val *Var)              {}
+func (this *NullCodeVisitor) VisitMacro(val *Macro)                         {}

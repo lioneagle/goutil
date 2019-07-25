@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/lioneagle/abnf/src/basic"
+	"github.com/lioneagle/goutil/src/buffer"
 	"github.com/lioneagle/goutil/src/chars"
 
 	"github.com/lioneagle/goutil/src/code_gen/model"
@@ -303,7 +304,7 @@ func (this *CLikeGeneratorBase) VisitRepeatAsDoWhileEnd(val *model.Repeat) {
 	this.Fprintfln(this.w, "}while(%s);", val.GetCondition())
 }
 
-func (this *CLikeGeneratorBase) VisitParamVarFirst(val *model.Var) {
+func (this *CLikeGeneratorBase) VisitFuncParamVarFirst(val *model.Var) {
 	if this.config.ParamsInOneLine() {
 		fmt.Fprintf(this.w, "%s %s", val.GetTypeName(), val.GetName())
 	} else {
@@ -311,11 +312,11 @@ func (this *CLikeGeneratorBase) VisitParamVarFirst(val *model.Var) {
 	}
 }
 
-func (this *CLikeGeneratorBase) VisitParamVarNonFirstBegin() {
+func (this *CLikeGeneratorBase) VisitFuncParamVarNonFirstBegin() {
 	this.EnterIndent(this.config.Indent().FuncParam)
 }
 
-func (this *CLikeGeneratorBase) VisitParamVarNonFirst(val *model.Var) {
+func (this *CLikeGeneratorBase) VisitFuncParamVarNonFirst(val *model.Var) {
 	if this.config.ParamsInOneLine() {
 		fmt.Fprintf(this.w, ", %s %s", val.GetTypeName(), val.GetName())
 	} else {
@@ -325,7 +326,7 @@ func (this *CLikeGeneratorBase) VisitParamVarNonFirst(val *model.Var) {
 	}
 }
 
-func (this *CLikeGeneratorBase) VisitParamVarNonFirstEnd() {
+func (this *CLikeGeneratorBase) VisitFuncParamVarNonFirstEnd() {
 	this.Exit()
 }
 
@@ -349,7 +350,7 @@ func (this *CLikeGeneratorBase) visitFuncDeclareBase(val *model.Function) {
 	this.GenMultiLineComment(val.GetComment())
 	val.GetReturnList().AcceptAsFuncReturns(this)
 	fmt.Fprintf(this.w, "%s(", val.GetName())
-	val.GetParams().AcceptAsParmList(this)
+	val.GetParams().AcceptAsFuncParmList(this)
 	fmt.Fprint(this.w, ")")
 
 }
@@ -360,4 +361,59 @@ func (this *CLikeGeneratorBase) VisitFuncReturnFirst(val *model.Var) {
 
 func (this *CLikeGeneratorBase) VisitFuncReturnNonFirst(val *model.Var) {
 
+}
+
+func (this *CLikeGeneratorBase) VisitMacro(val *model.Macro) {
+	this.GenMultiLineComment(val.GetComment())
+	fmt.Fprintf(this.w, "#define %s(", val.GetName())
+	val.GetParams().AcceptAsMacroParmList(this)
+	fmt.Fprint(this.w, ")")
+	chars.PrintIndent(this.w, 1)
+
+	buf := buffer.NewByteBuffer(nil)
+	gen := NewCLikeGeneratorBase(buf, this.config)
+	gen.CopyStack(&this.Indent)
+	val.GetBody().Accept(gen)
+
+	lines := strings.Split(strings.Replace(buf.String(), "\r", "", -1), "\n")
+
+	emptyTails := 0
+	for i := len(lines) - 1; i > 0; i-- {
+		if len(lines[i]) == 0 {
+			emptyTails++
+		}
+	}
+
+	lines = lines[:len(lines)-emptyTails]
+
+	if len(lines) <= 0 {
+		return
+	}
+
+	if len(lines) == 1 {
+		fmt.Fprint(this.w, lines[0])
+		return
+	}
+
+	for i := 0; i < len(lines); i++ {
+		fmt.Fprint(this.w, "\\")
+		this.PrintReturn(this.w)
+		fmt.Fprintf(this.w, "%s", lines[i])
+
+	}
+
+}
+
+func (this *CLikeGeneratorBase) VisitMacroParamVarFirst(val *model.Var) {
+	fmt.Fprintf(this.w, "%s", val.GetName())
+}
+
+func (this *CLikeGeneratorBase) VisitMacroParamVarNonFirstBegin() {
+}
+
+func (this *CLikeGeneratorBase) VisitMacroParamVarNonFirst(val *model.Var) {
+	fmt.Fprintf(this.w, ", %s", val.GetName())
+}
+
+func (this *CLikeGeneratorBase) VisitMacroParamVarNonFirstEnd() {
 }

@@ -24,6 +24,12 @@ func NewSentenceList() *SentenceList {
 	return &SentenceList{}
 }
 
+func (this *SentenceList) Accept(visitor CodeVisitor) {
+	for _, v := range this.codes {
+		visitor.VisitSentence(v)
+	}
+}
+
 func (this *SentenceList) Append(val *Sentence) {
 	this.codes = append(this.codes, val)
 }

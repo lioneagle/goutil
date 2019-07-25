@@ -32,6 +32,10 @@ func (this *Indent) Init(initIndent, defaultIndent int) {
 	this.returns.Init()
 }
 
+func (this *Indent) CopyStack(rhs *Indent) {
+	copy(this.Stack, rhs.Stack)
+}
+
 func (this *Indent) Enter() {
 	this.EnterIndent(this.DefaultIndent)
 }

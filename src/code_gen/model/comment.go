@@ -1,8 +1,8 @@
 package model
 
 type Comment struct {
-	comment      string
 	isSingleLine bool
+	comment      string
 }
 
 func NewComment() *Comment {
