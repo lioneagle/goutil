@@ -1,57 +1,82 @@
 package model
 
-type Macro struct {
+type Macro interface {
+	Code
+	IsMacro() bool
+}
+
+type MacroDefine struct {
 	name    string
 	comment string
 	params  *VarList
 	body    Code
 }
 
-func NewMacro() *Macro {
-	ret := &Macro{}
+func NewMacroDefine() *MacroDefine {
+	ret := &MacroDefine{}
 	ret.params = NewVarList()
 	return ret
 }
 
-func (this *Macro) AppendParam(val *Var) {
+func (this *MacroDefine) AppendParam(val *Var) {
 	this.params.Append(val)
 }
 
-func (this *Macro) GetName() string {
+func (this *MacroDefine) IsMacro() bool {
+	return true
+}
+
+func (this *MacroDefine) GetName() string {
 	return this.name
 }
 
-func (this *Macro) SetName(name string) {
+func (this *MacroDefine) SetName(name string) {
 	this.name = name
 }
 
-func (this *Macro) GetComment() string {
+func (this *MacroDefine) GetComment() string {
 	return this.comment
 }
 
-func (this *Macro) SetComment(comment string) {
+func (this *MacroDefine) SetComment(comment string) {
 	this.comment = comment
 }
 
-func (this *Macro) GetParams() *VarList {
+func (this *MacroDefine) GetParams() *VarList {
 	return this.params
 }
 
-func (this *Macro) GetBody() Code {
+func (this *MacroDefine) GetBody() Code {
 	return this.body
 }
 
-func (this *Macro) SetBody(code Code) {
+func (this *MacroDefine) SetBody(code Code) {
 	this.body = code
 }
 
-func (this *Macro) Accept(v CodeVisitor) {
-	v.VisitMacro(this)
+func (this *MacroDefine) Accept(v CodeVisitor) {
+	v.VisitMacroDefine(this)
 
 }
 
+type MacroDefineList struct {
+	macros []*MacroDefine
+}
+
+func NewMacroDefineList() *MacroDefineList {
+	return &MacroDefineList{}
+}
+
+func (this *MacroDefineList) Append(val *MacroDefine) {
+	this.macros = append(this.macros, val)
+}
+
+func (this *MacroDefineList) IsMacro() bool {
+	return true
+}
+
 type MacroList struct {
-	Macros []*Macro
+	macros []*Macro
 }
 
 func NewMacroList() *MacroList {
@@ -59,5 +84,9 @@ func NewMacroList() *MacroList {
 }
 
 func (this *MacroList) Append(val *Macro) {
-	this.Macros = append(this.Macros, val)
+	this.macros = append(this.macros, val)
+}
+
+func (this *MacroList) IsMacro() bool {
+	return true
 }

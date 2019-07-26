@@ -158,7 +158,7 @@ func TestCGeneratorGenStruct(t *testing.T) {
 	test.EXPECT_TRUE(t, file.FileEqual(standard_file, output_file), "file "+filepath.Base(standard_file)+" not equal")
 }
 
-func TestCGeneratorGenSingleChoice(t *testing.T) {
+func TestCGeneratorGenChoices(t *testing.T) {
 	standard_file, output_file := test.GenTestFileNames("../test_data/", "test_standard", "test_output", "clike_genertator_gen_if.c")
 
 	outputFile, err := os.Create(output_file)
@@ -171,26 +171,35 @@ func TestCGeneratorGenSingleChoice(t *testing.T) {
 	config := NewCConfig()
 	generator := NewCLikeGeneratorBase(outputFile, config)
 
-	choice := model.NewSingleChoice()
-	choice.SetCondition("i < 100")
-	choice.SetComment("generate if, left brace at next line")
-	choice.SetCodeTrue(model.NewSentence("x += 5;"))
-	choice.Accept(generator)
+	choices := model.NewMultiChoice()
+	choices.SetComment("generate if, left brace at next line")
 
-	choice.SetCodeFalse(model.NewSentence("x -= 3;"))
-	choice.Accept(generator)
+	choice := model.NewChoice()
+	choice.SetCondition("i < 100")
+	choice.SetCode(model.NewSentence("x += 5;"))
+
+	choices.AppendChoice(choice)
+	choices.Accept(generator)
+
+	choices.SetLastCode(model.NewSentence("x -= 3;"))
+	choices.Accept(generator)
 
 	generator.PrintReturn(outputFile)
 
 	config.SetBraceAtNextLine(false)
 
-	choice.SetCodeTrue(model.NewSentence("y++;"))
-	choice.SetComment("generate if, left brace at same line")
-	choice.SetCodeFalse(nil)
-	choice.Accept(generator)
+	choices = model.NewMultiChoice()
+	choices.SetComment("generate if, left brace at same line")
 
-	choice.SetCodeFalse(model.NewSentence("y -= 2;"))
-	choice.Accept(generator)
+	choice = model.NewChoice()
+	choice.SetCondition("i < 100")
+	choice.SetCode(model.NewSentence("y++;"))
+
+	choices.AppendChoice(choice)
+	choices.Accept(generator)
+
+	choices.SetLastCode(model.NewSentence("y -= 2;"))
+	choices.Accept(generator)
 
 	test.EXPECT_TRUE(t, file.FileEqual(standard_file, output_file), "file "+filepath.Base(standard_file)+" not equal")
 }
@@ -473,7 +482,7 @@ func TestCGeneratorGenMacroDefine(t *testing.T) {
 	config := NewCConfig()
 	generator := NewCLikeGeneratorBase(outputFile, config)
 
-	macro := model.NewMacro()
+	macro := model.NewMacroDefine()
 
 	vars := []struct {
 		name     string

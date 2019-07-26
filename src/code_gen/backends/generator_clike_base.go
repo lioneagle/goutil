@@ -234,29 +234,50 @@ func (this *CLikeGeneratorBase) VisitConstsEnd(val *model.ConstList) {
 	this.Fprintfln(this.w, "}%s;", val.GetName())
 }
 
-func (this *CLikeGeneratorBase) VisitSingleChoiceBegin(val *model.SingleChoice) {
+func (this *CLikeGeneratorBase) VisitMultiChoiceBegin(val *model.MultiChoice) {
 	this.GenMultiLineComment(val.GetComment())
+}
 
+func (this *CLikeGeneratorBase) VisitChoiceFirstBegin(val *model.Choice) {
 	this.Fprint(this.w, "if (")
 	fmt.Fprintf(this.w, val.GetCondition())
 	fmt.Fprint(this.w, ")")
 	this.genBlockBegin(this.config.Indent().If, 1)
 }
 
-func (this *CLikeGeneratorBase) VisitSingleChoiceEnd(val *model.SingleChoice) {
-	this.PrintReturn(this.w)
-}
-
-func (this *CLikeGeneratorBase) VisitSingleChoiceTrueBegin(val *model.SingleChoice) {
-	// do nothing now
-}
-
-func (this *CLikeGeneratorBase) VisitSingleChoiceTrueEnd(val *model.SingleChoice) {
+func (this *CLikeGeneratorBase) VisitChoiceFirstEnd(val *model.Choice) {
 	this.Exit()
 	this.Fprint(this.w, "}")
 }
 
-func (this *CLikeGeneratorBase) VisitSingleChoiceFalseBegin(val *model.SingleChoice) {
+func (this *CLikeGeneratorBase) VisitChoiceNonFirstBegin(val *model.Choice) {
+	if !this.config.BraceAtNextLine() {
+		fmt.Fprintf(this.w, " else if (")
+		fmt.Fprintf(this.w, val.GetCondition())
+		fmt.Fprint(this.w, ") {")
+		this.PrintReturn(this.w)
+	} else {
+		this.PrintReturn(this.w)
+		fmt.Fprintf(this.w, "else if (")
+		fmt.Fprintf(this.w, val.GetCondition())
+		fmt.Fprint(this.w, ")")
+		this.PrintReturn(this.w)
+		this.Fprintln(this.w, "{")
+	}
+	this.EnterIndent(this.config.Indent().If)
+}
+
+func (this *CLikeGeneratorBase) VisitChoiceNonFirstEnd(val *model.Choice) {
+	this.Exit()
+	this.Fprint(this.w, "}")
+}
+
+func (this *CLikeGeneratorBase) VisitMultiChoiceLastCode(val model.Code) {
+	if val == nil {
+		this.PrintReturn(this.w)
+		return
+	}
+
 	if !this.config.BraceAtNextLine() {
 		fmt.Fprintf(this.w, " else {")
 		this.PrintReturn(this.w)
@@ -266,11 +287,14 @@ func (this *CLikeGeneratorBase) VisitSingleChoiceFalseBegin(val *model.SingleCho
 		this.Fprintln(this.w, "{")
 	}
 	this.EnterIndent(this.config.Indent().If)
+
+	val.Accept(this)
+
+	this.Exit()
+	this.Fprintln(this.w, "}")
 }
 
-func (this *CLikeGeneratorBase) VisitSingleChoiceFalseEnd(val *model.SingleChoice) {
-	this.Exit()
-	this.Fprint(this.w, "}")
+func (this *CLikeGeneratorBase) VisitMultiChoiceEnd(val *model.MultiChoice) {
 }
 
 func (this *CLikeGeneratorBase) VisitRepeatAsForBegin(val *model.Repeat) {
@@ -363,7 +387,7 @@ func (this *CLikeGeneratorBase) VisitFuncReturnNonFirst(val *model.Var) {
 
 }
 
-func (this *CLikeGeneratorBase) VisitMacro(val *model.Macro) {
+func (this *CLikeGeneratorBase) VisitMacroDefine(val *model.MacroDefine) {
 	this.GenMultiLineComment(val.GetComment())
 	fmt.Fprintf(this.w, "#define %s(", val.GetName())
 	val.GetParams().AcceptAsMacroParmList(this)
