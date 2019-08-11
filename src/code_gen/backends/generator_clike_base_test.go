@@ -177,8 +177,8 @@ func TestCGeneratorGenChoices(t *testing.T) {
 	choice := model.NewChoice()
 	choice.SetCondition("i < 100")
 	choice.SetCode(model.NewSentence("x += 5;"))
-
 	choices.AppendChoice(choice)
+
 	choices.Accept(generator)
 
 	choices.SetLastCode(model.NewSentence("x -= 3;"))
@@ -194,8 +194,8 @@ func TestCGeneratorGenChoices(t *testing.T) {
 	choice = model.NewChoice()
 	choice.SetCondition("i < 100")
 	choice.SetCode(model.NewSentence("y++;"))
-
 	choices.AppendChoice(choice)
+
 	choices.Accept(generator)
 
 	choices.SetLastCode(model.NewSentence("y -= 2;"))
