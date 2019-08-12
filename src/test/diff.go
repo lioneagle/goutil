@@ -6,6 +6,8 @@ import (
 	"io"
 	"reflect"
 	"runtime"
+
+	"github.com/lioneagle/goutil/src/mathex"
 )
 
 type diffWriter struct {
@@ -63,14 +65,25 @@ func (this *diffWriter) diff(actual, wanted reflect.Value) bool {
 			this.print(a, b)
 			return false
 		}
-	case reflect.Float32, reflect.Float64:
-		if a, b := actual.Float(), wanted.Float(); a != b {
+	case reflect.Float32:
+		if a, b := actual.Float(), wanted.Float(); !mathex.EqualFloat64Ex(a, b, mathex.MinAccuracyFloat32) {
+			this.print(a, b)
+			return false
+		}
+
+	case reflect.Float64:
+		if a, b := actual.Float(), wanted.Float(); !mathex.EqualFloat64Ex(a, b, mathex.MinAccuracyFloat64) {
 			this.print(a, b)
 			return false
 		}
 	case reflect.Complex64:
+		if a, b := actual.Complex(), wanted.Complex(); !mathex.EqualComplex128Ex(a, b, mathex.MinAccuracyFloat32) {
+			this.print(a, b)
+			return false
+		}
+
 	case reflect.Complex128:
-		if a, b := actual.Complex(), wanted.Complex(); a != b {
+		if a, b := actual.Complex(), wanted.Complex(); !mathex.EqualComplex128Ex(a, b, mathex.MinAccuracyFloat64) {
 			this.print(a, b)
 			return false
 		}
