@@ -218,8 +218,8 @@ func (this *Logger) Debugf(format string, args ...interface{}) {
 	this.log(DEBUG, format, args...)
 }
 
-func (this *Logger) Printf(format string) {
-	this.print(format)
+func (this *Logger) Printf(format string, args ...interface{}) {
+	this.print(format, args...)
 }
 
 func (this *Logger) PrintStack() {
