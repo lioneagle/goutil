@@ -57,7 +57,7 @@ func NewLogger(out io.Writer) *Logger {
 func (this *Logger) init() {
 	this.level = WARNING
 	this.stackTraceLevel = EMERGENCY
-	//this.showShortFile = true
+	this.showShortFile = true
 	this.shortFileNameDepth = 1
 	this.showPackage = true
 	this.showFuncName = false
@@ -127,9 +127,9 @@ func (this *Logger) log(level Level, msg string, args ...interface{}) {
 	this.output(buffer.Bytes())
 }
 
-func (this *Logger) print(msg string, args ...interface{}) {
+func (this *Logger) print(format string, args ...interface{}) {
 	var buffer bytes.Buffer
-	buffer.WriteString(fmt.Sprintf(msg, args...))
+	buffer.WriteString(fmt.Sprintf(format, args...))
 	buffer.WriteString("\n")
 	this.output(buffer.Bytes())
 }
@@ -186,40 +186,40 @@ func extractFileName(fileName string, shortFileNameDepth int) string {
 	return fileName[i+1 : len(fileName)]
 }
 
-func (this *Logger) Emergency(msg string, args ...interface{}) {
-	this.log(EMERGENCY, msg, args...)
+func (this *Logger) Emergencyf(format string, args ...interface{}) {
+	this.log(EMERGENCY, format, args...)
 }
 
-func (this *Logger) Alert(msg string, args ...interface{}) {
-	this.log(ALERT, msg, args...)
+func (this *Logger) Alertf(format string, args ...interface{}) {
+	this.log(ALERT, format, args...)
 }
 
-func (this *Logger) Critical(msg string, args ...interface{}) {
-	this.log(CRITICAL, msg, args...)
+func (this *Logger) Criticalf(format string, args ...interface{}) {
+	this.log(CRITICAL, format, args...)
 }
 
-func (this *Logger) Error(msg string, args ...interface{}) {
-	this.log(ERROR, msg, args...)
+func (this *Logger) Errorf(format string, args ...interface{}) {
+	this.log(ERROR, format, args...)
 }
 
-func (this *Logger) Warning(msg string, args ...interface{}) {
-	this.log(WARNING, msg, args...)
+func (this *Logger) Warningf(format string, args ...interface{}) {
+	this.log(WARNING, format, args...)
 }
 
-func (this *Logger) Notice(msg string, args ...interface{}) {
-	this.log(NOTICE, msg, args...)
+func (this *Logger) Noticef(format string, args ...interface{}) {
+	this.log(NOTICE, format, args...)
 }
 
-func (this *Logger) Info(msg string, args ...interface{}) {
-	this.log(INFO, msg, args...)
+func (this *Logger) Infof(format string, args ...interface{}) {
+	this.log(INFO, format, args...)
 }
 
-func (this *Logger) Debug(msg string, args ...interface{}) {
-	this.log(DEBUG, msg, args...)
+func (this *Logger) Debugf(format string, args ...interface{}) {
+	this.log(DEBUG, format, args...)
 }
 
-func (this *Logger) Print(msg string) {
-	this.print(msg)
+func (this *Logger) Printf(format string) {
+	this.print(format)
 }
 
 func (this *Logger) PrintStack() {
@@ -236,40 +236,40 @@ func getDefaultLogger() *Logger {
 	return defaultLogger
 }
 
-func Emergency(msg string, args ...interface{}) {
-	getDefaultLogger().Emergency(msg, args...)
+func Emergencyf(format string, args ...interface{}) {
+	getDefaultLogger().Emergency(format, args...)
 }
 
-func Alert(msg string, args ...interface{}) {
-	getDefaultLogger().Alert(msg, args...)
+func Alertf(format string, args ...interface{}) {
+	getDefaultLogger().Alert(format, args...)
 }
 
-func Critical(msg string, args ...interface{}) {
-	getDefaultLogger().Critical(msg, args...)
+func Criticalf(format string, args ...interface{}) {
+	getDefaultLogger().Critical(format, args...)
 }
 
-func Error(msg string, args ...interface{}) {
-	getDefaultLogger().Error(msg, args...)
+func Errorf(format string, args ...interface{}) {
+	getDefaultLogger().Error(format, args...)
 }
 
-func Warning(msg string, args ...interface{}) {
-	getDefaultLogger().Warning(msg, args...)
+func Warningf(format string, args ...interface{}) {
+	getDefaultLogger().Warning(format, args...)
 }
 
-func Notice(msg string, args ...interface{}) {
+func Noticef(msg string, args ...interface{}) {
 	getDefaultLogger().Notice(msg, args...)
 }
 
-func Info(msg string, args ...interface{}) {
-	getDefaultLogger().Info(msg, args...)
+func Infof(format string, args ...interface{}) {
+	getDefaultLogger().Info(format, args...)
 }
 
-func Debug(msg string, args ...interface{}) {
-	getDefaultLogger().Debug(msg, args...)
+func Debugf(format string, args ...interface{}) {
+	getDefaultLogger().Debug(format, args...)
 }
 
-func Print(msg string) {
-	getDefaultLogger().Print(msg)
+func Printf(format string, args ...interface{}) {
+	getDefaultLogger().Print(format, args...)
 }
 
 func PrintStack() {
