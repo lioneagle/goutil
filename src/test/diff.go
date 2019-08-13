@@ -66,13 +66,13 @@ func (this *diffWriter) diff(actual, wanted reflect.Value) bool {
 			return false
 		}
 	case reflect.Float32:
-		if a, b := actual.Float(), wanted.Float(); !mathex.EqualFloat64Ex(a, b, mathex.MinAccuracyFloat32) {
+		if a, b := actual.Float(), wanted.Float(); mathex.CompareFloat64Ex(a, b, mathex.MinAccuracyFloat32) != 0 {
 			this.print(a, b)
 			return false
 		}
 
 	case reflect.Float64:
-		if a, b := actual.Float(), wanted.Float(); !mathex.EqualFloat64Ex(a, b, mathex.MinAccuracyFloat64) {
+		if a, b := actual.Float(), wanted.Float(); mathex.CompareFloat64Ex(a, b, mathex.MinAccuracyFloat64) != 0 {
 			this.print(a, b)
 			return false
 		}
