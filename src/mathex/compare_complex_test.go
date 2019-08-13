@@ -6,28 +6,6 @@ import (
 	"github.com/lioneagle/goutil/src/test"
 )
 
-func TestEqualFloat32(t *testing.T) {
-	var x, y float32
-
-	x, y = 0.1, 0.1
-	test.EXPECT_TRUE(t, EqualFloat32(x, y+MinAccuracyFloat32), "")
-	test.EXPECT_TRUE(t, EqualFloat32(x, y-MinAccuracyFloat32), "")
-
-	test.EXPECT_FALSE(t, EqualFloat32(x, y+2*MinAccuracyFloat32), "")
-	test.EXPECT_FALSE(t, EqualFloat32(x, y-2*MinAccuracyFloat32), "")
-}
-
-func TestEqualFloat64(t *testing.T) {
-	x, y := 0.1, 0.1
-	test.EXPECT_TRUE(t, EqualFloat64(x, y+MinAccuracyFloat64), "")
-	test.EXPECT_TRUE(t, EqualFloat64(x, y-MinAccuracyFloat64), "")
-	test.EXPECT_TRUE(t, EqualFloat64Ex(x, y+MinAccuracyFloat32, MinAccuracyFloat32), "")
-	test.EXPECT_TRUE(t, EqualFloat64Ex(x, y-MinAccuracyFloat32, MinAccuracyFloat32), "")
-
-	test.EXPECT_FALSE(t, EqualFloat64(x, y+2*MinAccuracyFloat64), "")
-	test.EXPECT_FALSE(t, EqualFloat64(x, y-2*MinAccuracyFloat64), "")
-}
-
 func TestEqualComplex64(t *testing.T) {
 	var x, y, delta complex64
 
