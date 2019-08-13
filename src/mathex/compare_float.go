@@ -1,9 +1,5 @@
 package mathex
 
-import (
-	"math"
-)
-
 const (
 	MinAccuracyFloat32 = 1.1920928955078125e-7                 // 1 / 2**23
 	MinAccuracyFloat64 = 2.2204460492503130808472633361816e-16 // 1 / 2**52
