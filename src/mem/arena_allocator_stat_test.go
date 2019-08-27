@@ -23,6 +23,9 @@ func TestArenaAllocatorStatPrint(t *testing.T) {
 	test.EXPECT_EQ(t, stat.FreePartNum(), StatNumber(4), "")
 	test.EXPECT_EQ(t, stat.String(), "alloc num: 1\nalloc num ok: 2\nfree all num: 3\nfree part num: 4\n", "")
 
+	stat.ClearAllocNum()
+	test.EXPECT_EQ(t, stat.String(), "alloc num ok: 2\nfree all num: 3\nfree part num: 4\n", "")
+
 	stat.Init()
 	test.EXPECT_EQ(t, stat.String(), "", "")
 }

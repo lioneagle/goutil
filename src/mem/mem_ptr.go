@@ -1,12 +1,7 @@
 package mem
 
 import (
-	"encoding/binary"
-	//"fmt"
-	//"reflect"
-	//"strconv"
 	"unsafe"
-	//"github.com/lioneagle/goutil/src/chars"
 )
 
 /* MemPtr save a integer value or a address shift of memory.
@@ -29,16 +24,4 @@ func (p MemPtr) GetUint() uint {
 
 func MemPtrSetUint(value MemPtr) MemPtr {
 	return value | MEM_PTR_BIT
-}
-
-func (p MemPtr) GetMemAddr(allocator *ArenaAllocator) *byte {
-	return (*byte)(unsafe.Pointer(&allocator.mem[p]))
-}
-
-func (p MemPtr) GetMemPointer(allocator *ArenaAllocator) unsafe.Pointer {
-	return unsafe.Pointer(&allocator.mem[p])
-}
-
-func (p MemPtr) GetUintptr(allocator *ArenaAllocator) uintptr {
-	return (uintptr)(unsafe.Pointer(&allocator.mem[p]))
 }

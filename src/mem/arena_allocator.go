@@ -31,8 +31,8 @@ func RoundToAlign(x, align uint32) uint32 {
  * ArenaAllocator can be reused when one protocol message is processed completed.
  */
 type ArenaAllocator struct {
+	ArenaAllocatorStat
 	used uint32
-	stat ArenaAllocatorStat
 	mem  []byte
 }
 
@@ -45,12 +45,12 @@ func NewArenaAllocator(capacity uint32) *ArenaAllocator {
 func (this *ArenaAllocator) Init(capacity uint32) *ArenaAllocator {
 	this.used = ARENA_ALLOCATOR_PREFIX_LEN
 	this.mem = make([]byte, int(RoundToAlign(capacity+ARENA_ALLOCATOR_PREFIX_LEN, ARENA_ALLOCATOR_ALIGN)))
-	this.stat.Init()
+	this.ArenaAllocatorStat.Init()
 	return this
 }
 
 func (this *ArenaAllocator) Stat() *ArenaAllocatorStat {
-	return &this.stat
+	return &this.ArenaAllocatorStat
 }
 
 func (this *ArenaAllocator) Used() uint32 {
@@ -66,7 +66,7 @@ func (this *ArenaAllocator) Left() uint32 {
 }
 
 func (this *ArenaAllocator) Alloc(size uint32) (addr MemPtr, allocSize uint32) {
-	this.stat.allocNum++
+	this.allocNum++
 
 	used := this.used
 
@@ -75,7 +75,7 @@ func (this *ArenaAllocator) Alloc(size uint32) (addr MemPtr, allocSize uint32) {
 		return MEM_PTR_NIL, 0
 	}
 
-	this.stat.allocNumOk++
+	this.allocNumOk++
 
 	return MemPtr(used), this.used - used
 }
@@ -100,7 +100,7 @@ func (this *ArenaAllocator) ZeroMem(addr MemPtr, num uint32) {
 }
 
 func (this *ArenaAllocator) AllocBytes(data []byte) MemPtr {
-	addr, _ := this.Alloc(uint32(len(data)))
+	addr, _ := this.Alloc(uint32(len(data) + 2))
 	if addr != MEM_PTR_NIL {
 		copy(this.mem[addr:], data)
 		binary.LittleEndian.PutUint16(this.mem[addr-2:], uint16(len(data)))
@@ -110,7 +110,7 @@ func (this *ArenaAllocator) AllocBytes(data []byte) MemPtr {
 }
 
 func (this *ArenaAllocator) AllocBytesBegin() MemPtr {
-	this.stat.allocNum++
+	this.allocNum++
 
 	this.used += 2
 
@@ -141,18 +141,56 @@ func (this *ArenaAllocator) AppendByte(data byte) bool {
 	return true
 }
 
+func (this *ArenaAllocator) AppendByteNoCheck(data byte) {
+	this.mem[this.used] = data
+	this.used++
+}
+
 func (this *ArenaAllocator) AllocBytesEnd(addr MemPtr) {
 	num := this.used - uint32(addr)
 	this.used = (this.used + ARENA_ALLOCATOR_ALIGN - 1) & ^(ARENA_ALLOCATOR_ALIGN - 1)
 	binary.LittleEndian.PutUint16(this.mem[addr-2:], uint16(num))
-	this.stat.allocNumOk++
+	this.allocNumOk++
 }
 
-func (this *ArenaAllocator) BytesLen(addr MemPtr) int {
+func (this *ArenaAllocator) Strlen(addr MemPtr) int {
 	if addr < 2 {
 		return 0
 	}
 	return int(binary.LittleEndian.Uint16(this.mem[addr-2:]))
+}
+
+func (this *ArenaAllocator) FreeAll() {
+	this.freeAllNum++
+	this.used = ARENA_ALLOCATOR_PREFIX_LEN
+}
+
+func (this *ArenaAllocator) FreePart(remain uint32) {
+	this.freePartNum++
+	if remain >= this.used {
+		return
+	}
+	this.used = remain + ARENA_ALLOCATOR_PREFIX_LEN
+}
+
+func (this *ArenaAllocator) GetString(addr MemPtr) string {
+	if addr == MEM_PTR_NIL {
+		return ""
+	}
+
+	header := reflect.StringHeader{Data: this.GetUintptr(addr), Len: this.Strlen(addr)}
+	return *(*string)(unsafe.Pointer(&header))
+}
+
+func (this *ArenaAllocator) Clone() *ArenaAllocator {
+	newAllocator := NewArenaAllocator(this.Capacity())
+	newAllocator.used = this.used
+	copy(newAllocator.mem[:this.used], this.mem[:this.used])
+	return newAllocator
+}
+
+func (this *ArenaAllocator) GetUintptr(addr MemPtr) uintptr {
+	return (uintptr)(unsafe.Pointer(&this.mem[addr]))
 }
 
 func ZeroMem(addr uintptr, size int) {
@@ -161,21 +199,5 @@ func ZeroMem(addr uintptr, size int) {
 
 	for i := range x {
 		x[i] = 0
-	}
-}
-
-func (this *ArenaAllocator) FreeAll() {
-	this.stat.freeAllNum++
-	this.used = ARENA_ALLOCATOR_PREFIX_LEN
-}
-
-func (this *ArenaAllocator) FreePart(remain uint32) {
-	this.stat.freePartNum++
-	if remain >= this.used {
-		return
-	}
-	this.used = remain + ARENA_ALLOCATOR_PREFIX_LEN
-	if this.used < ARENA_ALLOCATOR_PREFIX_LEN {
-		this.used = ARENA_ALLOCATOR_PREFIX_LEN
 	}
 }
