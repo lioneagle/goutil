@@ -8,7 +8,7 @@ import (
 
 func TestArenaAllocatorStatPrint(t *testing.T) {
 	stat := &ArenaAllocatorStat{}
-	test.EXPECT_EQ(t, stat.String(), "", "")
+	test.EXPECT_EQ(t, stat.String(), "all stats are zero", "")
 
 	stat.allocNum = 1
 	test.EXPECT_EQ(t, stat.String(), "alloc num: 1\n", "")
@@ -27,5 +27,5 @@ func TestArenaAllocatorStatPrint(t *testing.T) {
 	test.EXPECT_EQ(t, stat.String(), "alloc num ok: 2\nfree all num: 3\nfree part num: 4\n", "")
 
 	stat.Init()
-	test.EXPECT_EQ(t, stat.String(), "", "")
+	test.EXPECT_EQ(t, stat.String(), "all stats are zero", "")
 }

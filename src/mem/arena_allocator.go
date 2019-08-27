@@ -1,19 +1,15 @@
 package mem
 
 import (
-	//"fmt"
-	//"io"
 	"encoding/binary"
+	"fmt"
+	"io"
 	"reflect"
 	"unsafe"
-	//"github.com/lioneagle/goutil/src/buffer"
+
+	"github.com/lioneagle/goutil/src/buffer"
 )
 
-const SLICE_HEADER_LEN = int32(unsafe.Sizeof(reflect.SliceHeader{}))
-const ARENA_ALLOCATOR_ALIGN = uint32(1)
-
-//const ABNF_MEM_LIGN_MASK = ^(ABNF_MEM_ALIGN - 1)
-//const ABNF_MEM_LIGN_MASK2 = (ABNF_MEM_ALIGN - 1)
 const ARENA_ALLOCATOR_PREFIX_LEN = 8
 
 func RoundToAlign(x, align uint32) uint32 {
@@ -32,19 +28,22 @@ func RoundToAlign(x, align uint32) uint32 {
  */
 type ArenaAllocator struct {
 	ArenaAllocatorStat
-	used uint32
-	mem  []byte
+	used  uint32
+	align uint32
+	mem   []byte
 }
 
-func NewArenaAllocator(capacity uint32) *ArenaAllocator {
-	ret := ArenaAllocator{}
+/* align must be power of 2
+ */
+func NewArenaAllocator(capacity, align uint32) *ArenaAllocator {
+	ret := ArenaAllocator{align: align}
 	ret.Init(capacity)
 	return &ret
 }
 
 func (this *ArenaAllocator) Init(capacity uint32) *ArenaAllocator {
 	this.used = ARENA_ALLOCATOR_PREFIX_LEN
-	this.mem = make([]byte, int(RoundToAlign(capacity+ARENA_ALLOCATOR_PREFIX_LEN, ARENA_ALLOCATOR_ALIGN)))
+	this.mem = make([]byte, int(RoundToAlign(capacity+ARENA_ALLOCATOR_PREFIX_LEN, this.align)))
 	this.ArenaAllocatorStat.Init()
 	return this
 }
@@ -67,10 +66,9 @@ func (this *ArenaAllocator) Left() uint32 {
 
 func (this *ArenaAllocator) Alloc(size uint32) (addr MemPtr, allocSize uint32) {
 	this.allocNum++
-
 	used := this.used
 
-	this.used = (this.used + size + ARENA_ALLOCATOR_ALIGN - 1) & ^(ARENA_ALLOCATOR_ALIGN - 1)
+	this.used = RoundToAlign(this.used+size, this.align)
 	if this.used > uint32(cap(this.mem)) {
 		return MEM_PTR_NIL, 0
 	}
@@ -102,6 +100,7 @@ func (this *ArenaAllocator) ZeroMem(addr MemPtr, num uint32) {
 func (this *ArenaAllocator) AllocBytes(data []byte) MemPtr {
 	addr, _ := this.Alloc(uint32(len(data) + 2))
 	if addr != MEM_PTR_NIL {
+		addr += 2
 		copy(this.mem[addr:], data)
 		binary.LittleEndian.PutUint16(this.mem[addr-2:], uint16(len(data)))
 	}
@@ -111,7 +110,6 @@ func (this *ArenaAllocator) AllocBytes(data []byte) MemPtr {
 
 func (this *ArenaAllocator) AllocBytesBegin() MemPtr {
 	this.allocNum++
-
 	this.used += 2
 
 	if this.used > uint32(cap(this.mem)) {
@@ -148,7 +146,7 @@ func (this *ArenaAllocator) AppendByteNoCheck(data byte) {
 
 func (this *ArenaAllocator) AllocBytesEnd(addr MemPtr) {
 	num := this.used - uint32(addr)
-	this.used = (this.used + ARENA_ALLOCATOR_ALIGN - 1) & ^(ARENA_ALLOCATOR_ALIGN - 1)
+	this.used = RoundToAlign(this.used, this.align)
 	binary.LittleEndian.PutUint16(this.mem[addr-2:], uint16(num))
 	this.allocNumOk++
 }
@@ -183,7 +181,7 @@ func (this *ArenaAllocator) GetString(addr MemPtr) string {
 }
 
 func (this *ArenaAllocator) Clone() *ArenaAllocator {
-	newAllocator := NewArenaAllocator(this.Capacity())
+	newAllocator := NewArenaAllocator(this.Capacity(), this.align)
 	newAllocator.used = this.used
 	copy(newAllocator.mem[:this.used], this.mem[:this.used])
 	return newAllocator
@@ -191,6 +189,40 @@ func (this *ArenaAllocator) Clone() *ArenaAllocator {
 
 func (this *ArenaAllocator) GetUintptr(addr MemPtr) uintptr {
 	return (uintptr)(unsafe.Pointer(&this.mem[addr]))
+}
+
+func (this *ArenaAllocator) String() string {
+	buf := buffer.NewByteBuffer(nil)
+	this.PrintBrief(buf)
+	return buf.String()
+}
+
+func (this *ArenaAllocator) PrintAll(w io.Writer) {
+	this.Print(w, 0, int(this.Capacity()))
+}
+
+func (this *ArenaAllocator) PrintUsed(w io.Writer) {
+	this.Print(w, 0, int(this.Used()))
+}
+
+func (this *ArenaAllocator) PrintBrief(w io.Writer) {
+	size := int(this.Used())
+	if size > 64 {
+		size = 64
+	}
+	this.Print(w, 0, size)
+}
+
+func (this *ArenaAllocator) Print(w io.Writer, memBegin, memEnd int) {
+	fmt.Fprintln(w, "-------------------------- ArenaAllocator show begin ----------------------------")
+	buffer.PrintAsHex(w, this.mem, memBegin+ARENA_ALLOCATOR_PREFIX_LEN, memEnd+ARENA_ALLOCATOR_PREFIX_LEN)
+	fmt.Fprintln(w, "---------------------------------------------------------------------------------")
+	fmt.Fprintln(w, "ArenaAllocator stat:")
+	this.ArenaAllocatorStat.Print(w)
+	fmt.Fprintf(w, "Used     = %d\n", this.Used())
+	fmt.Fprintf(w, "Left     = %d\n", this.Left())
+	fmt.Fprintf(w, "Capacity = %d\n", this.Capacity())
+	fmt.Fprintln(w, "-------------------------- ArenaAllocator show end   ----------------------------")
 }
 
 func ZeroMem(addr uintptr, size int) {

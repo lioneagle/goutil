@@ -22,6 +22,10 @@ func (p MemPtr) GetUint() uint {
 	return uint(p & MEM_PTR_MASK)
 }
 
+func (p MemPtr) IsUint() bool {
+	return (p & MEM_PTR_BIT) != 0
+}
+
 func MemPtrSetUint(value MemPtr) MemPtr {
 	return value | MEM_PTR_BIT
 }

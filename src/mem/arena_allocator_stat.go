@@ -61,11 +61,18 @@ func (this *ArenaAllocatorStat) Print(w io.Writer) {
 		{"free part num", this.freePartNum},
 	}
 
+	hasNonZero := false
+
 	for _, v := range stat {
 		if v.num > 0 {
+			hasNonZero = true
 			io.WriteString(w, v.name)
 			io.WriteString(w, ": ")
 			fmt.Fprintf(w, "%d\n", v.num)
 		}
+	}
+
+	if !hasNonZero {
+		io.WriteString(w, "all stats are zero")
 	}
 }

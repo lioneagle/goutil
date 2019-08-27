@@ -4,11 +4,12 @@ import (
 	//"fmt"
 	"testing"
 
+	"github.com/lioneagle/goutil/src/buffer"
 	"github.com/lioneagle/goutil/src/test"
 )
 
 func TestArenaAllocatorAllocOk(t *testing.T) {
-	allocator := NewArenaAllocator(1024)
+	allocator := NewArenaAllocator(1024, 1)
 	test.EXPECT_NE(t, allocator.Capacity(), 1024, "")
 	test.EXPECT_NE(t, allocator.Left(), 1024, "")
 
@@ -20,22 +21,18 @@ func TestArenaAllocatorAllocOk(t *testing.T) {
 	test.EXPECT_EQ(t, allocator.Stat().AllocNumOk(), uint64(1), "")
 
 	allocator.FreeAll()
-	test.EXPECT_EQ(t, allocator.Used(), uint32(0), "")
-
 	addr, _ = allocator.AllocWithClear(8)
 	test.EXPECT_NE(t, addr, MEM_PTR_NIL, "")
 	test.EXPECT_EQ(t, allocator.Used(), uint32(8), "")
 	test.EXPECT_EQ(t, allocator.mem[allocator.used-8:allocator.used], []byte{0, 0, 0, 0, 0, 0, 0, 0}, "")
 
 	allocator.FreeAll()
-	test.EXPECT_EQ(t, allocator.Used(), uint32(0), "")
-
 	addr = allocator.AllocBytes([]byte("12346"))
 	test.EXPECT_NE(t, addr, MEM_PTR_NIL, "")
 	test.EXPECT_EQ(t, allocator.GetString(addr), "12346", "")
+	test.EXPECT_EQ(t, allocator.mem[addr-2], byte(5), "")
 
 	allocator.FreeAll()
-	test.EXPECT_EQ(t, allocator.Used(), uint32(0), "")
 
 	addr = allocator.AllocBytesBegin()
 	test.EXPECT_NE(t, addr, MEM_PTR_NIL, "")
@@ -45,7 +42,6 @@ func TestArenaAllocatorAllocOk(t *testing.T) {
 	test.EXPECT_EQ(t, allocator.GetString(addr), "12378", "")
 
 	allocator.FreeAll()
-	test.EXPECT_EQ(t, allocator.Used(), uint32(0), "")
 	addr = allocator.AllocBytesBegin()
 	test.EXPECT_NE(t, addr, MEM_PTR_NIL, "")
 	ret = allocator.AppendBytes([]byte("12378"))
@@ -58,7 +54,7 @@ func TestArenaAllocatorAllocOk(t *testing.T) {
 }
 
 func TestArenaAllocatorAllocNOk(t *testing.T) {
-	allocator := NewArenaAllocator(1024)
+	allocator := NewArenaAllocator(1024, 1)
 	test.EXPECT_NE(t, allocator.Capacity(), 1024, "")
 	test.EXPECT_NE(t, allocator.Left(), 1024, "")
 
@@ -81,7 +77,7 @@ func TestArenaAllocatorAllocNOk(t *testing.T) {
 }
 
 func TestArenaAllocatorFreeOk(t *testing.T) {
-	allocator := NewArenaAllocator(1024)
+	allocator := NewArenaAllocator(1024, 1)
 	test.EXPECT_NE(t, allocator.Capacity(), 1024, "")
 	test.EXPECT_NE(t, allocator.Left(), 1024, "")
 
@@ -94,7 +90,7 @@ func TestArenaAllocatorFreeOk(t *testing.T) {
 }
 
 func TestArenaAllocatorFreeNOk(t *testing.T) {
-	allocator := NewArenaAllocator(1024)
+	allocator := NewArenaAllocator(1024, 1)
 	test.EXPECT_NE(t, allocator.Capacity(), 1024, "")
 	test.EXPECT_NE(t, allocator.Left(), 1024, "")
 
@@ -104,7 +100,7 @@ func TestArenaAllocatorFreeNOk(t *testing.T) {
 }
 
 func TestArenaAllocatorGetString(t *testing.T) {
-	allocator := NewArenaAllocator(1024)
+	allocator := NewArenaAllocator(1024, 1)
 
 	addr := allocator.AllocBytes(nil)
 	test.EXPECT_EQ(t, allocator.Used(), uint32(2), "")
@@ -117,7 +113,7 @@ func TestArenaAllocatorGetString(t *testing.T) {
 }
 
 func TestArenaAllocatorStrlen(t *testing.T) {
-	allocator := NewArenaAllocator(1024)
+	allocator := NewArenaAllocator(1024, 1)
 
 	addr := allocator.AllocBytes(nil)
 	test.EXPECT_EQ(t, allocator.Used(), uint32(2), "")
@@ -130,7 +126,7 @@ func TestArenaAllocatorStrlen(t *testing.T) {
 }
 
 func TestArenaAllocatorZeroMem(t *testing.T) {
-	allocator := NewArenaAllocator(1024)
+	allocator := NewArenaAllocator(1024, 1)
 
 	addr := allocator.AllocBytes([]byte("1234"))
 	allocator.ZeroMem(addr, 4)
@@ -138,7 +134,7 @@ func TestArenaAllocatorZeroMem(t *testing.T) {
 }
 
 func TestArenaAllocatorClone(t *testing.T) {
-	allocator := NewArenaAllocator(1024)
+	allocator := NewArenaAllocator(1024, 1)
 
 	addr := allocator.AllocBytes([]byte("1234"))
 
@@ -149,8 +145,89 @@ func TestArenaAllocatorClone(t *testing.T) {
 	test.EXPECT_EQ(t, newAllocator.GetString(addr), "1234", "")
 }
 
+func TestArenaAllocatorString(t *testing.T) {
+	allocator := NewArenaAllocator(1024, 1)
+	allocator.AllocBytes([]byte("1234"))
+
+	wanted := `-------------------------- ArenaAllocator show begin ----------------------------
+00000008h: 04 00 31 32 33 34                                ; ..1234
+---------------------------------------------------------------------------------
+ArenaAllocator stat:
+alloc num: 1
+alloc num ok: 1
+Used     = 6
+Left     = 1018
+Capacity = 1024
+-------------------------- ArenaAllocator show end   ----------------------------
+`
+	str := allocator.String()
+	test.EXPECT_EQ(t, str, wanted, "")
+
+	allocator.FreeAll()
+	allocator.AllocBytes([]byte("12345678901234567890123456789012345678901234567890123456789012345"))
+
+	wanted = `-------------------------- ArenaAllocator show begin ----------------------------
+00000008h: 41 00 31 32 33 34 35 36  37 38 39 30 31 32 33 34 ; A.123456 78901234
+00000018h: 35 36 37 38 39 30 31 32  33 34 35 36 37 38 39 30 ; 56789012 34567890
+00000028h: 31 32 33 34 35 36 37 38  39 30 31 32 33 34 35 36 ; 12345678 90123456
+00000038h: 37 38 39 30 31 32 33 34  35 36 37 38 39 30 31 32 ; 78901234 56789012
+---------------------------------------------------------------------------------
+ArenaAllocator stat:
+alloc num: 2
+alloc num ok: 2
+free all num: 1
+Used     = 67
+Left     = 957
+Capacity = 1024
+-------------------------- ArenaAllocator show end   ----------------------------
+`
+
+	str = allocator.String()
+	test.EXPECT_EQ(t, str, wanted, "")
+}
+
+func TestArenaAllocatorPrintAll(t *testing.T) {
+	allocator := NewArenaAllocator(16, 1)
+	allocator.AllocBytes([]byte("1234"))
+
+	wanted := `-------------------------- ArenaAllocator show begin ----------------------------
+00000008h: 04 00 31 32 33 34 00 00  00 00 00 00 00 00 00 00 ; ..1234.. ........
+---------------------------------------------------------------------------------
+ArenaAllocator stat:
+alloc num: 1
+alloc num ok: 1
+Used     = 6
+Left     = 10
+Capacity = 16
+-------------------------- ArenaAllocator show end   ----------------------------
+`
+	buf := buffer.NewByteBuffer(nil)
+	allocator.PrintAll(buf)
+	test.EXPECT_EQ(t, buf.String(), wanted, "")
+}
+
+func TestArenaAllocatorPrintUsed(t *testing.T) {
+	allocator := NewArenaAllocator(16, 1)
+	allocator.AllocBytes([]byte("1234"))
+
+	wanted := `-------------------------- ArenaAllocator show begin ----------------------------
+00000008h: 04 00 31 32 33 34                                ; ..1234
+---------------------------------------------------------------------------------
+ArenaAllocator stat:
+alloc num: 1
+alloc num ok: 1
+Used     = 6
+Left     = 10
+Capacity = 16
+-------------------------- ArenaAllocator show end   ----------------------------
+`
+	buf := buffer.NewByteBuffer(nil)
+	allocator.PrintUsed(buf)
+	test.EXPECT_EQ(t, buf.String(), wanted, "")
+}
+
 func TestZeroMem(t *testing.T) {
-	allocator := NewArenaAllocator(1024)
+	allocator := NewArenaAllocator(1024, 1)
 
 	addr := allocator.AllocBytes([]byte("1234"))
 	ZeroMem(allocator.GetUintptr(addr), 4)
@@ -159,7 +236,7 @@ func TestZeroMem(t *testing.T) {
 
 func BenchmarkArenaAllocatorAlloc(b *testing.B) {
 	b.StopTimer()
-	allocator := NewArenaAllocator(1024 * 128)
+	allocator := NewArenaAllocator(1024*128, 1)
 	b.ReportAllocs()
 	b.SetBytes(2)
 	b.StartTimer()
@@ -172,7 +249,7 @@ func BenchmarkArenaAllocatorAlloc(b *testing.B) {
 
 func BenchmarkArenaAllocatorAllocWithClear1(b *testing.B) {
 	b.StopTimer()
-	allocator := NewArenaAllocator(1024 * 128)
+	allocator := NewArenaAllocator(1024*128, 1)
 	b.ReportAllocs()
 	b.SetBytes(2)
 	b.StartTimer()
@@ -185,7 +262,7 @@ func BenchmarkArenaAllocatorAllocWithClear1(b *testing.B) {
 
 func BenchmarkArenaAllocatorAllocBytes1(b *testing.B) {
 	b.StopTimer()
-	allocator := NewArenaAllocator(1024 * 128)
+	allocator := NewArenaAllocator(1024*128, 1)
 	data := []byte("01234567890123456789012345678901")
 	b.ReportAllocs()
 	b.SetBytes(2)
@@ -199,7 +276,7 @@ func BenchmarkArenaAllocatorAllocBytes1(b *testing.B) {
 
 func BenchmarkArenaAllocatorAllocBytes2(b *testing.B) {
 	b.StopTimer()
-	allocator := NewArenaAllocator(1024 * 128)
+	allocator := NewArenaAllocator(1024*128, 1)
 	data := []byte("01234567890123456789012345678901")
 	b.ReportAllocs()
 	b.SetBytes(2)
@@ -216,7 +293,7 @@ func BenchmarkArenaAllocatorAllocBytes2(b *testing.B) {
 
 func BenchmarkArenaAllocatorAllocBytes3(b *testing.B) {
 	b.StopTimer()
-	allocator := NewArenaAllocator(1024 * 128)
+	allocator := NewArenaAllocator(1024*128, 1)
 	data := []byte("01234567890123456789012345678901")
 	b.ReportAllocs()
 	b.SetBytes(2)
@@ -234,7 +311,7 @@ func BenchmarkArenaAllocatorAllocBytes3(b *testing.B) {
 
 func BenchmarkArenaAllocatorAllocBytes4(b *testing.B) {
 	b.StopTimer()
-	allocator := NewArenaAllocator(1024 * 128)
+	allocator := NewArenaAllocator(1024*128, 1)
 	data := []byte("01234567890123456789012345678901")
 	b.ReportAllocs()
 	b.SetBytes(2)
