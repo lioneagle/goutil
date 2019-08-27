@@ -100,12 +100,11 @@ func (this *ArenaAllocator) ZeroMem(addr MemPtr, num uint32) {
 func (this *ArenaAllocator) AllocBytes(data []byte) MemPtr {
 	addr, _ := this.Alloc(uint32(len(data) + 2))
 	if addr != MEM_PTR_NIL {
-		addr += 2
-		copy(this.mem[addr:], data)
-		binary.LittleEndian.PutUint16(this.mem[addr-2:], uint16(len(data)))
+		copy(this.mem[addr+2:], data)
+		binary.LittleEndian.PutUint16(this.mem[addr:], uint16(len(data)))
 	}
 
-	return addr
+	return addr + 2
 }
 
 func (this *ArenaAllocator) AllocBytesBegin() MemPtr {
@@ -233,4 +232,31 @@ func ZeroMem(addr uintptr, size int) {
 	for i := range x {
 		x[i] = 0
 	}
+}
+
+func ParseCharsetAndAlloc(allocator *ArenaAllocator, src []byte, pos int, charset *[256]uint32, mask uint32) (addr MemPtr, newPos int) {
+	newPos = ParseCharset(src, pos, charset, mask)
+
+	if newPos <= pos {
+		return MEM_PTR_NIL, newPos
+	}
+
+	addr = allocator.AllocBytes(src[pos:newPos])
+	return addr, newPos
+}
+
+func ParseCharsetAndAllocEnableEmpty(allocator *ArenaAllocator, src []byte, pos int, charset *[256]uint32, mask uint32) (addr MemPtr, newPos int) {
+	newPos = ParseCharset(src, pos, charset, mask)
+	addr = allocator.AllocBytes(src[pos:newPos])
+	return addr, newPos
+}
+
+func ParseCharset(src []byte, pos int, charset *[256]uint32, mask uint32) (newPos int) {
+	for newPos = pos; newPos < len(src); newPos++ {
+		if (charset[src[newPos]] & mask) == 0 {
+			break
+		}
+	}
+
+	return newPos
 }
