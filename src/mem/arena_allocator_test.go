@@ -152,12 +152,14 @@ func TestArenaAllocatorString(t *testing.T) {
 	wanted := `-------------------------- ArenaAllocator show begin ----------------------------
 00000008h: 04 00 31 32 33 34                                ; ..1234
 ---------------------------------------------------------------------------------
-ArenaAllocator stat:
+STAT:
 alloc num: 1
 alloc num ok: 1
-Used     = 6
-Left     = 1018
-Capacity = 1024
+
+MEMORY:
+used     = 6
+left     = 1018
+capacity = 1024
 -------------------------- ArenaAllocator show end   ----------------------------
 `
 	str := allocator.String()
@@ -172,13 +174,15 @@ Capacity = 1024
 00000028h: 31 32 33 34 35 36 37 38  39 30 31 32 33 34 35 36 ; 12345678 90123456
 00000038h: 37 38 39 30 31 32 33 34  35 36 37 38 39 30 31 32 ; 78901234 56789012
 ---------------------------------------------------------------------------------
-ArenaAllocator stat:
+STAT:
 alloc num: 2
 alloc num ok: 2
 free all num: 1
-Used     = 67
-Left     = 957
-Capacity = 1024
+
+MEMORY:
+used     = 67
+left     = 957
+capacity = 1024
 -------------------------- ArenaAllocator show end   ----------------------------
 `
 
@@ -193,12 +197,14 @@ func TestArenaAllocatorPrintAll(t *testing.T) {
 	wanted := `-------------------------- ArenaAllocator show begin ----------------------------
 00000008h: 04 00 31 32 33 34 00 00  00 00 00 00 00 00 00 00 ; ..1234.. ........
 ---------------------------------------------------------------------------------
-ArenaAllocator stat:
+STAT:
 alloc num: 1
 alloc num ok: 1
-Used     = 6
-Left     = 10
-Capacity = 16
+
+MEMORY:
+used     = 6
+left     = 10
+capacity = 16
 -------------------------- ArenaAllocator show end   ----------------------------
 `
 	buf := buffer.NewByteBuffer(nil)
@@ -213,12 +219,14 @@ func TestArenaAllocatorPrintUsed(t *testing.T) {
 	wanted := `-------------------------- ArenaAllocator show begin ----------------------------
 00000008h: 04 00 31 32 33 34                                ; ..1234
 ---------------------------------------------------------------------------------
-ArenaAllocator stat:
+STAT:
 alloc num: 1
 alloc num ok: 1
-Used     = 6
-Left     = 10
-Capacity = 16
+
+MEMORY:
+used     = 6
+left     = 10
+capacity = 16
 -------------------------- ArenaAllocator show end   ----------------------------
 `
 	buf := buffer.NewByteBuffer(nil)

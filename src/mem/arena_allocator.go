@@ -217,11 +217,12 @@ func (this *ArenaAllocator) Print(w io.Writer, memBegin, memEnd int) {
 	fmt.Fprintln(w, "-------------------------- ArenaAllocator show begin ----------------------------")
 	buffer.PrintAsHex(w, this.mem, memBegin+ARENA_ALLOCATOR_PREFIX_LEN, memEnd+ARENA_ALLOCATOR_PREFIX_LEN)
 	fmt.Fprintln(w, "---------------------------------------------------------------------------------")
-	fmt.Fprintln(w, "ArenaAllocator stat:")
+	fmt.Fprintln(w, "STAT:")
 	this.ArenaAllocatorStat.Print(w)
-	fmt.Fprintf(w, "Used     = %d\n", this.Used())
-	fmt.Fprintf(w, "Left     = %d\n", this.Left())
-	fmt.Fprintf(w, "Capacity = %d\n", this.Capacity())
+	fmt.Fprintln(w, "\nMEMORY:")
+	fmt.Fprintf(w, "used     = %d\n", this.Used())
+	fmt.Fprintf(w, "left     = %d\n", this.Left())
+	fmt.Fprintf(w, "capacity = %d\n", this.Capacity())
 	fmt.Fprintln(w, "-------------------------- ArenaAllocator show end   ----------------------------")
 }
 
