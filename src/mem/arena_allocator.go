@@ -233,30 +233,3 @@ func ZeroMem(addr uintptr, size int) {
 		x[i] = 0
 	}
 }
-
-func ParseCharsetAndAlloc(allocator *ArenaAllocator, src []byte, pos int, charset *[256]uint32, mask uint32) (addr MemPtr, newPos int) {
-	newPos = ParseCharset(src, pos, charset, mask)
-
-	if newPos <= pos {
-		return MEM_PTR_NIL, newPos
-	}
-
-	addr = allocator.AllocBytes(src[pos:newPos])
-	return addr, newPos
-}
-
-func ParseCharsetAndAllocEnableEmpty(allocator *ArenaAllocator, src []byte, pos int, charset *[256]uint32, mask uint32) (addr MemPtr, newPos int) {
-	newPos = ParseCharset(src, pos, charset, mask)
-	addr = allocator.AllocBytes(src[pos:newPos])
-	return addr, newPos
-}
-
-func ParseCharset(src []byte, pos int, charset *[256]uint32, mask uint32) (newPos int) {
-	for newPos = pos; newPos < len(src); newPos++ {
-		if (charset[src[newPos]] & mask) == 0 {
-			break
-		}
-	}
-
-	return newPos
-}
