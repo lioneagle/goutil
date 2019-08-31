@@ -39,6 +39,7 @@ func TestArenaAllocatorAllocOk(t *testing.T) {
 	ret := allocator.AppendBytes([]byte("12378"))
 	test.EXPECT_TRUE(t, ret, "")
 	allocator.AllocBytesEnd(addr)
+	test.EXPECT_EQ(t, allocator.Strlen(addr), 5, "")
 	test.EXPECT_EQ(t, allocator.GetString(addr), "12378", "")
 
 	allocator.FreeAll()
@@ -50,6 +51,7 @@ func TestArenaAllocatorAllocOk(t *testing.T) {
 	test.EXPECT_TRUE(t, ret, "")
 	allocator.AppendByteNoCheck('a')
 	allocator.AllocBytesEnd(addr)
+	test.EXPECT_EQ(t, allocator.Strlen(addr), 7, "")
 	test.EXPECT_EQ(t, allocator.GetString(addr), "123786a", "")
 }
 
