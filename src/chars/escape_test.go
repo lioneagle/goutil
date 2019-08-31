@@ -27,7 +27,7 @@ func TestUnescape(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			u := Unescape([]byte(v.escaped))
+			u := PercentUnescape([]byte(v.escaped))
 			test.EXPECT_EQ(t, string(u), v.unescaped, "")
 		})
 	}
@@ -77,8 +77,8 @@ func TestEscape(t *testing.T) {
 		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
 			t.Parallel()
 
-			u := Escape(chars, v.isInCharset)
-			test.EXPECT_TRUE(t, bytes.Equal(Unescape(u), chars), "")
+			u := PercentEscape(chars, v.isInCharset)
+			test.EXPECT_TRUE(t, bytes.Equal(PercentUnescape(u), chars), "")
 		})
 	}
 }
@@ -100,7 +100,7 @@ func BenchmarkEscape(b *testing.B) {
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		Escape(src, IsDigit)
+		PercentEscape(src, IsDigit)
 	}
 }
 
@@ -114,7 +114,7 @@ func BenchmarkEscapeEx(b *testing.B) {
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		EscapeEx(src, &Charsets0, MASK_DIGIT)
+		PercentEscapeEx(src, &Charsets0, MASK_DIGIT)
 	}
 }
 
@@ -128,6 +128,6 @@ func BenchmarkUnescape(b *testing.B) {
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		Unescape(src)
+		PercentUnescape(src)
 	}
 }

@@ -6,7 +6,7 @@ import (
 
 type IsInCharset func(ch byte) bool
 
-func Unescape(src []byte) (dst []byte) {
+func PercentUnescape(src []byte) (dst []byte) {
 	if bytes.IndexByte(src, '%') == -1 {
 		return src
 	}
@@ -15,7 +15,7 @@ func Unescape(src []byte) (dst []byte) {
 
 	for i := 0; i < len1; {
 		if (src[i] == '%') && ((i + 2) < len1) && IsHex(src[i+1]) && IsHex(src[i+2]) {
-			dst = append(dst, UnescapeToByteEx(src[i+1], src[i+2]))
+			dst = append(dst, PercentUnescapeToByteEx(src[i+1], src[i+2]))
 			i += 3
 		} else {
 			dst = append(dst, src[i])
@@ -26,15 +26,15 @@ func Unescape(src []byte) (dst []byte) {
 	return dst
 }
 
-func UnescapeToByte(src []byte) byte {
+func PercentUnescapeToByte(src []byte) byte {
 	return HexToByte(src[1])<<4 | HexToByte(src[2])
 }
 
-func UnescapeToByteEx(v1, v2 byte) byte {
+func PercentUnescapeToByteEx(v1, v2 byte) byte {
 	return HexToByte(v1)<<4 | HexToByte(v2)
 }
 
-func Escape(src []byte, inCharset IsInCharset) (dst []byte) {
+func PercentEscape(src []byte, inCharset IsInCharset) (dst []byte) {
 	if !NeedEscape(src, inCharset) {
 		return src
 	}
@@ -59,7 +59,7 @@ func NeedEscape(src []byte, inCharset IsInCharset) bool {
 	return false
 }
 
-func EscapeEx(src []byte, charset *[256]uint32, mask uint32) (dst []byte) {
+func PercentEscapeEx(src []byte, charset *[256]uint32, mask uint32) (dst []byte) {
 	if !NeedEscapeEx(src, charset, mask) {
 		return src
 	}

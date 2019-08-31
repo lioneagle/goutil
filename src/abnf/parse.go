@@ -52,7 +52,6 @@ func ParseInCharsetPercentEscapable(allocator *mem.ArenaAllocator, src []byte, p
 	for newPos < len1 {
 		v = src[newPos]
 		if ((charset[v]) & mask) == 0 {
-
 			if v != '%' {
 				break
 			}
