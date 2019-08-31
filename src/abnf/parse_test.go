@@ -72,35 +72,6 @@ func TestParseInCharsetAndAlloc(t *testing.T) {
 	}
 }
 
-func TestParseInCharsetAndAllocEnableEmpty(t *testing.T) {
-	testdata := []struct {
-		name    string
-		charset *[256]uint32
-		mask    uint32
-		src     string
-		newPos  int
-	}{
-		{"IsDigit", &chars.Charsets0, chars.MASK_DIGIT, "01234abc", 5},
-		{"IsDigit", &chars.Charsets0, chars.MASK_DIGIT, "56789=bc", 5},
-		{"IsDigit", &chars.Charsets0, chars.MASK_DIGIT, "ad6789abc", 0},
-	}
-
-	for i, v := range testdata {
-		v := v
-
-		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
-			t.Parallel()
-
-			allocator := mem.NewArenaAllocator(1024, 1)
-			addr, newPos := ParseInCharsetAndAllocEnableEmpty(allocator, []byte(v.src), 0, v.charset, v.mask)
-
-			test.EXPECT_NE(t, addr, mem.MEM_PTR_NIL, "")
-			test.EXPECT_EQ(t, allocator.Strlen(addr), v.newPos, "")
-			test.EXPECT_EQ(t, newPos, v.newPos, "")
-		})
-	}
-}
-
 func BenchmarkParseCharset(b *testing.B) {
 	b.StopTimer()
 	allocator := mem.NewArenaAllocator(1024, 1)

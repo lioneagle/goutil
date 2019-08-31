@@ -17,15 +17,15 @@ func RoundToAlign(x, align uint32) uint32 {
 }
 
 /* ArenaAllocator is a memory allocator for text/binary protocol processing,
- * it allocates memories and does not deallocate every memories which have
- * been allocated. It deallacator all memories by FreeAll.
- *
- * ArenaAllocator has no lock, so it is not gorouting safe, each gorouting
- * should use their own ArenaAllocator
- *
- * ArenaAllocator allocates memory fast and support alloctes memory when parsing.
- * ArenaAllocator can be reused when one protocol message is processed completed.
- */
+   it allocates memories and does not deallocate every memories which have
+   been allocated. It deallacator all memories by FreeAll.
+
+   ArenaAllocator has no lock, so it is not gorouting safe, each gorouting
+   should use their own ArenaAllocator
+
+   ArenaAllocator allocates memory fast and support alloctes memory when parsing.
+   ArenaAllocator can be reused when one protocol message is processed completed.
+*/
 type ArenaAllocator struct {
 	ArenaAllocatorStat
 	used  uint32
