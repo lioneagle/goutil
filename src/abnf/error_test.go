@@ -11,7 +11,7 @@ import (
 var src = []byte("12345678")
 
 func f1() error {
-	return New(src, 0, "err of f1")
+	return NewError(src, 0, "err of f1")
 }
 
 func f2() error {

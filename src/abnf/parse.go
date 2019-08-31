@@ -1,12 +1,15 @@
 package abnf
 
 import (
+	"fmt"
+
+	"github.com/lioneagle/goutil/src/chars"
 	"github.com/lioneagle/goutil/src/mem"
 )
 
 /* parse input when char is in charset and not empty, and allocte memory for output
  */
-func ParseInCharsetAndAlloc(allocator *mem.ArenaAllocator, src []byte, pos int, charset *[256]uint32, mask uint32) (addr mem.MemPtr, newPos int) {
+func ParseInCharsetAndAlloc(allocator *mem.ArenaAllocator, src []byte, pos Pos, charset *[256]uint32, mask uint32) (addr mem.MemPtr, newPos Pos) {
 	newPos = ParseInCharset(src, pos, charset, mask)
 
 	if newPos <= pos {
@@ -17,8 +20,10 @@ func ParseInCharsetAndAlloc(allocator *mem.ArenaAllocator, src []byte, pos int, 
 	return addr, newPos
 }
 
-func ParseInCharset(src []byte, pos int, charset *[256]uint32, mask uint32) (newPos int) {
-	for newPos = pos; newPos < len(src); newPos++ {
+/* parse input when char is in charset
+ */
+func ParseInCharset(src []byte, pos Pos, charset *[256]uint32, mask uint32) (newPos Pos) {
+	for newPos = pos; newPos < Pos(len(src)); newPos++ {
 		if (charset[src[newPos]] & mask) == 0 {
 			break
 		}
@@ -27,12 +32,83 @@ func ParseInCharset(src []byte, pos int, charset *[256]uint32, mask uint32) (new
 	return newPos
 }
 
-func ParseInCharsetPercentEscapable(src []byte, pos int, charset *[256]uint32, mask uint32) (newPos int) {
-	for newPos = pos; newPos < len(src); newPos++ {
-		if (charset[src[newPos]] & mask) == 0 {
-			break
+/* parse input when char is in charset and char may be percent escaped, such as "%61"
+ */
+func ParseInCharsetPercentEscapable(allocator *mem.ArenaAllocator, src []byte, pos Pos, charset *[256]uint32, mask uint32) (addr mem.MemPtr, newPos Pos, err error) {
+	newPos = pos
+	len1 := Pos(len(src))
+
+	fmt.Println("x0.1")
+	fmt.Println("allocator.Used() =", allocator.Used())
+
+	v := src[newPos]
+	if ((charset[v] & mask) == 0) && (v != '%') {
+		return mem.MEM_PTR_NIL, newPos, nil
+	}
+
+	addr = allocator.AllocBytesBegin()
+	if addr == mem.MEM_PTR_NIL {
+		fmt.Println("x0.3")
+		return mem.MEM_PTR_NIL, newPos, NewError(src, newPos, "no mem")
+	}
+
+	fmt.Println("x0.2")
+	fmt.Println("allocator.Used() =", allocator.Used())
+	fmt.Println("allocator.Capacity() =", allocator.Capacity())
+
+	prevPos := newPos
+	for newPos < len1 {
+		v = src[newPos]
+		fmt.Printf("v = %c\n", v)
+		if ((charset[v]) & mask) == 0 {
+
+			if v != '%' {
+				break
+			}
+
+			if (newPos + 2) >= len1 {
+				return mem.MEM_PTR_NIL, newPos, NewError(src, newPos, "reach end after '%'")
+			}
+
+			v1 := src[newPos+1]
+			v2 := src[newPos+2]
+			fmt.Println("x1")
+
+			if !chars.IsHex(v1) || !chars.IsHex(v2) {
+				return mem.MEM_PTR_NIL, newPos, NewError(src, newPos, "not HEX after '%'")
+			}
+
+			v = chars.UnescapeToByteEx(v1, v2)
+			if ((charset[v]) & mask) == 0 {
+				break
+			}
+
+			if (prevPos < newPos) && !allocator.AppendBytes(src[prevPos:newPos]) {
+				return mem.MEM_PTR_NIL, newPos, NewError(src, newPos, "no mem")
+			}
+
+			if !allocator.AppendByte(v) {
+				return mem.MEM_PTR_NIL, newPos, NewError(src, newPos, "no mem")
+			}
+
+			newPos += 3
+			prevPos = newPos
+
+			fmt.Println("x1.1")
+			fmt.Println("prevPos =", prevPos, "newPos =", newPos, "pos =", pos)
+		} else {
+			newPos++
 		}
 	}
 
-	return newPos
+	if (prevPos < newPos) && !allocator.AppendBytes(src[prevPos:newPos]) {
+		fmt.Println("x2.0")
+		return mem.MEM_PTR_NIL, newPos, NewError(src, newPos, "no mem")
+	}
+
+	fmt.Println("x2")
+	fmt.Println("prevPos =", prevPos, "newPos =", newPos, "pos =", pos)
+	fmt.Println("allocator.Used() =", allocator.Used())
+	allocator.AllocBytesEnd(addr)
+	return addr, newPos, nil
 }

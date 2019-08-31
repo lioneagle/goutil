@@ -37,9 +37,9 @@ func (e *Error) Write(w io.Writer) {
 	}
 }
 
-// New returns an error with the supplied message.
-// New also records the stack trace at the point it was called.
-func New(src []byte, pos Pos, message string) error {
+// NewError returns an error with the supplied message.
+// NewError also records the stack trace at the point it was called.
+func NewError(src []byte, pos Pos, message string) error {
 	err := &Error{src: src, pos: pos}
 	return errors.Wrap(err, message)
 }
