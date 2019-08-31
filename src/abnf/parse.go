@@ -1,7 +1,7 @@
 package abnf
 
 import (
-	"fmt"
+	//"fmt"
 
 	"github.com/lioneagle/goutil/src/chars"
 	"github.com/lioneagle/goutil/src/mem"
@@ -38,9 +38,6 @@ func ParseInCharsetPercentEscapable(allocator *mem.ArenaAllocator, src []byte, p
 	newPos = pos
 	len1 := Pos(len(src))
 
-	fmt.Println("x0.1")
-	fmt.Println("allocator.Used() =", allocator.Used())
-
 	v := src[newPos]
 	if ((charset[v] & mask) == 0) && (v != '%') {
 		return mem.MEM_PTR_NIL, newPos, nil
@@ -48,18 +45,12 @@ func ParseInCharsetPercentEscapable(allocator *mem.ArenaAllocator, src []byte, p
 
 	addr = allocator.AllocBytesBegin()
 	if addr == mem.MEM_PTR_NIL {
-		fmt.Println("x0.3")
 		return mem.MEM_PTR_NIL, newPos, NewError(src, newPos, "no mem")
 	}
-
-	fmt.Println("x0.2")
-	fmt.Println("allocator.Used() =", allocator.Used())
-	fmt.Println("allocator.Capacity() =", allocator.Capacity())
 
 	prevPos := newPos
 	for newPos < len1 {
 		v = src[newPos]
-		fmt.Printf("v = %c\n", v)
 		if ((charset[v]) & mask) == 0 {
 
 			if v != '%' {
@@ -72,7 +63,6 @@ func ParseInCharsetPercentEscapable(allocator *mem.ArenaAllocator, src []byte, p
 
 			v1 := src[newPos+1]
 			v2 := src[newPos+2]
-			fmt.Println("x1")
 
 			if !chars.IsHex(v1) || !chars.IsHex(v2) {
 				return mem.MEM_PTR_NIL, newPos, NewError(src, newPos, "not HEX after '%'")
@@ -93,22 +83,15 @@ func ParseInCharsetPercentEscapable(allocator *mem.ArenaAllocator, src []byte, p
 
 			newPos += 3
 			prevPos = newPos
-
-			fmt.Println("x1.1")
-			fmt.Println("prevPos =", prevPos, "newPos =", newPos, "pos =", pos)
 		} else {
 			newPos++
 		}
 	}
 
 	if (prevPos < newPos) && !allocator.AppendBytes(src[prevPos:newPos]) {
-		fmt.Println("x2.0")
 		return mem.MEM_PTR_NIL, newPos, NewError(src, newPos, "no mem")
 	}
 
-	fmt.Println("x2")
-	fmt.Println("prevPos =", prevPos, "newPos =", newPos, "pos =", pos)
-	fmt.Println("allocator.Used() =", allocator.Used())
 	allocator.AllocBytesEnd(addr)
 	return addr, newPos, nil
 }

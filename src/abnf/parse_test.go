@@ -167,3 +167,21 @@ func BenchmarkParseCharsetAndAlloc(b *testing.B) {
 		}
 	}
 }
+
+func BenchmarkParseInCharsetPercentEscapable(b *testing.B) {
+	b.StopTimer()
+	allocator := mem.NewArenaAllocator(1024, 1)
+	data := []byte("001234567890%330123456789")
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		allocator.FreeAll()
+		_, _, err := ParseInCharsetPercentEscapable(allocator, data, 0, &chars.Charsets0, chars.MASK_DIGIT)
+		if err != nil {
+			return
+		}
+	}
+
+}
