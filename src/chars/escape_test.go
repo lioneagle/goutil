@@ -114,7 +114,7 @@ func BenchmarkEscapeEx(b *testing.B) {
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-		EscapeEx(src, &Charset0, MASK_DIGIT)
+		EscapeEx(src, &Charsets0, MASK_DIGIT)
 	}
 }
 
