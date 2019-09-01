@@ -220,3 +220,60 @@ func ParseUint8(src []byte, pos Pos) (digit uint8, newPos Pos, ok bool) {
 
 	return uint8(digit1), newPos, true
 }
+
+/* EncodeUint encode uint64 to byte buffer
+   EncodeUint is faster than strconv.FormatUint
+*/
+func EncodeUint(buf *ByteBuffer, digit uint64) {
+	if digit < 10 {
+		buf.Write(g_digitsString[digit : digit+1])
+	} else if digit < 100 {
+		buf.Write(g_smallDigitsString[digit*2 : digit*2+2])
+	} else {
+
+		var val [32]byte
+		num := 31
+		for digit > 0 {
+			mod := digit
+			digit /= 10
+			val[num] = '0' + byte(mod-digit*10)
+			num--
+		}
+
+		buf.Write(val[num+1:])
+	}
+}
+
+/* EncodeUintWithWidth encode uint64 to byte buffer with width,
+   if length of digit is less than width, spaces are filled before digit.
+   if length of digit is larger than width, no space is before digit.
+   EncodeUintWithWidth is much faster than fmt.Sprintf
+*/
+func EncodeUintWithWidth(buf *ByteBuffer, digit uint64, width int) {
+	if digit < 10 {
+		for i := 1; i < width; i++ {
+			buf.WriteByte(' ')
+		}
+		buf.Write(g_digitsString[digit : digit+1])
+	} else if digit < 100 {
+		for i := 2; i < width; i++ {
+			buf.WriteByte(' ')
+		}
+		buf.Write(g_smallDigitsString[digit*2 : digit*2+2])
+	} else {
+		var val [32]byte
+		num := 31
+		for digit > 0 {
+			mod := digit
+			digit /= 10
+			val[num] = '0' + byte(mod-digit*10)
+			num--
+		}
+
+		for i := width - 32 + num + 1; i > 0; i-- {
+			buf.WriteByte(' ')
+		}
+
+		buf.Write(val[num+1:])
+	}
+}

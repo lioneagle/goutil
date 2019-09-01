@@ -284,6 +284,60 @@ func TestParseUint8(t *testing.T) {
 	}
 }
 
+func TestEncodeUint(t *testing.T) {
+	testdata := []struct {
+		digit  uint64
+		wanted string
+	}{
+		{0, "0"},
+		{4, "4"},
+		{13, "13"},
+		{123, "123"},
+		{65536, "65536"},
+	}
+
+	for i, v := range testdata {
+		v := v
+
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			buf := NewByteBuffer(nil)
+			EncodeUint(buf, v.digit)
+			test.EXPECT_EQ(t, buf.String(), v.wanted, "")
+		})
+	}
+}
+
+func TestEncodeUintWithWidth(t *testing.T) {
+	testdata := []struct {
+		digit  uint64
+		width  int
+		wanted string
+	}{
+		{0, 0, "0"},
+		{2, 0, "2"},
+		{2, 3, "  2"},
+		{25, 1, "25"},
+		{25, 3, " 25"},
+		{123, 7, "    123"},
+		{65536, 5, "65536"},
+		{65536, 10, "     65536"},
+	}
+
+	for i, v := range testdata {
+		v := v
+
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			buf := NewByteBuffer(nil)
+			EncodeUintWithWidth(buf, v.digit, v.width)
+			test.EXPECT_EQ(t, buf.String(), v.wanted, "")
+		})
+	}
+}
+
 func BenchmarkParseCharset(b *testing.B) {
 	b.StopTimer()
 	allocator := mem.NewArenaAllocator(1024, 1)
@@ -371,9 +425,7 @@ func BenchmarkParseInCharsetPercentEscapableErr(b *testing.B) {
 
 func BenchmarkParseUint64_1(b *testing.B) {
 	b.StopTimer()
-
 	src := []byte("12345")
-
 	b.ReportAllocs()
 	b.SetBytes(2)
 	b.StartTimer()
@@ -385,9 +437,7 @@ func BenchmarkParseUint64_1(b *testing.B) {
 
 func BenchmarkParseUint64_Strconv_ParseUint(b *testing.B) {
 	b.StopTimer()
-
 	src := "12345"
-
 	b.ReportAllocs()
 	b.SetBytes(2)
 	b.StartTimer()
@@ -399,9 +449,7 @@ func BenchmarkParseUint64_Strconv_ParseUint(b *testing.B) {
 
 func BenchmarkParseUint64_Strconv_Atoi(b *testing.B) {
 	b.StopTimer()
-
 	src := "12345"
-
 	b.ReportAllocs()
 	b.SetBytes(2)
 	b.StartTimer()
@@ -413,9 +461,7 @@ func BenchmarkParseUint64_Strconv_Atoi(b *testing.B) {
 
 func BenchmarkParseUint32_1(b *testing.B) {
 	b.StopTimer()
-
 	src := []byte("12345")
-
 	b.ReportAllocs()
 	b.SetBytes(2)
 	b.StartTimer()
@@ -427,9 +473,7 @@ func BenchmarkParseUint32_1(b *testing.B) {
 
 func BenchmarkParseUint16_1(b *testing.B) {
 	b.StopTimer()
-
 	src := []byte("12345")
-
 	b.ReportAllocs()
 	b.SetBytes(2)
 	b.StartTimer()
@@ -441,14 +485,165 @@ func BenchmarkParseUint16_1(b *testing.B) {
 
 func BenchmarkParseUint8_1(b *testing.B) {
 	b.StopTimer()
-
 	src := []byte("123")
-
 	b.ReportAllocs()
 	b.SetBytes(2)
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
 		ParseUint8(src, 0)
+	}
+}
+
+func BenchmarkEncodeUint_1(b *testing.B) {
+	b.StopTimer()
+	buf := NewByteBuffer(make([]byte, 1024))
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		buf.Reset()
+		EncodeUint(buf, 1234567)
+	}
+}
+
+func BenchmarkEncodeUint_2(b *testing.B) {
+	b.StopTimer()
+	buf := NewByteBuffer(make([]byte, 1024))
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		buf.Reset()
+		EncodeUint(buf, 123)
+	}
+}
+
+func BenchmarkEncodeUint_3(b *testing.B) {
+	b.StopTimer()
+	buf := NewByteBuffer(make([]byte, 1024))
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		buf.Reset()
+		EncodeUint(buf, 20)
+	}
+}
+
+func BenchmarkEncodeUint_1_Strconv_1(b *testing.B) {
+	b.StopTimer()
+	buf := NewByteBuffer(make([]byte, 1024))
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		buf.WriteString(strconv.FormatUint(1234567, 10))
+	}
+}
+
+func BenchmarkEncodeUint_2_Strconv(b *testing.B) {
+	b.StopTimer()
+	buf := NewByteBuffer(make([]byte, 1024))
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		buf.WriteString(strconv.FormatUint(123, 10))
+	}
+}
+
+func BenchmarkEncodeUint_3_Strconv(b *testing.B) {
+	b.StopTimer()
+	buf := NewByteBuffer(make([]byte, 1024))
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		buf.WriteString(strconv.FormatUint(20, 10))
+	}
+}
+
+func BenchmarkEncodeUintWithWidth_1(b *testing.B) {
+	b.StopTimer()
+	buf := NewByteBuffer(make([]byte, 1024))
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		buf.Reset()
+		EncodeUintWithWidth(buf, 1234567, 10)
+	}
+}
+
+func BenchmarkEncodeUintWithWidth_2(b *testing.B) {
+	b.StopTimer()
+	buf := NewByteBuffer(make([]byte, 1024))
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		buf.Reset()
+		EncodeUintWithWidth(buf, 123, 10)
+	}
+}
+
+func BenchmarkEncodeUintWithWidth_3(b *testing.B) {
+	b.StopTimer()
+	buf := NewByteBuffer(make([]byte, 1024))
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		buf.Reset()
+		EncodeUintWithWidth(buf, 20, 10)
+	}
+}
+
+func BenchmarkEncodeUintWithWidth_1_fmt_Sprintf(b *testing.B) {
+	b.StopTimer()
+	buf := NewByteBuffer(make([]byte, 1024))
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		buf.Reset()
+		buf.WriteString(fmt.Sprintf("%10d", 1234567))
+	}
+}
+
+func BenchmarkEncodeUintWithWidth_2_fmt_Sprintf(b *testing.B) {
+	b.StopTimer()
+	buf := NewByteBuffer(make([]byte, 1024))
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		buf.Reset()
+		buf.WriteString(fmt.Sprintf("%10d", 123))
+	}
+}
+
+func BenchmarkEncodeUintWithWidth_3_fmt_Sprintf(b *testing.B) {
+	b.StopTimer()
+	buf := NewByteBuffer(make([]byte, 1024))
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		buf.Reset()
+		buf.WriteString(fmt.Sprintf("%10d", 20))
 	}
 }
