@@ -91,7 +91,7 @@ func TestParseInCharsetPercentEscapable(t *testing.T) {
 		{1024, "IsDigit", &chars.Charsets0, chars.MASK_DIGIT, "%301234abc", true, true, 7, 5},
 		{1024, "IsDigit", &chars.Charsets0, chars.MASK_DIGIT, "%30%311234abc", true, true, 10, 6},
 		{1024, "IsDigit", &chars.Charsets0, chars.MASK_DIGIT, "%311234%30", true, true, 10, 6},
-		{1024, "IsDigit", &chars.Charsets0, chars.MASK_DIGIT, "%30%31123%3a", true, true, 9, 5},
+		{1024, "IsDigit", &chars.Charsets0, chars.MASK_DIGIT, "%30%31123%3a", true, true, 12, 6},
 		{1024, "IsDigit", &chars.Charsets0, chars.MASK_DIGIT, "ad6789abc", false, true, 0, 0},
 
 		{1, "IsDigit", &chars.Charsets0, chars.MASK_DIGIT, "01234abc", false, false, 0, 0},
@@ -169,7 +169,7 @@ func BenchmarkParseCharsetAndAlloc(b *testing.B) {
 	}
 }
 
-func BenchmarkParseInCharsetPercentEscapable(b *testing.B) {
+func BenchmarkParseInCharsetPercentEscapable1(b *testing.B) {
 	b.StopTimer()
 	allocator := mem.NewArenaAllocator(1024, 1)
 	data := []byte("001234567890%330123456789")

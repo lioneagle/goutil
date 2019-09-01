@@ -33,7 +33,8 @@ func ParseInCharset(src []byte, pos Pos, charset *[256]uint32, mask uint32) (new
 }
 
 /* parse input when char is in charset and char may be percent escaped, such as "%61"
- */
+   using goto for performance
+*/
 func ParseInCharsetPercentEscapable(allocator *mem.ArenaAllocator, src []byte, pos Pos, charset *[256]uint32, mask uint32) (addr mem.MemPtr, newPos Pos, err error) {
 	newPos = pos
 	len1 := Pos(len(src))
@@ -52,29 +53,17 @@ func ParseInCharsetPercentEscapable(allocator *mem.ArenaAllocator, src []byte, p
 
 	for {
 		prevPos = newPos
-		for newPos < len1 {
+		for ; newPos < len1; newPos++ {
 			v = src[newPos]
 			if ((charset[v]) & mask) == 0 {
 				if v == '%' {
-					break
+					goto unescape
 				}
-
-				if (prevPos < newPos) && !allocator.AppendBytes(src[prevPos:newPos]) {
-					return mem.MEM_PTR_NIL, newPos, NewError(src, newPos, "no mem")
-				}
-
-				allocator.AllocBytesEnd(addr)
-				return addr, newPos, nil
-
-			} else {
-				newPos++
+				goto end
 			}
 		}
-
-		if newPos >= len1 {
-			break
-		}
-
+		goto end
+	unescape:
 		if (newPos + 2) >= len1 {
 			return mem.MEM_PTR_NIL, newPos, NewError(src, newPos, "reach end after '%'")
 		}
@@ -87,9 +76,6 @@ func ParseInCharsetPercentEscapable(allocator *mem.ArenaAllocator, src []byte, p
 		}
 
 		v = chars.PercentUnescapeToByteEx(v1, v2)
-		if ((charset[v]) & mask) == 0 {
-			break
-		}
 
 		if (prevPos < newPos) && !allocator.AppendBytes(src[prevPos:newPos]) {
 			return mem.MEM_PTR_NIL, newPos, NewError(src, newPos, "no mem")
@@ -101,7 +87,7 @@ func ParseInCharsetPercentEscapable(allocator *mem.ArenaAllocator, src []byte, p
 
 		newPos += 3
 	}
-
+end:
 	if (prevPos < newPos) && !allocator.AppendBytes(src[prevPos:newPos]) {
 		return mem.MEM_PTR_NIL, newPos, NewError(src, newPos, "no mem")
 	}
