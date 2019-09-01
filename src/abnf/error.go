@@ -12,6 +12,7 @@ const (
 )
 
 type Error struct {
+	msg string
 	src []byte
 	pos Pos
 }
@@ -32,16 +33,23 @@ func (e *Error) Write(w io.Writer) {
 		if (e.pos + num) > Pos(len(e.src)) {
 			num = Pos(len(e.src)) - e.pos
 		}
-		fmt.Fprintf(w, "src[%d]: %s", e.pos, string(e.src[e.pos:e.pos+num]))
+		fmt.Fprintf(w, "%s: src[%d]: %s", e.msg, e.pos, string(e.src[e.pos:e.pos+num]))
 		return
 	}
 }
 
 // NewError returns an error with the supplied message.
 // NewError also records the stack trace at the point it was called.
-func NewError(src []byte, pos Pos, message string) error {
-	err := &Error{src: src, pos: pos}
+func NewError2(src []byte, pos Pos, message string) error {
+	err := &Error{src: src, pos: pos, msg: message}
 	return errors.Wrap(err, message)
+}
+
+func NewError(src []byte, pos Pos, message string) error {
+	err := &Error{src: src, pos: pos, msg: message}
+	//return errors.WithStack(err)
+	return errors.WithStack(err)
+	//return err
 }
 
 // Errorf formats according to a format specifier and returns the string
@@ -49,5 +57,6 @@ func NewError(src []byte, pos Pos, message string) error {
 // Errorf also records the stack trace at the point it was called.
 func Errorf(src []byte, pos Pos, format string, args ...interface{}) error {
 	err := &Error{src: src, pos: pos}
-	return errors.Wrapf(err, format, args...)
+	err.msg = fmt.Sprintf(format, args...)
+	return errors.WithStack(err)
 }
