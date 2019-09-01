@@ -186,6 +186,23 @@ func BenchmarkParseInCharsetPercentEscapable1(b *testing.B) {
 	}
 }
 
+func BenchmarkParseInCharsetPercentEscapable2(b *testing.B) {
+	b.StopTimer()
+	allocator := mem.NewArenaAllocator(1024, 1)
+	data := []byte("%30%30%31%32%33%34%35%36%37%38%39%30%33%301%32%33%34%35%36%37%38%39")
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		allocator.FreeAll()
+		_, _, err := ParseInCharsetPercentEscapable(allocator, data, 0, &chars.Charsets0, chars.MASK_DIGIT)
+		if err != nil {
+			return
+		}
+	}
+}
+
 func BenchmarkParseInCharsetPercentEscapableErr(b *testing.B) {
 	b.StopTimer()
 	allocator := mem.NewArenaAllocator(1024, 1)
