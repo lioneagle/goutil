@@ -2,6 +2,7 @@ package abnf
 
 import (
 	"fmt"
+	"strconv"
 	"testing"
 
 	//"github.com/lioneagle/goutil/src/buffer"
@@ -135,6 +136,154 @@ func TestParseInCharsetPercentEscapable(t *testing.T) {
 	}
 }
 
+func TestParseUint64(t *testing.T) {
+	testdata := []struct {
+		src    string
+		digit  uint64
+		newPos Pos
+		ok     bool
+	}{
+		{"1234567890.abc", 1234567890, 10, true},
+		{"10.40.1.1", 10, 2, true},
+		{"18446744073709551615", 18446744073709551615, 20, true},
+		{"18446744073709551615.", 18446744073709551615, 20, true},
+		{"1844674407370955161", 1844674407370955161, 19, true},
+		{"1844674407370955161.", 1844674407370955161, 19, true},
+
+		{"", 0, 0, false},
+		{"18446744073709551616", 0, 19, false},
+		{"18446744073709551626", 0, 19, false},
+		{"184467440737095516155", 0, 20, false},
+	}
+
+	for i, v := range testdata {
+		v := v
+
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			digit1, newPos, ok := ParseUint64([]byte(v.src), 0)
+
+			if v.ok {
+				test.EXPECT_TRUE(t, ok, "")
+				test.EXPECT_EQ(t, uint64(digit1), v.digit, "")
+				test.EXPECT_EQ(t, newPos, v.newPos, "")
+			} else {
+				test.EXPECT_FALSE(t, ok, "")
+				test.EXPECT_EQ(t, newPos, v.newPos, "")
+			}
+		})
+	}
+}
+
+func TestParseUint32(t *testing.T) {
+	testdata := []struct {
+		src    string
+		digit  uint64
+		newPos Pos
+		ok     bool
+	}{
+		{"123456789.abc", 123456789, 9, true},
+		{"4294967295", 4294967295, 10, true},
+		{"4294967295.", 4294967295, 10, true},
+
+		{"", 0, 0, false},
+		{"4294967296", 0, 10, false},
+		{"42949672956", 0, 11, false},
+	}
+
+	for i, v := range testdata {
+		v := v
+
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			digit1, newPos, ok := ParseUint32([]byte(v.src), 0)
+
+			if v.ok {
+				test.EXPECT_TRUE(t, ok, "")
+				test.EXPECT_EQ(t, uint64(digit1), v.digit, "")
+				test.EXPECT_EQ(t, newPos, v.newPos, "")
+			} else {
+				test.EXPECT_FALSE(t, ok, "")
+				test.EXPECT_EQ(t, newPos, v.newPos, "")
+			}
+		})
+	}
+}
+
+func TestParseUint16(t *testing.T) {
+	testdata := []struct {
+		src    string
+		digit  uint64
+		newPos Pos
+		ok     bool
+	}{
+		{"1234.abc", 1234, 4, true},
+		{"65535", 65535, 5, true},
+		{"65535.", 65535, 5, true},
+
+		{"", 0, 0, false},
+		{"65536", 0, 5, false},
+		{"655351", 0, 6, false},
+	}
+
+	for i, v := range testdata {
+		v := v
+
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			digit1, newPos, ok := ParseUint16([]byte(v.src), 0)
+
+			if v.ok {
+				test.EXPECT_TRUE(t, ok, "")
+				test.EXPECT_EQ(t, uint64(digit1), v.digit, "")
+				test.EXPECT_EQ(t, newPos, v.newPos, "")
+			} else {
+				test.EXPECT_FALSE(t, ok, "")
+				test.EXPECT_EQ(t, newPos, v.newPos, "")
+			}
+		})
+	}
+}
+
+func TestParseUint8(t *testing.T) {
+	testdata := []struct {
+		src    string
+		digit  uint64
+		newPos Pos
+		ok     bool
+	}{
+		{"12.abc", 12, 2, true},
+		{"255", 255, 3, true},
+		{"255.", 255, 3, true},
+
+		{"", 0, 0, false},
+		{"256", 0, 3, false},
+		{"2551", 0, 4, false},
+	}
+
+	for i, v := range testdata {
+		v := v
+
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			t.Parallel()
+
+			digit1, newPos, ok := ParseUint8([]byte(v.src), 0)
+
+			if v.ok {
+				test.EXPECT_TRUE(t, ok, "")
+				test.EXPECT_EQ(t, uint64(digit1), v.digit, "")
+				test.EXPECT_EQ(t, newPos, v.newPos, "")
+			} else {
+				test.EXPECT_FALSE(t, ok, "")
+				test.EXPECT_EQ(t, newPos, v.newPos, "")
+			}
+		})
+	}
+}
+
 func BenchmarkParseCharset(b *testing.B) {
 	b.StopTimer()
 	allocator := mem.NewArenaAllocator(1024, 1)
@@ -217,5 +366,89 @@ func BenchmarkParseInCharsetPercentEscapableErr(b *testing.B) {
 		if err == nil {
 			return
 		}
+	}
+}
+
+func BenchmarkParseUint64_1(b *testing.B) {
+	b.StopTimer()
+
+	src := []byte("12345")
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		ParseUint64(src, 0)
+	}
+}
+
+func BenchmarkParseUint64_Strconv_ParseUint(b *testing.B) {
+	b.StopTimer()
+
+	src := "12345"
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		strconv.ParseUint(src, 10, 64)
+	}
+}
+
+func BenchmarkParseUint64_Strconv_Atoi(b *testing.B) {
+	b.StopTimer()
+
+	src := "12345"
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		strconv.Atoi(src)
+	}
+}
+
+func BenchmarkParseUint32_1(b *testing.B) {
+	b.StopTimer()
+
+	src := []byte("12345")
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		ParseUint32(src, 0)
+	}
+}
+
+func BenchmarkParseUint16_1(b *testing.B) {
+	b.StopTimer()
+
+	src := []byte("12345")
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		ParseUint16(src, 0)
+	}
+}
+
+func BenchmarkParseUint8_1(b *testing.B) {
+	b.StopTimer()
+
+	src := []byte("123")
+
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		ParseUint8(src, 0)
 	}
 }
