@@ -62,7 +62,7 @@ func (this *ByteBuffer) WriteString(val string) (int, error) {
 	return len(val), nil
 }
 
-func (this *ByteBuffer) WriteEscape(val []byte, charset *[256]uint32, mask uint32) (int, error) {
+func (this *ByteBuffer) WritePercentEscape(val []byte, charset *[256]uint32, mask uint32) (int, error) {
 	charset1 := charset
 	for _, v := range val {
 		if (charset1[v] & mask) != 0 {
