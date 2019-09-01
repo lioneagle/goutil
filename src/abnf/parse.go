@@ -48,43 +48,58 @@ func ParseInCharsetPercentEscapable(allocator *mem.ArenaAllocator, src []byte, p
 		return mem.MEM_PTR_NIL, newPos, NewError(src, newPos, "no mem")
 	}
 
-	prevPos := newPos
-	for newPos < len1 {
-		v = src[newPos]
-		if ((charset[v]) & mask) == 0 {
-			if v != '%' {
-				break
-			}
+	var prevPos Pos
 
-			if (newPos + 2) >= len1 {
-				return mem.MEM_PTR_NIL, newPos, NewError(src, newPos, "reach end after '%'")
-			}
-
-			v1 := src[newPos+1]
-			v2 := src[newPos+2]
-
-			if !chars.IsHex(v1) || !chars.IsHex(v2) {
-				return mem.MEM_PTR_NIL, newPos, NewError(src, newPos, "not HEX after '%'")
-			}
-
-			v = chars.UnescapeToByteEx(v1, v2)
+	for {
+		prevPos = newPos
+		for newPos < len1 {
+			v = src[newPos]
 			if ((charset[v]) & mask) == 0 {
-				break
-			}
+				if v == '%' {
+					break
+				}
 
-			if (prevPos < newPos) && !allocator.AppendBytes(src[prevPos:newPos]) {
-				return mem.MEM_PTR_NIL, newPos, NewError(src, newPos, "no mem")
-			}
+				if (prevPos < newPos) && !allocator.AppendBytes(src[prevPos:newPos]) {
+					return mem.MEM_PTR_NIL, newPos, NewError(src, newPos, "no mem")
+				}
 
-			if !allocator.AppendByte(v) {
-				return mem.MEM_PTR_NIL, newPos, NewError(src, newPos, "no mem")
-			}
+				allocator.AllocBytesEnd(addr)
+				return addr, newPos, nil
 
-			newPos += 3
-			prevPos = newPos
-		} else {
-			newPos++
+			} else {
+				newPos++
+			}
 		}
+
+		if newPos >= len1 {
+			break
+		}
+
+		if (newPos + 2) >= len1 {
+			return mem.MEM_PTR_NIL, newPos, NewError(src, newPos, "reach end after '%'")
+		}
+
+		v1 := src[newPos+1]
+		v2 := src[newPos+2]
+
+		if !chars.IsHex(v1) || !chars.IsHex(v2) {
+			return mem.MEM_PTR_NIL, newPos, NewError(src, newPos, "not HEX after '%'")
+		}
+
+		v = chars.PercentUnescapeToByteEx(v1, v2)
+		if ((charset[v]) & mask) == 0 {
+			break
+		}
+
+		if (prevPos < newPos) && !allocator.AppendBytes(src[prevPos:newPos]) {
+			return mem.MEM_PTR_NIL, newPos, NewError(src, newPos, "no mem")
+		}
+
+		if !allocator.AppendByte(v) {
+			return mem.MEM_PTR_NIL, newPos, NewError(src, newPos, "no mem")
+		}
+
+		newPos += 3
 	}
 
 	if (prevPos < newPos) && !allocator.AppendBytes(src[prevPos:newPos]) {
