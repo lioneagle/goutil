@@ -297,11 +297,11 @@ func Criticalf(format string, args ...interface{}) {
 }
 
 func Error(msg string) {
-	getDefaultLogger().Critical(msg)
+	getDefaultLogger().Error(msg)
 }
 
 func Errorf(format string, args ...interface{}) {
-	getDefaultLogger().Error(format, args...)
+	getDefaultLogger().Errorf(format, args...)
 }
 
 func Warning(msg string) {
