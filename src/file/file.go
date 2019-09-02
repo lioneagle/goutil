@@ -16,18 +16,18 @@ import (
 func FileEqual(filename1, filename2 string) bool {
 	file1, err := ioutil.ReadFile(filename1)
 	if err != nil {
-		logger.Error("cannot open file %s", filename1)
+		logger.Errorf("cannot open file %s", filename1)
 		return false
 	}
 
 	file2, err := ioutil.ReadFile(filename2)
 	if err != nil {
-		logger.Error("cannot open file %s", filename2)
+		logger.Errorf("cannot open file %s", filename2)
 		return false
 	}
 
 	if len(file1) != len(file2) {
-		logger.Error("different len, len(%s) = %d, len(%s) = %d", filename1, len(file1), filename2, len(file2))
+		logger.Errorf("different len, len(%s) = %d, len(%s) = %d", filename1, len(file1), filename2, len(file2))
 		return false
 	}
 
@@ -36,7 +36,7 @@ func FileEqual(filename1, filename2 string) bool {
 	if !ret {
 		for i := 0; i < len(file1); i++ {
 			if file1[i] != file2[i] {
-				logger.Error("first diffrent char is %d at position %d", file1[i], i)
+				logger.Errorf("first diffrent char is %d at position %d", file1[i], i)
 				break
 			}
 		}
