@@ -186,36 +186,72 @@ func extractFileName(fileName string, shortFileNameDepth int) string {
 	return fileName[i+1 : len(fileName)]
 }
 
+func (this *Logger) Emergency(msg string) {
+	this.log(EMERGENCY, "%s", msg)
+}
+
 func (this *Logger) Emergencyf(format string, args ...interface{}) {
 	this.log(EMERGENCY, format, args...)
+}
+
+func (this *Logger) Alert(msg string) {
+	this.log(ALERT, "%s", msg)
 }
 
 func (this *Logger) Alertf(format string, args ...interface{}) {
 	this.log(ALERT, format, args...)
 }
 
+func (this *Logger) Critical(msg string) {
+	this.log(CRITICAL, "%s", msg)
+}
+
 func (this *Logger) Criticalf(format string, args ...interface{}) {
 	this.log(CRITICAL, format, args...)
+}
+
+func (this *Logger) Error(msg string) {
+	this.log(ERROR, "%s", msg)
 }
 
 func (this *Logger) Errorf(format string, args ...interface{}) {
 	this.log(ERROR, format, args...)
 }
 
+func (this *Logger) Warning(msg string) {
+	this.log(WARNING, "%s", msg)
+}
+
 func (this *Logger) Warningf(format string, args ...interface{}) {
 	this.log(WARNING, format, args...)
+}
+
+func (this *Logger) Notice(msg string) {
+	this.log(NOTICE, "%s", msg)
 }
 
 func (this *Logger) Noticef(format string, args ...interface{}) {
 	this.log(NOTICE, format, args...)
 }
 
+func (this *Logger) Info(msg string) {
+	this.log(INFO, "%s", msg)
+}
+
 func (this *Logger) Infof(format string, args ...interface{}) {
 	this.log(INFO, format, args...)
 }
 
+func (this *Logger) Debug(msg string) {
+	this.log(DEBUG, "%s", msg)
+}
+
 func (this *Logger) Debugf(format string, args ...interface{}) {
 	this.log(DEBUG, format, args...)
+}
+
+func (this *Logger) Print(msg string) {
+	this.print("%s", msg)
 }
 
 func (this *Logger) Printf(format string, args ...interface{}) {
@@ -236,36 +272,72 @@ func getDefaultLogger() *Logger {
 	return defaultLogger
 }
 
+func Emergency(msg string) {
+	getDefaultLogger().Emergency(msg)
+}
+
 func Emergencyf(format string, args ...interface{}) {
 	getDefaultLogger().Emergencyf(format, args...)
+}
+
+func Alert(msg string) {
+	getDefaultLogger().Alert(msg)
 }
 
 func Alertf(format string, args ...interface{}) {
 	getDefaultLogger().Alertf(format, args...)
 }
 
+func Critical(msg string) {
+	getDefaultLogger().Critical(msg)
+}
+
 func Criticalf(format string, args ...interface{}) {
 	getDefaultLogger().Criticalf(format, args...)
 }
 
+func Error(msg string) {
+	getDefaultLogger().Critical(msg)
+}
+
 func Errorf(format string, args ...interface{}) {
-	getDefaultLogger().Errorf(format, args...)
+	getDefaultLogger().Error(format, args...)
+}
+
+func Warning(msg string) {
+	getDefaultLogger().Warning(msg)
 }
 
 func Warningf(format string, args ...interface{}) {
 	getDefaultLogger().Warningf(format, args...)
 }
 
+func Notice(msg string) {
+	getDefaultLogger().Notice(msg)
+}
+
 func Noticef(msg string, args ...interface{}) {
 	getDefaultLogger().Noticef(msg, args...)
+}
+
+func Info(msg string) {
+	getDefaultLogger().Info(msg)
 }
 
 func Infof(format string, args ...interface{}) {
 	getDefaultLogger().Infof(format, args...)
 }
 
+func Debug(msg string) {
+	getDefaultLogger().Debug(msg)
+}
+
 func Debugf(format string, args ...interface{}) {
 	getDefaultLogger().Debugf(format, args...)
+}
+
+func Print(msg string) {
+	getDefaultLogger().Print(msg)
 }
 
 func Printf(format string, args ...interface{}) {
