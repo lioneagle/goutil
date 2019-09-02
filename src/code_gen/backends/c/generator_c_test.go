@@ -19,7 +19,7 @@ func TestCGeneratorGenBlock(t *testing.T) {
 
 	outputFile, err := os.Create(output_file)
 	if err != nil {
-		logger.Error("cannot open file %s", output_file)
+		logger.Errorf("cannot open file %s", output_file)
 		return
 	}
 	defer outputFile.Close()
@@ -41,7 +41,7 @@ func TestCGeneratorGenEnum(t *testing.T) {
 
 	outputFile, err := os.Create(output_file)
 	if err != nil {
-		logger.Error("cannot open file %s", output_file)
+		logger.Errorf("cannot open file %s", output_file)
 		return
 	}
 	defer outputFile.Close()

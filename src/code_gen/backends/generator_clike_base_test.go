@@ -18,7 +18,7 @@ func TestCLikeGeneratorGenBlock(t *testing.T) {
 
 	outputFile, err := os.Create(output_file)
 	if err != nil {
-		logger.Error("cannot open file %s", output_file)
+		logger.Errorf("cannot open file %s", output_file)
 		return
 	}
 	defer outputFile.Close()
@@ -40,7 +40,7 @@ func TestCGeneratorGenEnum(t *testing.T) {
 
 	outputFile, err := os.Create(output_file)
 	if err != nil {
-		logger.Error("cannot open file %s", output_file)
+		logger.Errorf("cannot open file %s", output_file)
 		return
 	}
 	defer outputFile.Close()
@@ -89,7 +89,7 @@ func TestCGeneratorGenComment(t *testing.T) {
 
 	outputFile, err := os.Create(output_file)
 	if err != nil {
-		logger.Error("cannot open file %s", output_file)
+		logger.Errorf("cannot open file %s", output_file)
 		return
 	}
 	defer outputFile.Close()
@@ -119,7 +119,7 @@ func TestCGeneratorGenStruct(t *testing.T) {
 
 	outputFile, err := os.Create(output_file)
 	if err != nil {
-		logger.Error("cannot open file %s", output_file)
+		logger.Errorf("cannot open file %s", output_file)
 		return
 	}
 	defer outputFile.Close()
@@ -163,7 +163,7 @@ func TestCGeneratorGenChoices(t *testing.T) {
 
 	outputFile, err := os.Create(output_file)
 	if err != nil {
-		logger.Error("cannot open file %s", output_file)
+		logger.Errorf("cannot open file %s", output_file)
 		return
 	}
 	defer outputFile.Close()
@@ -209,7 +209,7 @@ func TestCGeneratorGenFor(t *testing.T) {
 
 	outputFile, err := os.Create(output_file)
 	if err != nil {
-		logger.Error("cannot open file %s", output_file)
+		logger.Errorf("cannot open file %s", output_file)
 		return
 	}
 	defer outputFile.Close()
@@ -240,7 +240,7 @@ func TestCGeneratorGenWhile(t *testing.T) {
 
 	outputFile, err := os.Create(output_file)
 	if err != nil {
-		logger.Error("cannot open file %s", output_file)
+		logger.Errorf("cannot open file %s", output_file)
 		return
 	}
 	defer outputFile.Close()
@@ -271,7 +271,7 @@ func TestCGeneratorGenDoWhile(t *testing.T) {
 
 	outputFile, err := os.Create(output_file)
 	if err != nil {
-		logger.Error("cannot open file %s", output_file)
+		logger.Errorf("cannot open file %s", output_file)
 		return
 	}
 	defer outputFile.Close()
@@ -302,7 +302,7 @@ func TestCGeneratorGenParamList(t *testing.T) {
 
 	outputFile, err := os.Create(output_file)
 	if err != nil {
-		logger.Error("cannot open file %s", output_file)
+		logger.Errorf("cannot open file %s", output_file)
 		return
 	}
 	defer outputFile.Close()
@@ -346,7 +346,7 @@ func TestCGeneratorGenFunctionDeclare(t *testing.T) {
 
 	outputFile, err := os.Create(output_file)
 	if err != nil {
-		logger.Error("cannot open file %s", output_file)
+		logger.Errorf("cannot open file %s", output_file)
 		return
 	}
 	defer outputFile.Close()
@@ -409,7 +409,7 @@ func TestCGeneratorGenFunctionDefine(t *testing.T) {
 
 	outputFile, err := os.Create(output_file)
 	if err != nil {
-		logger.Error("cannot open file %s", output_file)
+		logger.Errorf("cannot open file %s", output_file)
 		return
 	}
 	defer outputFile.Close()
@@ -474,7 +474,7 @@ func TestCGeneratorGenMacroDefine(t *testing.T) {
 
 	outputFile, err := os.Create(output_file)
 	if err != nil {
-		logger.Error("cannot open file %s", output_file)
+		logger.Errorf("cannot open file %s", output_file)
 		return
 	}
 	defer outputFile.Close()
