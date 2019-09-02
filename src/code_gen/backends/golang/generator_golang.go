@@ -104,7 +104,7 @@ func (this *GolangGenerator) VisitConst(val *model.Var) {
 
 	if len(val.GetComment()) > 0 {
 		basic.PrintIndent(this.w, this.maxValueLen-len(val.GetInitValue())+this.config.Indent().Comment)
-		this.genSingleLineCommentWithoutIndent(val.Comment)
+		this.genSingleLineCommentWithoutIndent(val.GetComment())
 	} else {
 		this.PrintReturn(this.w)
 	}
