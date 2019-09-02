@@ -155,6 +155,6 @@ func BenchmarkByteBufferWriteEscape(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		buf.Reset()
-		buf.WritePercentEscape(src, &chars.Charset0, chars.MASK_DIGIT)
+		buf.WritePercentEscape(src, &chars.Charsets0, chars.MASK_DIGIT)
 	}
 }
