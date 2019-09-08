@@ -179,7 +179,7 @@ func (this *diffWriter) diff(actual, wanted reflect.Value) bool {
 		ret := true
 		for i := 0; i < len1; i++ {
 			//fmt.Printf("actual.Index(%d) = %#v, wanted.Index(%d) = %#v\n", i, actual.Index(i), i, wanted.Index(i))
-			if !this.reLabel(fmt.Sprintf("[%d].", i)).diff(actual.Index(i), wanted.Index(i)) {
+			if !this.reLabel(fmt.Sprintf("[%d]", i)).diff(actual.Index(i), wanted.Index(i)) {
 				ret = false
 			}
 		}
@@ -218,7 +218,7 @@ func (this *diffWriter) diff(actual, wanted reflect.Value) bool {
 
 func (this *diffWriter) reLabel(name string) *diffWriter {
 	w := *this
-	if this.label != "" && this.label[0] != '[' {
+	if this.label != "" && name != '[' {
 		w.label += "."
 	}
 	w.label += name
