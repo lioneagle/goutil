@@ -218,7 +218,7 @@ func (this *diffWriter) diff(actual, wanted reflect.Value) bool {
 
 func (this *diffWriter) reLabel(name string) *diffWriter {
 	w := *this
-	if this.label != "" && name != '[' {
+	if this.label != "" && name[0] != '[' {
 		w.label += "."
 	}
 	w.label += name
