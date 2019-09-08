@@ -97,7 +97,7 @@ func (this *diffWriter) diff(actual, wanted reflect.Value) bool {
 		ret := true
 		n := actual.Len()
 		for i := 0; i < n; i++ {
-			if !this.reLabel(fmt.Sprintf("[%d].", i)).diff(actual.Index(i), wanted.Index(i)) {
+			if !this.reLabel(fmt.Sprintf("[%d]", i)).diff(actual.Index(i), wanted.Index(i)) {
 				ret = false
 			}
 		}
