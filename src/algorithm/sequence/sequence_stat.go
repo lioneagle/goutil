@@ -5,11 +5,12 @@ import (
 )
 
 type SequenceStat struct {
-	max     float64
-	min     float64
-	average float64
-	stdev   float64 // 样本标准差
-	stdevp  float64 // 总体标准差
+	Size   int
+	Max     float64
+	Min     float64
+	Average float64
+	Stdev   float64 // 样本标准差
+	Stdevp  float64 // 总体标准差
 }
 
 func NewSequenceStat() *SequenceStat {
@@ -19,10 +20,11 @@ func NewSequenceStat() *SequenceStat {
 }
 
 func (stat *SequenceStat) Clear() {
-	stat.max = -math.SmallestNonzeroFloat64
-	stat.min = math.MaxFloat64
-	stat.average = 0.0
-	stat.stdev = 0.0
+	stat.Max = -math.SmallestNonzeroFloat64
+	stat.Min = math.MaxFloat64
+	stat.Average = 0.0
+	stat.Stdev = 0.0
+	stat.Size = 0
 }
 
 func (stat *SequenceStat) Calc(data SequenceData) {
@@ -33,28 +35,29 @@ func (stat *SequenceStat) Calc(data SequenceData) {
 	}
 
 	N := float64(data.Len())
+	stat.Size = data.Len()
 	squareSum := 0.0
 	average := 0.0
 
 	for i := 0; i < data.Len(); i++ {
 		v := data.GetAt(i)
 
-		if v > stat.max {
-			stat.max = v
+		if v > stat.Max {
+			stat.Max = v
 		}
 
-		if v < stat.min {
-			stat.min = v
+		if v < stat.Min {
+			stat.Min = v
 		}
 
 		average += v
 		squareSum += v * v
 	}
 
-	stat.average = average / N
+	stat.Average = average / N
 
 	if N > 1 {
-		stat.stdev = math.Sqrt((squareSum + N*average*average) / (N - 1))
-		stat.stdevp = math.Sqrt((squareSum + N*average*average) / N)
+		stat.Stdev = math.Sqrt((squareSum + N*average*average) / (N - 1))
+		stat.Stdevp = math.Sqrt((squareSum + N*average*average) / N)
 	}
 }

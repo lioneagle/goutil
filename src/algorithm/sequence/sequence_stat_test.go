@@ -14,8 +14,8 @@ func TestSequenceStatCalc(t *testing.T) {
 		wanted *SequenceStat
 	}{
 		{&SliceFloat64{[]float64{}}, NewSequenceStat()},
-		{&SliceFloat64{[]float64{8, 6, 5, 9, 1}}, &SequenceStat{max: 9, min: 1, average: 5.8, stdev: 3.1144823, stdevp: 2.785677655}},
-		{&SliceFloat64{[]float64{2, 3, 2, 7, 3, 4}}, &SequenceStat{max: 7, min: 2, average: 3.5, stdev: 1.870828693, stdevp: 1.707825128}},
+		{&SliceFloat64{[]float64{8, 6, 5, 9, 1}}, &SequenceStat{Max: 9, Min: 1, Average: 5.8, Stdev: 3.1144823, Stdevp: 2.785677655}},
+		{&SliceFloat64{[]float64{2, 3, 2, 7, 3, 4}}, &SequenceStat{Max: 7, Min: 2, Average: 3.5, Stdev: 1.870828693, Stdevp: 1.707825128}},
 	}
 
 	for i, v := range testdata {
@@ -27,7 +27,7 @@ func TestSequenceStatCalc(t *testing.T) {
 			stat := NewSequenceStat()
 			stat.Calc(v.data)
 
-			test.EXPECT_TRUE(t, mathex.CompareFloat64Ex(stat.max, v.wanted.max, 0.0000001) == 0, "stat = %v, wanted = %v", stat, v.wanted)
+			test.EXPECT_TRUE(t, mathex.CompareFloat64Ex(stat.Max, v.wanted.Max, 0.0000001) == 0, "stat = %v, wanted = %v", stat, v.wanted)
 		})
 	}
 }
