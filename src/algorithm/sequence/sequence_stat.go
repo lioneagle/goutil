@@ -1,4 +1,4 @@
-package mathex
+package sequence
 
 import (
 	"math"

@@ -1,4 +1,4 @@
-package basic
+package sequence
 
 import (
 	"github.com/lioneagle/goutil/src/mathex"
@@ -28,7 +28,7 @@ func NewDrawdowns() *Drawdowns {
 	return ret
 }
 
-func (d *Drawdowns) CalcData(data mathex.SequenceData, precision float64) {
+func (d *Drawdowns) CalcData(data SequenceData, precision float64) {
 	for i := 0; i < data.Len(); i++ {
 		d.Calc(i, data.GetAt(i), precision)
 	}

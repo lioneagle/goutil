@@ -1,4 +1,8 @@
-package mathex
+package sequence
+
+import (
+	"github.com/lioneagle/goutil/src/mathex"
+)
 
 type SequenceData interface {
 	GetAt(index int) float64
@@ -10,7 +14,7 @@ func FindMax(data SequenceData, from, to int, precision float64) (float64, int) 
 	maxPos := from
 	for i := from + 1; i < to; i++ {
 		val := data.GetAt(i)
-		if CompareFloat64Ex(val, max, precision) > 0 {
+		if mathex.CompareFloat64Ex(val, max, precision) > 0 {
 			max = val
 			maxPos = i
 		}
@@ -24,7 +28,7 @@ func FindMin(data SequenceData, from, to int, precision float64) (float64, int) 
 	minPos := from
 	for i := from + 1; i < to; i++ {
 		val := data.GetAt(i)
-		if CompareFloat64Ex(val, min, precision) < 0 {
+		if mathex.CompareFloat64Ex(val, min, precision) < 0 {
 			min = val
 			minPos = i
 		}

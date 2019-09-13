@@ -1,9 +1,10 @@
-package mathex
+package sequence
 
 import (
 	"fmt"
 	"testing"
 
+	"github.com/lioneagle/goutil/src/mathex"
 	"github.com/lioneagle/goutil/src/test"
 )
 
@@ -26,7 +27,7 @@ func TestSequenceStatCalc(t *testing.T) {
 			stat := NewSequenceStat()
 			stat.Calc(v.data)
 
-			test.EXPECT_TRUE(t, CompareFloat64Ex(stat.max, v.wanted.max, 0.0000001) == 0, "stat = %v, wanted = %v", stat, v.wanted)
+			test.EXPECT_TRUE(t, mathex.CompareFloat64Ex(stat.max, v.wanted.max, 0.0000001) == 0, "stat = %v, wanted = %v", stat, v.wanted)
 		})
 	}
 }
