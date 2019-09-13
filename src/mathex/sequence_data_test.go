@@ -10,8 +10,8 @@ import (
 func TestSequenceDataFindMaxMin(t *testing.T) {
 	slice := &SliceFloat64{[]float64{8, 6, 2, 9, 3}}
 
-	max, maxPos := FindMax(slice, 0, slice.Len())
-	min, minPos := FindMin(slice, 0, slice.Len())
+	max, maxPos := FindMax(slice, 0, slice.Len(), 1e-8)
+	min, minPos := FindMin(slice, 0, slice.Len(), 1e-8)
 
 	test.EXPECT_EQ(t, slice.Len(), 5, "")
 	test.EXPECT_EQ(t, max, float64(9.0), "")

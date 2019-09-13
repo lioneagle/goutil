@@ -1,20 +1,16 @@
 package mathex
 
-const (
-	DATA_PRECISION = 1e-8
-)
-
 type SequenceData interface {
 	GetAt(index int) float64
 	Len() int
 }
 
-func FindMax(data SequenceData, from, to int) (float64, int) {
+func FindMax(data SequenceData, from, to int, precision float64) (float64, int) {
 	max := data.GetAt(from)
 	maxPos := from
 	for i := from + 1; i < to; i++ {
 		val := data.GetAt(i)
-		if CompareFloat64Ex(val, max, DATA_PRECISION) > 0 {
+		if CompareFloat64Ex(val, max, precision) > 0 {
 			max = val
 			maxPos = i
 		}
@@ -23,12 +19,12 @@ func FindMax(data SequenceData, from, to int) (float64, int) {
 	return max, maxPos
 }
 
-func FindMin(data SequenceData, from, to int) (float64, int) {
+func FindMin(data SequenceData, from, to int, precision float64) (float64, int) {
 	min := data.GetAt(from)
 	minPos := from
 	for i := from + 1; i < to; i++ {
 		val := data.GetAt(i)
-		if CompareFloat64Ex(val, min, DATA_PRECISION) < 0 {
+		if CompareFloat64Ex(val, min, precision) < 0 {
 			min = val
 			minPos = i
 		}
