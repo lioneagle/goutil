@@ -2,30 +2,23 @@ package backends
 
 import (
 	//"fmt"
-	"os"
-	"path/filepath"
+
 	"testing"
 
 	"github.com/lioneagle/goutil/src/code_gen/backends"
 	"github.com/lioneagle/goutil/src/code_gen/model"
 
 	"github.com/lioneagle/goutil/src/file"
-	"github.com/lioneagle/goutil/src/logger"
 	"github.com/lioneagle/goutil/src/test"
 )
 
 func TestCGeneratorGenBlock(t *testing.T) {
-	standard_file, output_file := test.GenTestFileNames("../../test_data/", "test_standard", "test_output", "c_genertator_gen_block.c")
-
-	outputFile, err := os.Create(output_file)
-	if err != nil {
-		logger.Errorf("cannot open file %s", output_file)
-		return
-	}
-	defer outputFile.Close()
+	testFiles, err := test.GetTestFiles(t, "../../test_data/c/", "c_genertator_gen_block.c")
+	test.ASSERT_EQ(t, err, nil, "")
+	defer testFiles.Output.File.Close()
 
 	config := backends.NewCConfig()
-	generator := NewCGeneratorBase(outputFile, config)
+	generator := NewCGeneratorBase(testFiles.Output.File, config)
 
 	block := model.NewBlock()
 	sentence := model.NewSentence("test_gen_block();")
@@ -33,21 +26,17 @@ func TestCGeneratorGenBlock(t *testing.T) {
 
 	block.Accept(generator)
 
-	test.EXPECT_TRUE(t, file.FileEqual(standard_file, output_file), "file "+filepath.Base(standard_file)+" not equal")
+	err = file.FileEqual(testFiles.Output.Name, testFiles.Standard.Name)
+	test.EXPECT_EQ(t, err, nil, "")
 }
 
 func TestCGeneratorGenEnum(t *testing.T) {
-	standard_file, output_file := test.GenTestFileNames("../../test_data/", "test_standard", "test_output", "c_genertator_gen_enum.c")
-
-	outputFile, err := os.Create(output_file)
-	if err != nil {
-		logger.Errorf("cannot open file %s", output_file)
-		return
-	}
-	defer outputFile.Close()
+	testFiles, err := test.GetTestFiles(t, "../../test_data/c/", "c_genertator_gen_enum.c")
+	test.ASSERT_EQ(t, err, nil, "")
+	defer testFiles.Output.File.Close()
 
 	config := backends.NewCConfig()
-	generator := NewCGeneratorBase(outputFile, config)
+	generator := NewCGeneratorBase(testFiles.Output.File, config)
 
 	vars := []struct {
 		name      string
@@ -83,9 +72,10 @@ func TestCGeneratorGenEnum(t *testing.T) {
 
 	generator.CLikeGeneratorBase.GenMultiLineComment(configComment)
 
-	generator.PrintReturn(outputFile)
+	generator.PrintReturn(testFiles.Output.File)
 
 	constList.Accept(generator)
 
-	test.EXPECT_TRUE(t, file.FileEqual(standard_file, output_file), "file "+filepath.Base(standard_file)+" not equal")
+	err = file.FileEqual(testFiles.Output.Name, testFiles.Standard.Name)
+	test.EXPECT_EQ(t, err, nil, "")
 }
