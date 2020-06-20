@@ -30,6 +30,7 @@ func (this *SentenceList) Accept(visitor CodeVisitor) {
 	}
 }
 
-func (this *SentenceList) Append(val *Sentence) {
-	this.codes = append(this.codes, val)
+func (this *SentenceList) Append(val ...*Sentence) *SentenceList {
+	this.codes = append(this.codes, val...)
+	return this
 }

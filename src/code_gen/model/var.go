@@ -118,11 +118,12 @@ func (this *VarList) AcceptAsMacroParmList(visitor CodeVisitor) {
 	}
 	visitor.VisitMacroParamVarNonFirstEnd()
 }
-func (this *VarList) Append(val *Var) {
+func (this *VarList) Append(val ...*Var) *VarList {
 	//fmt.Println("this =", this)
 	//fmt.Println("this.Vars =", this.Vars)
 	//fmt.Println("val =", val)
-	this.vars = append(this.vars, val)
+	this.vars = append(this.vars, val...)
+	return this
 }
 
 func (this *VarList) GetMaxNameLen() int {

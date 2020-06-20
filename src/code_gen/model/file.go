@@ -34,8 +34,9 @@ func (this *File) Accept(v CodeVisitor) {
 	//v.VisitFile(this)
 }
 
-func (this *File) AppendConst(val *ConstList) {
-	this.rangePublic.constGroup.AppendConstList(val)
+func (this *File) AppendConst(val ...*ConstList) *File {
+	this.rangePublic.constGroup.AppendConstList(val...)
+	return this
 }
 
 type FileList struct {
@@ -50,6 +51,7 @@ func (this *FileList) Accept(v CodeVisitor) {
 	//v.VisitFileList(this)
 }
 
-func (this *FileList) Append(val *File) {
-	this.Files = append(this.Files, val)
+func (this *FileList) Append(val ...*File) *FileList {
+	this.Files = append(this.Files, val...)
+	return this
 }

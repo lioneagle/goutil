@@ -10,11 +10,6 @@ import (
 	"github.com/lioneagle/goutil/src/test"
 )
 
-func getTestFilesForClike(filename string) (standard_file, output_file string) {
-	return test.GenTestFileNames("../test_data/clike/", "test_standard",
-		"test_output", filename)
-}
-
 func TestCLikeGeneratorGenBlock(t *testing.T) {
 	testFiles, err := test.GetTestFiles(t, "../test_data/clike/", "clike_genertator_gen_block.c")
 	test.ASSERT_EQ(t, err, nil, "")
@@ -62,7 +57,7 @@ func TestCLikeGeneratorGenEnum(t *testing.T) {
 		val.SetComment(v.comment)
 		constList.AppendConst(val)
 	}
-
+	config.SetVarUseSingleLineComment(true)
 	constList.Accept(generator)
 
 	config.Indent().Assign = 2
@@ -98,6 +93,8 @@ func TestCLikeGeneratorGenComment(t *testing.T) {
     `
 
 	generator.GenMultiLineComment(comment)
+	generator.GenMultiLineComment("single comment as multi comment")
+	config.SetVarUseSingleLineComment(true)
 	generator.genSingleLineCommentWithoutIndent("test single line comment")
 
 	err = file.FileEqual(testFiles.Output.Name, testFiles.Standard.Name)
@@ -138,13 +135,15 @@ func TestCLikeGeneratorGenStruct(t *testing.T) {
 	config.SetBraceAtNextLine(false)
 
 	generator.PrintReturn(testFiles.Output.File)
+
+	config.SetVarUseSingleLineComment(true)
 	struct1.Accept(generator)
 
 	err = file.FileEqual(testFiles.Output.Name, testFiles.Standard.Name)
 	test.EXPECT_EQ(t, err, nil, "")
 }
 
-func TestCLikeGeneratorGenChoices(t *testing.T) {
+func TestCLikeGeneratorGenMultiChoice(t *testing.T) {
 	testFiles, err := test.GetTestFiles(t, "../test_data/clike/", "clike_genertator_gen_if.c")
 	test.ASSERT_EQ(t, err, nil, "")
 	defer testFiles.Output.File.Close()
@@ -180,6 +179,100 @@ func TestCLikeGeneratorGenChoices(t *testing.T) {
 	choices.Accept(generator)
 
 	choices.SetLastCode(model.NewSentence("y -= 2;"))
+	choices.Accept(generator)
+
+	err = file.FileEqual(testFiles.Output.Name, testFiles.Standard.Name)
+	test.EXPECT_EQ(t, err, nil, "")
+}
+
+func TestCLikeGeneratorGenChoiceGroup(t *testing.T) {
+	testFiles, err := test.GetTestFiles(t, "../test_data/clike/", "clike_genertator_gen_switch.c")
+	test.ASSERT_EQ(t, err, nil, "")
+	defer testFiles.Output.File.Close()
+
+	config := NewCConfig()
+	generator := NewCLikeGeneratorBase(testFiles.Output.File, config)
+
+	choices := model.NewChoiceGroup()
+	choices.SetComment("generate switch, left brace at next line")
+	choices.SetCondition("state")
+
+	choice := model.NewChoice()
+	choice.SetCondition("ST_INIT")
+	choice.SetCode(model.NewSentenceList().Append(
+		model.NewSentence("x += 5;"),
+		model.NewSentence("break;"),
+	))
+	choice.SetComment("state1")
+	choices.AppendChoice(choice)
+
+	choice = model.NewChoice()
+	choice.SetCondition("ST_1")
+	choice.SetCode(model.NewSentenceList().Append(
+		model.NewSentence("x += 6;"),
+		model.NewSentence("break;"),
+	))
+	choice.SetComment("state2")
+	choices.AppendChoice(choice)
+
+	choice = model.NewChoice()
+	choice.SetCondition("ST_2")
+	choice.SetCode(model.NewSentenceList().Append(
+		model.NewSentence("x += 7;"),
+		model.NewSentence("break;"),
+	))
+	choice.SetComment("state3")
+	choices.AppendChoice(choice)
+
+	choices.Accept(generator)
+
+	choices.SetDefaultCode(model.NewSentenceList().Append(
+		model.NewSentence("x -= 3;"),
+		model.NewSentence("break;"),
+	))
+	choices.Accept(generator)
+
+	generator.PrintReturn(testFiles.Output.File)
+
+	config.SetBraceAtNextLine(false)
+
+	choices = model.NewChoiceGroup()
+	choices.SetComment("generate switch, left brace at same line")
+
+	choice = model.NewChoice()
+	choice.SetCondition("ST_INIT")
+	choice.SetCode(model.NewSentenceList().Append(
+		model.NewSentence("y += 5;"),
+		model.NewSentence("break;"),
+	))
+	choice.SetComment("state4")
+	choices.AppendChoice(choice)
+
+	choice = model.NewChoice()
+	choice.SetCondition("ST_1")
+	choice.SetCode(model.NewSentenceList().Append(
+		model.NewSentence("y += 6;"),
+		model.NewSentence("break;"),
+	))
+	choice.SetComment("state5")
+	choices.AppendChoice(choice)
+
+	choice = model.NewChoice()
+	choice.SetCondition("ST_2")
+	choice.SetCode(model.NewSentenceList().Append(
+		model.NewSentence("y += 7;"),
+		model.NewSentence("break;"),
+	))
+	choice.SetComment("state6")
+	choices.AppendChoice(choice)
+
+	choices.Accept(generator)
+
+	choices.SetDefaultCode(model.NewSentenceList().Append(
+		model.NewSentence("y -= 3;"),
+		model.NewSentence("break;"),
+	))
+
 	choices.Accept(generator)
 
 	err = file.FileEqual(testFiles.Output.Name, testFiles.Standard.Name)

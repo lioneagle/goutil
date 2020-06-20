@@ -97,7 +97,7 @@ func (this *ConfigCommonImpl) Init() {
 	this.printTimeUsed = true
 	this.outputPath = "./"
 	this.indent.Init()
-	this.varUseSingleLineComment = true
+	//this.varUseSingleLineComment = true
 	this.paramsInOneLine = true
 
 }

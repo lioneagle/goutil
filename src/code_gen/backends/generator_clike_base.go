@@ -66,6 +66,11 @@ func (this *CLikeGeneratorBase) genSingleLineCommentWithoutIndent(comment string
 	this.PrintReturn(this.w)
 }
 
+func (this *CLikeGeneratorBase) GenSingleLineComment(comment string) {
+	this.Fprint(this.w, "")
+	this.genSingleLineCommentWithoutIndent(comment)
+}
+
 func (this *CLikeGeneratorBase) GenMultiLineComment(comment string) {
 	lines := strings.Split(comment, "\n")
 	if len(lines) <= 0 {
@@ -91,7 +96,7 @@ func (this *CLikeGeneratorBase) GenMultiLineComment(comment string) {
 	}
 
 	if len(newLines) == 1 {
-		this.Fprintfln(this.w, "/* %s */", newLines[0])
+		this.GenSingleLineComment(newLines[0])
 	} else if this.config.MultiLineCommentDecorate() {
 		this.Fprint(this.w, "/*")
 		basic.PrintChars(this.w, '*', max_len+2)
@@ -295,6 +300,60 @@ func (this *CLikeGeneratorBase) VisitMultiChoiceLastCode(val model.Code) {
 }
 
 func (this *CLikeGeneratorBase) VisitMultiChoiceEnd(val *model.MultiChoice) {
+}
+
+func (this *CLikeGeneratorBase) VisitChoiceGroupBegin(val *model.ChoiceGroup) {
+	this.GenMultiLineComment(val.GetComment())
+	this.Fprintf(this.w, "switch (%s)", val.GetCondition())
+	if !this.config.BraceAtNextLine() {
+		fmt.Fprintf(this.w, " {")
+		this.PrintReturn(this.w)
+	} else {
+		this.PrintReturn(this.w)
+		this.Fprintln(this.w, "{")
+	}
+
+	this.EnterIndent(this.config.Indent().Switch)
+}
+
+func (this *CLikeGeneratorBase) VisitChoiceGroupItemBegin(val *model.Choice) {
+	this.Fprintf(this.w, "case %s:", val.GetCondition())
+	if !this.config.BraceAtNextLine() {
+		fmt.Fprintf(this.w, " {")
+		this.PrintReturn(this.w)
+	} else {
+		this.PrintReturn(this.w)
+		this.Fprintln(this.w, "{")
+	}
+	this.EnterIndent(this.config.Indent().Case)
+	this.GenMultiLineComment(val.GetComment())
+}
+
+func (this *CLikeGeneratorBase) VisitChoiceGroupItemEnd(val *model.Choice) {
+	this.Exit()
+	this.Fprintln(this.w, "}")
+}
+
+func (this *CLikeGeneratorBase) VisitChoiceGroupDefaultBegin(val model.Code) {
+	this.Fprintf(this.w, "default:")
+	if !this.config.BraceAtNextLine() {
+		fmt.Fprintf(this.w, " {")
+		this.PrintReturn(this.w)
+	} else {
+		this.PrintReturn(this.w)
+		this.Fprintln(this.w, "{")
+	}
+	this.EnterIndent(this.config.Indent().Case)
+}
+
+func (this *CLikeGeneratorBase) VisitChoiceGroupDefaultEnd(val model.Code) {
+	this.Exit()
+	this.Fprintln(this.w, "}")
+}
+
+func (this *CLikeGeneratorBase) VisitChoiceGroupEnd(val *model.ChoiceGroup) {
+	this.Exit()
+	this.Fprintln(this.w, "}")
 }
 
 func (this *CLikeGeneratorBase) VisitRepeatAsForBegin(val *model.Repeat) {

@@ -18,8 +18,8 @@ func NewMacroDefine() *MacroDefine {
 	return ret
 }
 
-func (this *MacroDefine) AppendParam(val *Var) {
-	this.params.Append(val)
+func (this *MacroDefine) AppendParam(val ...*Var) {
+	this.params.Append(val...)
 }
 
 func (this *MacroDefine) IsMacro() bool {
@@ -67,8 +67,8 @@ func NewMacroDefineList() *MacroDefineList {
 	return &MacroDefineList{}
 }
 
-func (this *MacroDefineList) Append(val *MacroDefine) {
-	this.macros = append(this.macros, val)
+func (this *MacroDefineList) Append(val ...*MacroDefine) {
+	this.macros = append(this.macros, val...)
 }
 
 func (this *MacroDefineList) IsMacro() bool {
@@ -83,8 +83,9 @@ func NewMacroList() *MacroList {
 	return &MacroList{}
 }
 
-func (this *MacroList) Append(val *Macro) {
-	this.macros = append(this.macros, val)
+func (this *MacroList) Append(val ...*Macro) *MacroList {
+	this.macros = append(this.macros, val...)
+	return this
 }
 
 func (this *MacroList) IsMacro() bool {

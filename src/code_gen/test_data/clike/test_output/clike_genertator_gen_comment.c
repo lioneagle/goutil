@@ -7,4 +7,5 @@
  * length parsed
  * NOTE: create for test
  */
+/* single comment as multi comment */
 // test single line comment

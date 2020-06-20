@@ -35,8 +35,9 @@ func (this *ConstList) Accept(visitor CodeVisitor) {
 	visitor.VisitConstsEnd(this)
 }
 
-func (this *ConstList) AppendConst(Const *Var) {
-	this.consts.Append(Const)
+func (this *ConstList) AppendConst(Const ...*Var) *ConstList {
+	this.consts.Append(Const...)
+	return this
 }
 
 func (this *ConstList) GetMaxNameLen() int {
@@ -68,6 +69,7 @@ func (this *ConstGroup) SetName(val string) {
 	this.name = val
 }
 
-func (this *ConstGroup) AppendConstList(val *ConstList) {
-	this.consts = append(this.consts, val)
+func (this *ConstGroup) AppendConstList(val ...*ConstList) *ConstGroup {
+	this.consts = append(this.consts, val...)
+	return this
 }

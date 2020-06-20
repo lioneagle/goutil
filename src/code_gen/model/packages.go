@@ -16,8 +16,8 @@ func (this *Package) Accept(v CodeVisitor) {
 	//v.VisitPackage(this)
 }
 
-func (this *Package) AppendFile(val *File) {
-	this.Files.Append(val)
+func (this *Package) AppendFile(val ...*File) {
+	this.Files.Append(val...)
 }
 
 type PackageList struct {
@@ -32,6 +32,7 @@ func (this *PackageList) Accept(v CodeVisitor) {
 	//v.VisitPackageList(this)
 }
 
-func (this *PackageList) AppendPackage(val *Package) {
-	this.Packages = append(this.Packages, val)
+func (this *PackageList) AppendPackage(val ...*Package) *PackageList {
+	this.Packages = append(this.Packages, val...)
+	return this
 }

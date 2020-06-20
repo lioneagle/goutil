@@ -40,8 +40,9 @@ func (this *Function) GetReturnList() *VarList {
 	return this.returns
 }
 
-func (this *Function) AppendCode(code Code) {
-	this.body.AppendCode(code)
+func (this *Function) AppendCode(code ...Code) *Function {
+	this.body.AppendCode(code...)
+	return this
 }
 
 func (this *Function) GetBody() *Block {
@@ -60,12 +61,14 @@ func (this *Function) AcceptAsDefine(v CodeVisitor) {
 	v.VisitFuncDefine(this)
 }
 
-func (this *Function) AppendParam(val *Var) {
-	this.params.Append(val)
+func (this *Function) AppendParam(val ...*Var) *Function {
+	this.params.Append(val...)
+	return this
 }
 
-func (this *Function) AppendReturnType(val *Var) {
-	this.returns.Append(val)
+func (this *Function) AppendReturnType(val ...*Var) *Function {
+	this.returns.Append(val...)
+	return this
 }
 
 type FunctionList struct {
@@ -76,6 +79,7 @@ func NewFunctionList() *FunctionList {
 	return &FunctionList{}
 }
 
-func (this *FunctionList) Append(val *Function) {
-	this.Funcs = append(this.Funcs, val)
+func (this *FunctionList) Append(val ...*Function) *FunctionList {
+	this.Funcs = append(this.Funcs, val...)
+	return this
 }

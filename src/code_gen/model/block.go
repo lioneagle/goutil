@@ -16,6 +16,7 @@ func (this *Block) Accept(visitor CodeVisitor) {
 	visitor.VisitBlockEnd(this)
 }
 
-func (this *Block) AppendCode(child Code) {
-	this.children = append(this.children, child)
+func (this *Block) AppendCode(child ...Code) *Block {
+	this.children = append(this.children, child...)
+	return this
 }

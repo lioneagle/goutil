@@ -26,6 +26,12 @@ func (this *Choice) AcceptAsNonFirst(visitor CodeVisitor) {
 	visitor.VisitChoiceNonFirstEnd(this)
 }
 
+func (this *Choice) AcceptAsChoiceGropuItem(visitor CodeVisitor) {
+	visitor.VisitChoiceGroupItemBegin(this)
+	this.code.Accept(visitor)
+	visitor.VisitChoiceGroupItemEnd(this)
+}
+
 func (this *Choice) SetCode(code Code) {
 	this.code = code
 }
@@ -64,8 +70,9 @@ func (this *MultiChoice) GetComment() string {
 	return this.comment
 }
 
-func (this *MultiChoice) AppendChoice(choice *Choice) {
-	this.choices = append(this.choices, choice)
+func (this *MultiChoice) AppendChoice(choice ...*Choice) *MultiChoice {
+	this.choices = append(this.choices, choice...)
+	return this
 }
 
 func (this *MultiChoice) SetLastCode(code Code) {
@@ -92,9 +99,11 @@ func (this *MultiChoice) Accept(visitor CodeVisitor) {
 }
 
 type ChoiceGroup struct {
-	comment  string
-	choices  []*Choice
-	lastCode Code
+	comment     string
+	condition   string
+	hasDefault  bool
+	choices     []*Choice
+	defaultCode Code
 }
 
 func NewChoiceGroup() *ChoiceGroup {
@@ -111,10 +120,41 @@ func (this *ChoiceGroup) GetComment() string {
 	return this.comment
 }
 
-func (this *ChoiceGroup) AppendChoice(choice *Choice) {
-	this.choices = append(this.choices, choice)
+func (this *ChoiceGroup) SetCondition(condition string) {
+	this.condition = condition
 }
 
-func (this *ChoiceGroup) SetLastCode(code Code) {
-	this.lastCode = code
+func (this *ChoiceGroup) GetCondition() string {
+	return this.condition
+}
+
+func (this *ChoiceGroup) AppendChoice(choice ...*Choice) *ChoiceGroup {
+	this.choices = append(this.choices, choice...)
+	return this
+}
+
+func (this *ChoiceGroup) SetDefaultCode(code Code) {
+	this.defaultCode = code
+	this.hasDefault = true
+}
+
+func (this *ChoiceGroup) Accept(visitor CodeVisitor) {
+	if len(this.choices) <= 0 {
+		return
+	}
+
+	visitor.VisitChoiceGroupBegin(this)
+
+	for i := 0; i < len(this.choices); i++ {
+		this.choices[i].AcceptAsChoiceGropuItem(visitor)
+	}
+
+	if this.hasDefault {
+		visitor.VisitChoiceGroupDefaultBegin(this.defaultCode)
+		this.defaultCode.Accept(visitor)
+		visitor.VisitChoiceGroupDefaultEnd(this.defaultCode)
+	}
+
+	visitor.VisitChoiceGroupEnd(this)
+
 }

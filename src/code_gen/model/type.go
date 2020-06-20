@@ -16,8 +16,9 @@ func NewTypeList() *TypeList {
 	return &TypeList{}
 }
 
-func (this *TypeList) Append(val *Type) {
-	this.types = append(this.types, val)
+func (this *TypeList) Append(val ...*Type) *TypeList {
+	this.types = append(this.types, val...)
+	return this
 }
 
 func (this *TypeList) GetTypeNameLen() int {

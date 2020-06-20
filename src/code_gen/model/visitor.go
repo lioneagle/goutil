@@ -38,6 +38,13 @@ type CodeVisitor interface {
 	VisitMultiChoiceLastCode(val Code)
 	VisitMultiChoiceEnd(val *MultiChoice)
 
+	VisitChoiceGroupBegin(val *ChoiceGroup)
+	VisitChoiceGroupItemBegin(val *Choice)
+	VisitChoiceGroupItemEnd(val *Choice)
+	VisitChoiceGroupDefaultBegin(val Code)
+	VisitChoiceGroupDefaultEnd(val Code)
+	VisitChoiceGroupEnd(val *ChoiceGroup)
+
 	VisitRepeatAsForBegin(val *Repeat)
 	VisitRepeatAsForEnd(val *Repeat)
 

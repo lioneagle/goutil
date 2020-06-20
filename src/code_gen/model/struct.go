@@ -71,32 +71,39 @@ func (this *Struct) SetName(name string) {
 	this.name = name
 }
 
-func (this *Struct) AppendGenericType(val *Type) {
-	this.genericTypes.Append(val)
+func (this *Struct) AppendGenericType(val ...*Type) *Struct {
+	this.genericTypes.Append(val...)
+	return this
 }
 
-func (this *Struct) AppendTypeDefinePublic(val *Sentence) {
-	this.rangePublic.typeDefine.Append(val)
+func (this *Struct) AppendTypeDefinePublic(val ...*Sentence) *Struct {
+	this.rangePublic.typeDefine.Append(val...)
+	return this
 }
 
-func (this *Struct) AppendFieldPublic(val *Var) {
-	this.rangePublic.fields.Append(val)
+func (this *Struct) AppendFieldPublic(val ...*Var) *Struct {
+	this.rangePublic.fields.Append(val...)
+	return this
 }
 
-func (this *Struct) AppendMethodPublic(val *Function) {
-	this.rangePublic.methods.Append(val)
+func (this *Struct) AppendMethodPublic(val ...*Function) *Struct {
+	this.rangePublic.methods.Append(val...)
+	return this
 }
 
-func (this *Struct) AppendTypeDefineProtected(val *Sentence) {
-	this.getRangeProtected().typeDefine.Append(val)
+func (this *Struct) AppendTypeDefineProtected(val ...*Sentence) *Struct {
+	this.getRangeProtected().typeDefine.Append(val...)
+	return this
 }
 
-func (this *Struct) AppendFieldProtected(val *Var) {
-	this.getRangeProtected().fields.Append(val)
+func (this *Struct) AppendFieldProtected(val ...*Var) *Struct {
+	this.getRangeProtected().fields.Append(val...)
+	return this
 }
 
-func (this *Struct) AppendMethodProtected(val *Function) {
-	this.getRangeProtected().methods.Append(val)
+func (this *Struct) AppendMethodProtected(val ...*Function) *Struct {
+	this.getRangeProtected().methods.Append(val...)
+	return this
 }
 
 func (this *Struct) getRangeProtected() *StructRange {
@@ -106,16 +113,19 @@ func (this *Struct) getRangeProtected() *StructRange {
 	return this.rangeProtected
 }
 
-func (this *Struct) AppendTypeDefinePrivate(val *Sentence) {
-	this.getRangePrivate().typeDefine.Append(val)
+func (this *Struct) AppendTypeDefinePrivate(val ...*Sentence) *Struct {
+	this.getRangePrivate().typeDefine.Append(val...)
+	return this
 }
 
-func (this *Struct) AppendFieldPrivate(val *Var) {
-	this.getRangePrivate().fields.Append(val)
+func (this *Struct) AppendFieldPrivate(val ...*Var) *Struct {
+	this.getRangePrivate().fields.Append(val...)
+	return this
 }
 
-func (this *Struct) AppendMethodPrivate(val *Function) {
-	this.getRangePrivate().methods.Append(val)
+func (this *Struct) AppendMethodPrivate(val ...*Function) *Struct {
+	this.getRangePrivate().methods.Append(val...)
+	return this
 }
 
 func (this *Struct) getRangePrivate() *StructRange {
@@ -133,6 +143,7 @@ func NewStructList() *StructList {
 	return &StructList{}
 }
 
-func (this *StructList) Append(val *Struct) {
-	this.structs = append(this.structs, val)
+func (this *StructList) Append(val ...*Struct) *StructList {
+	this.structs = append(this.structs, val...)
+	return this
 }
