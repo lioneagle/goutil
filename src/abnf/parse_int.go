@@ -11,7 +11,9 @@ import (
    ParseUInt64 is faster than strconv.ParseUint and strconv.Atoi
 */
 func ParseUint64(src []byte, pos Pos) (digit uint64, newPos Pos, ok bool) {
-	const cutoff = (1<<64-1)/10 + 1
+	// Cutoff is the smallest number such that cutoff*base > maxUint64
+	const maxUint64 = (1<<64 - 1)
+	const cutoff = maxUint64/10 + 1
 
 	len1 := Pos(len(src))
 	charset := &chars.Charsets0
@@ -21,10 +23,10 @@ func ParseUint64(src []byte, pos Pos) (digit uint64, newPos Pos, ok bool) {
 
 	var end1 Pos
 
-	if len1 < 19 {
-		end1 = newPos + len1
+	if len1-pos < 19 {
+		end1 = len1
 	} else {
-		end1 = newPos + 19
+		end1 = pos + 19
 	}
 
 	digit = uint64(0)
@@ -157,7 +159,7 @@ func EncodeUint(buf *ByteBuffer, digit uint64) {
 /* EncodeUintWithWidth encode uint64 to byte buffer with width,
    if length of digit is less than width, spaces are filled before digit.
    if length of digit is larger than width, no space is before digit.
-   EncodeUintWithWidth is much faster than fmt.Sprintf
+   EncodeUintWithWidth is faster than fmt.Sprintf
 */
 func EncodeUintWithWidth(buf *ByteBuffer, digit uint64, width int) {
 	if digit < 10 {
