@@ -23,4 +23,4 @@ do{\
     x = 1;\
     y = 2;\
     return 1;\
-}while();
+}while(0);

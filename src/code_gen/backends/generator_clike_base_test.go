@@ -578,6 +578,7 @@ func TestCLikeGeneratorGenMacroDefine(t *testing.T) {
 
 	repeat := model.NewRepeat()
 	repeat.SetCode(codes)
+	repeat.SetCondition("0")
 	repeat.SetAcceptType(model.REPEAT_TYPE_DO_WHILE)
 
 	macro.SetBody(repeat)

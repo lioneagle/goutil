@@ -482,7 +482,6 @@ func (this *CLikeGeneratorBase) VisitMacroDefine(val *model.MacroDefine) {
 		fmt.Fprint(this.w, "\\")
 		this.PrintReturn(this.w)
 		fmt.Fprintf(this.w, "%s", lines[i])
-
 	}
 
 }
