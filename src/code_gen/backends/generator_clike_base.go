@@ -262,7 +262,6 @@ func (this *CLikeGeneratorBase) VisitChoiceNonFirstBegin(val *model.Choice) {
 		fmt.Fprint(this.w, ") {")
 		this.PrintReturn(this.w)
 	} else {
-		this.PrintReturn(this.w)
 		fmt.Fprintf(this.w, "else if (")
 		fmt.Fprintf(this.w, val.GetCondition())
 		fmt.Fprint(this.w, ")")
@@ -448,15 +447,29 @@ func (this *CLikeGeneratorBase) VisitFuncReturnNonFirst(val *model.Var) {
 
 func (this *CLikeGeneratorBase) VisitMacroDefine(val *model.MacroDefine) {
 	this.GenMultiLineComment(val.GetComment())
-	fmt.Fprintf(this.w, "#define %s(", val.GetName())
-	val.GetParams().AcceptAsMacroParmList(this)
-	fmt.Fprint(this.w, ")")
-	chars.PrintIndent(this.w, 1)
+	fmt.Fprintf(this.w, "#define %s", val.GetName())
+	if val.HasParams() {
+		fmt.Fprintf(this.w, "(")
+		val.GetParams().AcceptAsMacroParmList(this)
+		fmt.Fprint(this.w, ")")
+		chars.PrintIndent(this.w, 1)
+	} else {
+		fmt.Fprintf(this.w, " ")
+	}
 
+	this.VisitMacroCode(val.GetBody())
+}
+
+func (this *CLikeGeneratorBase) VisitMacroUndefine(val *model.MacroUndefine) {
+	this.GenMultiLineComment(val.GetComment())
+	this.Fprintfln(this.w, "#undef %s", val.GetValue())
+}
+
+func (this *CLikeGeneratorBase) VisitMacroCode(val model.Code) {
 	buf := buffer.NewByteBuffer(nil)
 	gen := NewCLikeGeneratorBase(buf, this.config)
 	gen.CopyStack(&this.Indent)
-	val.GetBody().Accept(gen)
+	val.Accept(gen)
 
 	lines := strings.Split(strings.Replace(buf.String(), "\r", "", -1), "\n")
 
@@ -475,6 +488,9 @@ func (this *CLikeGeneratorBase) VisitMacroDefine(val *model.MacroDefine) {
 
 	if len(lines) == 1 {
 		fmt.Fprint(this.w, lines[0])
+		if lines[0][len(lines[0])-1] != '\n' {
+			this.PrintReturn(this.w)
+		}
 		return
 	}
 
@@ -483,7 +499,6 @@ func (this *CLikeGeneratorBase) VisitMacroDefine(val *model.MacroDefine) {
 		this.PrintReturn(this.w)
 		fmt.Fprintf(this.w, "%s", lines[i])
 	}
-
 }
 
 func (this *CLikeGeneratorBase) VisitMacroParamVarFirst(val *model.Var) {
@@ -498,4 +513,44 @@ func (this *CLikeGeneratorBase) VisitMacroParamVarNonFirst(val *model.Var) {
 }
 
 func (this *CLikeGeneratorBase) VisitMacroParamVarNonFirstEnd() {
+}
+
+func (this *CLikeGeneratorBase) VisitMacroMultiChoiceBegin(val *model.MultiChoice) {
+	this.GenMultiLineComment(val.GetComment())
+}
+
+func (this *CLikeGeneratorBase) VisitMacroChoiceFirstBegin(val *model.Choice) {
+	this.Fprintfln(this.w, "#if %s", val.GetCondition())
+	this.EnterIndent(this.config.Indent().MacroIf)
+}
+
+func (this *CLikeGeneratorBase) VisitMacroChoiceFirstEnd(val *model.Choice) {
+	this.Exit()
+}
+
+func (this *CLikeGeneratorBase) VisitMacroChoiceNonFirstBegin(val *model.Choice) {
+	this.Fprintfln(this.w, "#elif %s", val.GetCondition())
+	this.EnterIndent(this.config.Indent().MacroIf)
+}
+
+func (this *CLikeGeneratorBase) VisitMacroChoiceNonFirstEnd(val *model.Choice) {
+	this.Exit()
+}
+
+func (this *CLikeGeneratorBase) VisitMacroMultiChoiceLastCode(val model.Code) {
+	if val == nil {
+		return
+	}
+
+	this.Fprintln(this.w, "#else")
+	this.EnterIndent(this.config.Indent().MacroIf)
+
+	//this.VisitMacroCode(val)
+	val.Accept(this)
+
+	this.Exit()
+}
+
+func (this *CLikeGeneratorBase) VisitMacroMultiChoiceEnd(val *model.MultiChoice) {
+	this.Fprintln(this.w, "#endif")
 }

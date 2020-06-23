@@ -19,6 +19,7 @@ type Indents struct {
 	Union     int
 	Assign    int
 	Comment   int
+	MacroIf   int
 }
 
 func (this *Indents) Init() {
@@ -35,6 +36,7 @@ func (this *Indents) Init() {
 	this.Union = 4
 	this.Assign = 1
 	this.Comment = 1
+	this.MacroIf = 0
 }
 
 func (this *Indents) String() string {

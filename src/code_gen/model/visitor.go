@@ -71,6 +71,16 @@ type CodeVisitor interface {
 	VisitMacroParamVarNonFirst(val *Var)
 	VisitMacroParamVarNonFirstEnd()
 	VisitMacroDefine(val *MacroDefine)
+	VisitMacroUndefine(val *MacroUndefine)
+	VisitMacroCode(val Code)
+
+	VisitMacroMultiChoiceBegin(val *MultiChoice)
+	VisitMacroChoiceFirstBegin(val *Choice)
+	VisitMacroChoiceFirstEnd(val *Choice)
+	VisitMacroChoiceNonFirstBegin(val *Choice)
+	VisitMacroChoiceNonFirstEnd(val *Choice)
+	VisitMacroMultiChoiceLastCode(val Code)
+	VisitMacroMultiChoiceEnd(val *MultiChoice)
 }
 
 type NullCodeVisitor struct {
@@ -91,37 +101,52 @@ func (this *NullCodeVisitor) VisitBlockEnd(val *Block) {}
 //func (this *NullCodeVisitor) VisitFunction(val *Function)       {}
 func (this *NullCodeVisitor) VisitSentence(val *Sentence) {}
 
-func (this *NullCodeVisitor) VisitStructBegin(val *Struct)               {}
-func (this *NullCodeVisitor) VisitStructRangePublicBegin(val *Struct)    {}
-func (this *NullCodeVisitor) VisitStructRangePublicEnd(val *Struct)      {}
-func (this *NullCodeVisitor) VisitStructRangeProtectedBegin(val *Struct) {}
-func (this *NullCodeVisitor) VisitStructRangeProtectedEnd(val *Struct)   {}
-func (this *NullCodeVisitor) VisitStructRangePrivateBegin(val *Struct)   {}
-func (this *NullCodeVisitor) VisitStructRangePrivateEnd(val *Struct)     {}
-func (this *NullCodeVisitor) VisitStructEnd(val *Struct)                 {}
-func (this *NullCodeVisitor) VisitStructFieldVarListBegin(val *VarList)  {}
-func (this *NullCodeVisitor) VisitStructFieldVar(val *Var)               {}
-func (this *NullCodeVisitor) VisitStructFieldVarListEnd(val *VarList)    {}
-func (this *NullCodeVisitor) VisitMultiChoiceBegin(val *MultiChoice)     {}
-func (this *NullCodeVisitor) VisitChoiceFirstBegin(val *Choice)          {}
-func (this *NullCodeVisitor) VisitChoiceFirstEnd(val *Choice)            {}
-func (this *NullCodeVisitor) VisitChoiceNonFirstBegin(val *Choice)       {}
-func (this *NullCodeVisitor) VisitChoiceNonFirstEnd(val *Choice)         {}
-func (this *NullCodeVisitor) VisitMultiChoiceLastCode(val Code)          {}
-func (this *NullCodeVisitor) VisitMultiChoiceEnd(val *MultiChoice)       {}
-func (this *NullCodeVisitor) VisitRepeatAsForBegin(val *Repeat)          {}
-func (this *NullCodeVisitor) VisitRepeatAsForEnd(val *Repeat)            {}
-func (this *NullCodeVisitor) VisitRepeatAsWhileBegin(val *Repeat)        {}
-func (this *NullCodeVisitor) VisitRepeatAsWhileEnd(val *Repeat)          {}
-func (this *NullCodeVisitor) VisitRepeatAsDoWhileBegin(val *Repeat)      {}
-func (this *NullCodeVisitor) VisitRepeatAsDoWhileEnd(val *Repeat)        {}
-func (this *NullCodeVisitor) VisitFuncParamVarFirst(val *Var)            {}
-func (this *NullCodeVisitor) VisitFuncParamVarNonFirstBegin()            {}
-func (this *NullCodeVisitor) VisitFuncParamVarNonFirst(val *Var)         {}
-func (this *NullCodeVisitor) VisitFuncParamVarNonFirstEnd()              {}
-func (this *NullCodeVisitor) VisitFuncDeclare(val *Function)             {}
-func (this *NullCodeVisitor) VisitFuncDefine(val *Function)              {}
-func (this *NullCodeVisitor) VisitFuncNoReturn()                         {}
-func (this *NullCodeVisitor) VisitFuncReturnFirst(val *Var)              {}
-func (this *NullCodeVisitor) VisitFuncReturnNonFirst(val *Var)           {}
-func (this *NullCodeVisitor) VisitMacroDefine(val *MacroDefine)          {}
+func (this *NullCodeVisitor) VisitStructBegin(val *Struct)                {}
+func (this *NullCodeVisitor) VisitStructRangePublicBegin(val *Struct)     {}
+func (this *NullCodeVisitor) VisitStructRangePublicEnd(val *Struct)       {}
+func (this *NullCodeVisitor) VisitStructRangeProtectedBegin(val *Struct)  {}
+func (this *NullCodeVisitor) VisitStructRangeProtectedEnd(val *Struct)    {}
+func (this *NullCodeVisitor) VisitStructRangePrivateBegin(val *Struct)    {}
+func (this *NullCodeVisitor) VisitStructRangePrivateEnd(val *Struct)      {}
+func (this *NullCodeVisitor) VisitStructEnd(val *Struct)                  {}
+func (this *NullCodeVisitor) VisitStructFieldVarListBegin(val *VarList)   {}
+func (this *NullCodeVisitor) VisitStructFieldVar(val *Var)                {}
+func (this *NullCodeVisitor) VisitStructFieldVarListEnd(val *VarList)     {}
+func (this *NullCodeVisitor) VisitMultiChoiceBegin(val *MultiChoice)      {}
+func (this *NullCodeVisitor) VisitChoiceFirstBegin(val *Choice)           {}
+func (this *NullCodeVisitor) VisitChoiceFirstEnd(val *Choice)             {}
+func (this *NullCodeVisitor) VisitChoiceNonFirstBegin(val *Choice)        {}
+func (this *NullCodeVisitor) VisitChoiceNonFirstEnd(val *Choice)          {}
+func (this *NullCodeVisitor) VisitMultiChoiceLastCode(val Code)           {}
+func (this *NullCodeVisitor) VisitMultiChoiceEnd(val *MultiChoice)        {}
+func (this *NullCodeVisitor) VisitChoiceGroupBegin(val *ChoiceGroup)      {}
+func (this *NullCodeVisitor) VisitChoiceGroupItemBegin(val *Choice)       {}
+func (this *NullCodeVisitor) VisitChoiceGroupItemEnd(val *Choice)         {}
+func (this *NullCodeVisitor) VisitChoiceGroupDefaultBegin(val Code)       {}
+func (this *NullCodeVisitor) VisitChoiceGroupDefaultEnd(val Code)         {}
+func (this *NullCodeVisitor) VisitChoiceGroupEnd(val *ChoiceGroup)        {}
+func (this *NullCodeVisitor) VisitRepeatAsForBegin(val *Repeat)           {}
+func (this *NullCodeVisitor) VisitRepeatAsForEnd(val *Repeat)             {}
+func (this *NullCodeVisitor) VisitRepeatAsWhileBegin(val *Repeat)         {}
+func (this *NullCodeVisitor) VisitRepeatAsWhileEnd(val *Repeat)           {}
+func (this *NullCodeVisitor) VisitRepeatAsDoWhileBegin(val *Repeat)       {}
+func (this *NullCodeVisitor) VisitRepeatAsDoWhileEnd(val *Repeat)         {}
+func (this *NullCodeVisitor) VisitFuncParamVarFirst(val *Var)             {}
+func (this *NullCodeVisitor) VisitFuncParamVarNonFirstBegin()             {}
+func (this *NullCodeVisitor) VisitFuncParamVarNonFirst(val *Var)          {}
+func (this *NullCodeVisitor) VisitFuncParamVarNonFirstEnd()               {}
+func (this *NullCodeVisitor) VisitFuncDeclare(val *Function)              {}
+func (this *NullCodeVisitor) VisitFuncDefine(val *Function)               {}
+func (this *NullCodeVisitor) VisitFuncNoReturn()                          {}
+func (this *NullCodeVisitor) VisitFuncReturnFirst(val *Var)               {}
+func (this *NullCodeVisitor) VisitFuncReturnNonFirst(val *Var)            {}
+func (this *NullCodeVisitor) VisitMacroDefine(val *MacroDefine)           {}
+func (this *NullCodeVisitor) VisitMacroUndefine(val *MacroUndefine)       {}
+func (this *NullCodeVisitor) VisitMacroCode(val Code)                     {}
+func (this *NullCodeVisitor) VisitMacroMultiChoiceBegin(val *MultiChoice) {}
+func (this *NullCodeVisitor) VisitMacroChoiceFirstBegin(val *Choice)      {}
+func (this *NullCodeVisitor) VisitMacroChoiceFirstEnd(val *Choice)        {}
+func (this *NullCodeVisitor) VisitMacroChoiceNonFirstBegin(val *Choice)   {}
+func (this *NullCodeVisitor) VisitMacroChoiceNonFirstEnd(val *Choice)     {}
+func (this *NullCodeVisitor) VisitMacroMultiChoiceLastCode(val Code)      {}
+func (this *NullCodeVisitor) VisitMacroMultiChoiceEnd(val *MultiChoice)   {}

@@ -588,3 +588,33 @@ func TestCLikeGeneratorGenMacroDefine(t *testing.T) {
 	err = file.FileEqual(testFiles.Output.Name, testFiles.Standard.Name)
 	test.EXPECT_EQ(t, err, nil, "")
 }
+
+func TestCLikeGeneratorGenMacroChoice(t *testing.T) {
+	testFiles, err := test.GetTestFiles(t, "../test_data/clike/", "clike_genertator_gen_macro_choice.c")
+	test.ASSERT_EQ(t, err, nil, "")
+	defer testFiles.Output.File.Close()
+
+	config := NewCConfig()
+	generator := NewCLikeGeneratorBase(testFiles.Output.File, config)
+
+	choices := model.NewMultiChoice()
+	choices.SetComment("generate #if")
+
+	choice := model.NewChoice()
+	choice.SetCondition("i < 100")
+
+	macro := model.NewMacroDefine()
+	macro.SetName("FLAG")
+	macro.SetBody(model.NewSentence("5"))
+	choice.SetCode(macro)
+	choices.AppendChoice(choice)
+
+	choices.AcceptAsMacro(generator)
+
+	choices.SetLastCode(model.NewSentence("x -= 3;"))
+	macro.SetHasParams()
+	choices.AcceptAsMacro(generator)
+
+	err = file.FileEqual(testFiles.Output.Name, testFiles.Standard.Name)
+	test.EXPECT_EQ(t, err, nil, "")
+}

@@ -20,10 +20,22 @@ func (this *Choice) AcceptAsFirst(visitor CodeVisitor) {
 	visitor.VisitChoiceFirstEnd(this)
 }
 
+func (this *Choice) AcceptAsFirstMacro(visitor CodeVisitor) {
+	visitor.VisitMacroChoiceFirstBegin(this)
+	this.code.Accept(visitor)
+	visitor.VisitMacroChoiceFirstEnd(this)
+}
+
 func (this *Choice) AcceptAsNonFirst(visitor CodeVisitor) {
 	visitor.VisitChoiceNonFirstBegin(this)
 	this.code.Accept(visitor)
 	visitor.VisitChoiceNonFirstEnd(this)
+}
+
+func (this *Choice) AcceptAsNonFirstMacro(visitor CodeVisitor) {
+	visitor.VisitMacroChoiceNonFirstBegin(this)
+	this.code.Accept(visitor)
+	visitor.VisitMacroChoiceNonFirstEnd(this)
 }
 
 func (this *Choice) AcceptAsChoiceGropuItem(visitor CodeVisitor) {
@@ -79,6 +91,10 @@ func (this *MultiChoice) SetLastCode(code Code) {
 	this.lastCode = code
 }
 
+func (this *MultiChoice) ChoiceLen() int {
+	return len(this.choices)
+}
+
 func (this *MultiChoice) Accept(visitor CodeVisitor) {
 	if len(this.choices) <= 0 {
 		return
@@ -95,6 +111,25 @@ func (this *MultiChoice) Accept(visitor CodeVisitor) {
 	visitor.VisitMultiChoiceLastCode(this.lastCode)
 
 	visitor.VisitMultiChoiceEnd(this)
+
+}
+
+func (this *MultiChoice) AcceptAsMacro(visitor CodeVisitor) {
+	if len(this.choices) <= 0 {
+		return
+	}
+
+	visitor.VisitMacroMultiChoiceBegin(this)
+
+	this.choices[0].AcceptAsFirstMacro(visitor)
+
+	for i := 1; i < len(this.choices); i++ {
+		this.choices[i].AcceptAsNonFirstMacro(visitor)
+	}
+
+	visitor.VisitMacroMultiChoiceLastCode(this.lastCode)
+
+	visitor.VisitMacroMultiChoiceEnd(this)
 
 }
 

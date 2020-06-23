@@ -6,10 +6,11 @@ type Macro interface {
 }
 
 type MacroDefine struct {
-	name    string
-	comment string
-	params  *VarList
-	body    Code
+	name      string
+	comment   string
+	hasParams bool
+	params    *VarList
+	body      Code
 }
 
 func NewMacroDefine() *MacroDefine {
@@ -19,7 +20,10 @@ func NewMacroDefine() *MacroDefine {
 }
 
 func (this *MacroDefine) AppendParam(val ...*Var) {
-	this.params.Append(val...)
+	if len(val) > 0 {
+		this.params.Append(val...)
+		this.hasParams = true
+	}
 }
 
 func (this *MacroDefine) IsMacro() bool {
@@ -32,6 +36,18 @@ func (this *MacroDefine) GetName() string {
 
 func (this *MacroDefine) SetName(name string) {
 	this.name = name
+}
+
+func (this *MacroDefine) SetHasParams() {
+	this.hasParams = true
+}
+
+func (this *MacroDefine) SetNoParams() {
+	this.hasParams = false
+}
+
+func (this *MacroDefine) HasParams() bool {
+	return this.hasParams
 }
 
 func (this *MacroDefine) GetComment() string {
@@ -56,7 +72,39 @@ func (this *MacroDefine) SetBody(code Code) {
 
 func (this *MacroDefine) Accept(v CodeVisitor) {
 	v.VisitMacroDefine(this)
+}
 
+type MacroUndefine struct {
+	comment string
+	value   string
+}
+
+func NewMacroUndefine() *MacroUndefine {
+	return &MacroUndefine{}
+}
+
+func (this *MacroUndefine) GetComment() string {
+	return this.comment
+}
+
+func (this *MacroUndefine) SetComment(comment string) {
+	this.comment = comment
+}
+
+func (this *MacroUndefine) GetValue() string {
+	return this.value
+}
+
+func (this *MacroUndefine) SetValue(value string) {
+	this.value = value
+}
+
+func (this *MacroUndefine) IsMacro() bool {
+	return true
+}
+
+func (this *MacroUndefine) Accept(v CodeVisitor) {
+	v.VisitMacroUndefine(this)
 }
 
 type MacroDefineList struct {

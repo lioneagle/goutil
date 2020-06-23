@@ -8,6 +8,7 @@
  * NOTE: create for test
  */
 #define PARSE(context, src, len) do{return 0;}while(0)
+
 /*********************************
  * NAME: parse
  * PARAMS:
