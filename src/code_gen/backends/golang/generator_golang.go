@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/lioneagle/abnf/src/basic"
 	"github.com/lioneagle/goutil/src/chars"
 
 	"github.com/lioneagle/goutil/src/code_gen/backends"
@@ -96,14 +95,14 @@ func (this *GolangGenerator) VisitConstsBegin(val *model.ConstList) {
 func (this *GolangGenerator) VisitConst(val *model.Var) {
 	this.Fprint(this.w, val.GetName())
 	if len(val.GetInitValue()) > 0 {
-		basic.PrintIndent(this.w, this.maxNameLen-len(val.GetName())+this.config.Indent().Assign)
+		chars.PrintIndent(this.w, this.maxNameLen-len(val.GetName())+this.config.Indent().Assign)
 		fmt.Fprintf(this.w, "= %s,", val.GetInitValue())
 	} else {
 		fmt.Fprint(this.w, ",")
 	}
 
 	if len(val.GetComment()) > 0 {
-		basic.PrintIndent(this.w, this.maxValueLen-len(val.GetInitValue())+this.config.Indent().Comment)
+		chars.PrintIndent(this.w, this.maxValueLen-len(val.GetInitValue())+this.config.Indent().Comment)
 		this.genSingleLineCommentWithoutIndent(val.GetComment())
 	} else {
 		this.PrintReturn(this.w)

@@ -5,7 +5,6 @@ import (
 	"io"
 	"strings"
 
-	"github.com/lioneagle/abnf/src/basic"
 	"github.com/lioneagle/goutil/src/buffer"
 	"github.com/lioneagle/goutil/src/chars"
 
@@ -99,7 +98,7 @@ func (this *CLikeGeneratorBase) GenMultiLineComment(comment string) {
 		this.GenSingleLineComment(newLines[0])
 	} else if this.config.MultiLineCommentDecorate() {
 		this.Fprint(this.w, "/*")
-		basic.PrintChars(this.w, '*', max_len+2)
+		chars.PrintChars(this.w, '*', max_len+2)
 		this.PrintReturn(this.w)
 
 		for i := 0; i < len(newLines); i++ {
@@ -107,7 +106,7 @@ func (this *CLikeGeneratorBase) GenMultiLineComment(comment string) {
 			this.PrintReturn(this.w)
 		}
 		fmt.Fprint(this.w, " ")
-		basic.PrintChars(this.w, '*', max_len+3)
+		chars.PrintChars(this.w, '*', max_len+3)
 		this.Fprintln(this.w, "*/")
 	} else {
 		this.Fprint(this.w, "/* ")
@@ -189,12 +188,12 @@ func (this *CLikeGeneratorBase) VisitStructFieldVarListBegin(val *model.VarList)
 
 func (this *CLikeGeneratorBase) VisitStructFieldVar(val *model.Var) {
 	this.Fprintf(this.w, "%s", val.GetTypeName())
-	basic.PrintIndent(this.w, this.maxTypeNameLen-len(val.GetTypeName())+1)
+	chars.PrintIndent(this.w, this.maxTypeNameLen-len(val.GetTypeName())+1)
 	fmt.Fprintf(this.w, "%s;", val.GetName())
 
 	if len(val.GetComment()) > 0 {
 		indent := this.maxNameLen - len(val.GetName()) + this.config.Indent().Comment
-		basic.PrintIndent(this.w, indent)
+		chars.PrintIndent(this.w, indent)
 		this.genSingleLineCommentWithoutIndent(val.GetComment())
 	} else {
 		this.PrintReturn(this.w)
@@ -216,7 +215,7 @@ func (this *CLikeGeneratorBase) VisitConstsBegin(val *model.ConstList) {
 func (this *CLikeGeneratorBase) VisitConst(val *model.Var) {
 	this.Fprint(this.w, val.GetName())
 	if len(val.GetInitValue()) > 0 {
-		basic.PrintIndent(this.w, this.maxNameLen-len(val.GetName())+this.config.Indent().Assign)
+		chars.PrintIndent(this.w, this.maxNameLen-len(val.GetName())+this.config.Indent().Assign)
 		fmt.Fprintf(this.w, "= %s,", val.GetInitValue())
 	} else {
 		fmt.Fprint(this.w, ",")
@@ -227,7 +226,7 @@ func (this *CLikeGeneratorBase) VisitConst(val *model.Var) {
 		if len(val.GetInitValue()) <= 0 {
 			indent += this.config.Indent().Assign + len("= ")
 		}
-		basic.PrintIndent(this.w, indent)
+		chars.PrintIndent(this.w, indent)
 		this.genSingleLineCommentWithoutIndent(val.GetComment())
 	} else {
 		this.PrintReturn(this.w)
