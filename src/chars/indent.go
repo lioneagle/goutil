@@ -12,6 +12,12 @@ func PrintIndent(w io.Writer, indent int) {
 	fmt.Fprintf(w, fmt.Sprintf("%%%ds", indent), "")
 }
 
+func PrintChars(w io.Writer, ch, num int) {
+	for i := 0; i < num; i++ {
+		fmt.Fprintf(w, "%c", ch)
+	}
+}
+
 type Indent struct {
 	UseTab        bool
 	DefaultIndent int
