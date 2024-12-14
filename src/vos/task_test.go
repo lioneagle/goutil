@@ -124,7 +124,7 @@ func TestCreateAndRunSyncTaskOk(t *testing.T) {
 
 	time.Sleep(time.Second / 1000)
 
-	msgInfo := &MsgInfo{version: 1, MsgId: 1, Source: id, Dest: id}
+	msgInfo := &MsgInfo{Version: 1, MsgId: 1, Source: id, Dest: id}
 	SendMsgToTask(msgInfo, nil, 0)
 
 	DestroyTask(id)
@@ -186,7 +186,7 @@ func (this *testClient) Run() {
 	server, _, _ := FindTask("server")
 	client, mailbox, _ := FindTask("client")
 
-	msgInfo := &MsgInfo{version: 1, MsgId: EV_TEST_REQ, Source: client, Dest: server}
+	msgInfo := &MsgInfo{Version: 1, MsgId: EV_TEST_REQ, Source: client, Dest: server}
 	request := &testRequest{name: "send request"}
 
 	SendMsgToTask(msgInfo, request, 0)
@@ -229,7 +229,7 @@ func (this *testServer) RecvMsg(msg *Message) {
 
 		atomic.AddUint64(&testStat.requestRecv, 1)
 
-		msgInfo := &MsgInfo{version: 1, MsgId: EV_TEST_RSP, Source: msg.Msginfo.Dest, Dest: msg.Msginfo.Source}
+		msgInfo := &MsgInfo{Version: 1, MsgId: EV_TEST_RSP, Source: msg.Msginfo.Dest, Dest: msg.Msginfo.Source}
 		response := &testResponse{id: 404}
 
 		SendMsgToTask(msgInfo, response, 0)

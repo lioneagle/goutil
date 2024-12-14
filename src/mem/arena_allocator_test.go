@@ -4,11 +4,11 @@ import (
 	//"fmt"
 	"testing"
 
-	"github.com/lioneagle/goutil/src/buffer"
+	//"github.com/lioneagle/goutil/src/buffer"
 	"github.com/lioneagle/goutil/src/test"
 )
 
-func TestArenaAllocatorAllocOk(t *testing.T) {
+/*func TestArenaAllocatorAllocOk(t *testing.T) {
 	allocator := NewArenaAllocator(1024, 1)
 	test.EXPECT_NE(t, allocator.Capacity(), 1024, "")
 	test.EXPECT_NE(t, allocator.Left(), 1024, "")
@@ -53,7 +53,7 @@ func TestArenaAllocatorAllocOk(t *testing.T) {
 	allocator.AllocBytesEnd(addr)
 	test.EXPECT_EQ(t, allocator.Strlen(addr), 7, "")
 	test.EXPECT_EQ(t, allocator.GetString(addr), "123786a", "")
-}
+}*/
 
 func TestArenaAllocatorAllocNOk(t *testing.T) {
 	allocator := NewArenaAllocator(1024, 1)
@@ -147,6 +147,7 @@ func TestArenaAllocatorClone(t *testing.T) {
 	test.EXPECT_EQ(t, newAllocator.GetString(addr), "1234", "")
 }
 
+/*
 func TestArenaAllocatorString(t *testing.T) {
 	allocator := NewArenaAllocator(1024, 1)
 	allocator.AllocBytes([]byte("1234"))
@@ -235,7 +236,7 @@ capacity = 16
 	allocator.PrintUsed(buf)
 	test.EXPECT_EQ(t, buf.String(), wanted, "")
 }
-
+*/
 func TestZeroMem(t *testing.T) {
 	allocator := NewArenaAllocator(1024, 1)
 

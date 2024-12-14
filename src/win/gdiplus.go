@@ -544,14 +544,14 @@ func GetEncoderClsid(format string) (clsid *CLSID, index int) {
 
 	err := GdipGetImageEncodersSize(&num, &size)
 	if err != nil {
-		fmt.Println("GetEncoderClsid:: call GdipGetImageEncodersSize failed, err = %s", err.Error())
+		fmt.Printf("GetEncoderClsid:: call GdipGetImageEncodersSize failed, err = %s", err.Error())
 		return nil, -1
 	}
 
 	buf := make([]byte, size)
 	err = GdipGetImageEncoders(num, size, (*ImageCodecInfo)(unsafe.Pointer(&buf[0])))
 	if err != nil {
-		fmt.Println("GetEncoderClsid:: call GdipGetImageEncoders failed, err = %s", err.Error())
+		fmt.Printf("GetEncoderClsid:: call GdipGetImageEncoders failed, err = %s", err.Error())
 		return nil, -1
 	}
 

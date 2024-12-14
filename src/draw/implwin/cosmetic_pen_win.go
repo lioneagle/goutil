@@ -1,8 +1,8 @@
 package implwin
 
 import (
-	"draw"
-	"win"
+	"github.com/lioneagle/goutil/src/draw"
+	"github.com/lioneagle/goutil/src/win"
 )
 
 type CosmeticPenWin struct {

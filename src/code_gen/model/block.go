@@ -1,22 +1,29 @@
 package model
 
 type Block struct {
-	children []Code
+	codes *Codes
 }
 
 func NewBlock() *Block {
-	return &Block{}
+	return &Block{
+		codes: NewCodes(),
+	}
 }
 
 func (this *Block) Accept(visitor CodeVisitor) {
 	visitor.VisitBlockBegin(this)
-	for _, v := range this.children {
-		v.Accept(visitor)
-	}
+	this.codes.Accept(visitor)
 	visitor.VisitBlockEnd(this)
 }
 
-func (this *Block) AppendCode(child ...Code) *Block {
-	this.children = append(this.children, child...)
-	return this
+func (this *Block) GetCodes() *Codes {
+	return this.codes
+}
+
+func (this *Block) SetCodes(codes *Codes) {
+	this.codes = codes
+}
+
+func (this *Block) AppendCode(code Code) {
+	this.codes.Append(code)
 }

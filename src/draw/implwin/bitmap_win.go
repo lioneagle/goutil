@@ -3,8 +3,8 @@ package implwin
 import (
 	"fmt"
 
-	"draw"
-	"win"
+	"github.com/lioneagle/goutil/src/draw"
+	"github.com/lioneagle/goutil/src/win"
 )
 
 type BitmapWin struct {
@@ -67,7 +67,7 @@ func (this *BitmapWin) SaveToFile(filename, format string) error {
 
 	err := win.GdipCreateBitmapFromHBITMAP(this.hBmp, 0, &bitmap)
 	if err != nil {
-		return draw.NewError(fmt.Sprintf("GdipCreateBitmapFromHBITMAP failed, err =", err.Error()))
+		return draw.NewError(fmt.Sprintf("GdipCreateBitmapFromHBITMAP failed, err = %s", err.Error()))
 	}
 	defer win.GdipDisposeImage(&bitmap.GpImage)
 
@@ -78,7 +78,7 @@ func (this *BitmapWin) SaveToFile(filename, format string) error {
 
 	err = win.GdipSaveImageToFile(&bitmap.GpImage, filename, clsid, nil)
 	if err != nil {
-		return draw.NewError(fmt.Sprintf("GdipSaveImageToFile failed, err =", err.Error()))
+		return draw.NewError(fmt.Sprintf("GdipSaveImageToFile failed, err = %s", err.Error()))
 	}
 
 	return nil

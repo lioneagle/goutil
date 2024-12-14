@@ -41,7 +41,7 @@ func (this *Function) GetReturnList() *VarList {
 }
 
 func (this *Function) AppendCode(code ...Code) *Function {
-	this.body.AppendCode(code...)
+	this.body.GetCodes().Append(code...)
 	return this
 }
 

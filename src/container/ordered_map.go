@@ -90,7 +90,7 @@ func (this *OderedMap[KEY, VAL]) ForEach(
 	for _, key := range this.order {
 		val, ok := this.data[key]
 		if !ok {
-			return errors.Errorf("OrderedMap Foreach: cannot find by key \"%s\"", key)
+			return errors.Errorf("OrderedMap Foreach: cannot find by key \"%v\"", key)
 		}
 		halt, err := op(key, val)
 		if err != nil {

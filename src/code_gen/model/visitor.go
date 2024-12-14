@@ -6,6 +6,13 @@ type CodeVisitor interface {
 
 	VisitComment(val *Comment)
 
+	VisitCodesBegin(val *Codes)
+	VisitCodesEnd(val *Codes)
+
+	VisitBlockBegin(val *Block)
+	VisitBlockEnd(val *Block)
+	//VisitBlock(val *Block)
+
 	VisitStructBegin(val *Struct)
 	VisitStructRangePublicBegin(val *Struct)
 	VisitStructRangePublicEnd(val *Struct)
@@ -14,10 +21,6 @@ type CodeVisitor interface {
 	VisitStructRangePrivateBegin(val *Struct)
 	VisitStructRangePrivateEnd(val *Struct)
 	VisitStructEnd(val *Struct)
-
-	//VisitBlock(val *Block)
-	VisitBlockBegin(val *Block)
-	VisitBlockEnd(val *Block)
 
 	//VisitFunction(val *Function)
 	VisitSentence(val *Sentence)
@@ -81,6 +84,14 @@ type CodeVisitor interface {
 	VisitMacroChoiceNonFirstEnd(val *Choice)
 	VisitMacroMultiChoiceLastCode(val Code)
 	VisitMacroMultiChoiceEnd(val *MultiChoice)
+
+	VisitModuleImport(val *ModuleImport)
+	VisitModuleImportListBegin(val *ModuleImportList)
+	VisitModuleImportListEnd(val *ModuleImportList)
+
+	VisitFileBegin(val *File)
+	VisitFileEnd(val *File)
+	//VisitFileList(val *FileList)
 }
 
 type NullCodeVisitor struct {
@@ -92,6 +103,9 @@ func (this *NullCodeVisitor) VisitComment(val *Comment) {}
 //func (this *NullCodeVisitor) VisitPacakgeList(val *PackageList) {}
 //func (this *NullCodeVisitor) VisitVar(val *Var)                 {}
 //func (this *NullCodeVisitor) VisitConst(val *Const)             {}
+
+func (this *NullCodeVisitor) VisitCodesBegin(val *Codes) {}
+func (this *NullCodeVisitor) VisitCodesEnd(val *Codes)   {}
 
 func (this *NullCodeVisitor) VisitBlockBegin(val *Block) {}
 
@@ -150,3 +164,10 @@ func (this *NullCodeVisitor) VisitMacroChoiceNonFirstBegin(val *Choice)   {}
 func (this *NullCodeVisitor) VisitMacroChoiceNonFirstEnd(val *Choice)     {}
 func (this *NullCodeVisitor) VisitMacroMultiChoiceLastCode(val Code)      {}
 func (this *NullCodeVisitor) VisitMacroMultiChoiceEnd(val *MultiChoice)   {}
+func (this *NullCodeVisitor) VisitModuleImport(val *ModuleImport)              {}
+func (this *NullCodeVisitor) VisitModuleImportListBegin(val *ModuleImportList) {}
+func (this *NullCodeVisitor) VisitModuleImportListEnd(val *ModuleImportList)   {}
+func (this *NullCodeVisitor) VisitFileBegin(val *File)                         {}
+func (this *NullCodeVisitor) VisitFileEnd(val *File)                           {}
+
+//func (this *NullCodeVisitor) VisitFileList(val *FileList)                      {}

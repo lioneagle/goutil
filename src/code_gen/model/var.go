@@ -58,7 +58,9 @@ type VarList struct {
 }
 
 func NewVarList() *VarList {
-	return &VarList{}
+	return &VarList{
+		vars: make([]*Var, 0),
+	}
 }
 
 func (this *VarList) AcceptAsFuncReturns(visitor CodeVisitor) {

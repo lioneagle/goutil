@@ -3,8 +3,8 @@ package implwin
 import (
 	//"fmt"
 
-	"draw"
-	"win"
+	"github.com/lioneagle/goutil/src/draw"
+	"github.com/lioneagle/goutil/src/win"
 )
 
 type CanvasWin struct {

@@ -60,6 +60,8 @@ func TestCGeneratorGenEnum(t *testing.T) {
 		constList.AppendConst(val)
 	}
 
+	config.SetVarUseSingleLineComment(true)
+
 	constList.Accept(generator)
 
 	config.Indent().Assign = 2

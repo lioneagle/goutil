@@ -112,7 +112,9 @@ type MacroDefineList struct {
 }
 
 func NewMacroDefineList() *MacroDefineList {
-	return &MacroDefineList{}
+	return &MacroDefineList{
+		macros: make([]*MacroDefine, 0),
+	}
 }
 
 func (this *MacroDefineList) Append(val ...*MacroDefine) {
@@ -128,7 +130,9 @@ type MacroList struct {
 }
 
 func NewMacroList() *MacroList {
-	return &MacroList{}
+	return &MacroList{
+		macros: make([]*Macro, 0),
+	}
 }
 
 func (this *MacroList) Append(val ...*Macro) *MacroList {

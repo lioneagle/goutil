@@ -4,7 +4,15 @@ import (
 	_ "fmt"
 )
 
+const (
+	CHOICE_TYPE_NORAML       = 0
+	CHOICE_TYPE_MACRO_IF     = 1
+	CHOICE_TYPE_MACRO_IFDEF  = 2
+	CHOICE_TYPE_MACRO_IFNDEF = 3
+)
+
 type Choice struct {
+	choiceType int
 	comment   string
 	condition string
 	code      Code
@@ -12,6 +20,14 @@ type Choice struct {
 
 func NewChoice() *Choice {
 	return &Choice{}
+}
+
+func (this *Choice) SetChoiceType(choiceType int) {
+	this.choiceType = choiceType
+}
+
+func (this *Choice) GetChoiceType() int {
+	return this.choiceType
 }
 
 func (this *Choice) AcceptAsFirst(visitor CodeVisitor) {
@@ -64,14 +80,31 @@ func (this *Choice) GetCondition() string {
 	return this.condition
 }
 
+const (
+	MULTI_CHOICE_TYPE_NORAML = 0
+	MULTI_CHOCIE_TYPE_MACRO  = 1
+)
+
 type MultiChoice struct {
+	choiceType int
 	comment  string
 	choices  []*Choice
 	lastCode Code
+	endComment string
 }
 
 func NewMultiChoice() *MultiChoice {
-	return &MultiChoice{}
+	return &MultiChoice{
+		choices: make([]*Choice, 0),
+	}
+}
+
+func (this *MultiChoice) SetChoiceType(choiceType int) {
+	this.choiceType = choiceType
+}
+
+func (this *MultiChoice) GetChoiceType() int {
+	return this.choiceType
 }
 
 func (this *MultiChoice) SetComment(comment string) {
@@ -80,6 +113,14 @@ func (this *MultiChoice) SetComment(comment string) {
 
 func (this *MultiChoice) GetComment() string {
 	return this.comment
+}
+
+func (this *MultiChoice) SetEndComment(comment string) {
+	this.endComment = comment
+}
+
+func (this *MultiChoice) GetEndComment() string {
+	return this.endComment
 }
 
 func (this *MultiChoice) AppendChoice(choice ...*Choice) *MultiChoice {
@@ -96,6 +137,18 @@ func (this *MultiChoice) ChoiceLen() int {
 }
 
 func (this *MultiChoice) Accept(visitor CodeVisitor) {
+	if len(this.choices) <= 0 {
+		return
+	}
+
+	if this.choiceType == MULTI_CHOICE_TYPE_NORAML {
+		this.AcceptNormal(visitor)
+	} else {
+		this.AcceptAsMacro(visitor)
+	}
+}
+
+func (this *MultiChoice) AcceptNormal(visitor CodeVisitor) {
 	if len(this.choices) <= 0 {
 		return
 	}
@@ -142,9 +195,9 @@ type ChoiceGroup struct {
 }
 
 func NewChoiceGroup() *ChoiceGroup {
-	ret := &ChoiceGroup{}
-	ret.choices = make([]*Choice, 0)
-	return ret
+	return &ChoiceGroup{
+		choices: make([]*Choice, 0),
+	}
 }
 
 func (this *ChoiceGroup) SetComment(comment string) {

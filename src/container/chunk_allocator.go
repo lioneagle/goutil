@@ -1,4 +1,4 @@
-package containers
+package container
 
 type Chunk struct {
 	id   int32

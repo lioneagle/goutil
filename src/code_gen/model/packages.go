@@ -1,5 +1,6 @@
 package model
 
+/*
 type Package struct {
 	name    string
 	alias   string
@@ -21,11 +22,13 @@ func (this *Package) AppendFile(val ...*File) {
 }
 
 type PackageList struct {
-	Packages []*Package
+	packages []*Package
 }
 
 func NewPakcageList() *PackageList {
-	return &PackageList{}
+	return &PackageList{
+		packages: make([]*Package, 0),
+	}
 }
 
 func (this *PackageList) Accept(v CodeVisitor) {
@@ -33,6 +36,7 @@ func (this *PackageList) Accept(v CodeVisitor) {
 }
 
 func (this *PackageList) AppendPackage(val ...*Package) *PackageList {
-	this.Packages = append(this.Packages, val...)
+	this.packages = append(this.packages, val...)
 	return this
 }
+*/

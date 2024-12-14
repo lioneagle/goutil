@@ -15,6 +15,8 @@ const (
 	COLOR_WHITE
 )
 
+type Attribute int
+
 // Base attributes
 const (
 	Reset Attribute = iota

@@ -1,7 +1,7 @@
 package implwin
 
 import (
-	"win"
+	"github.com/lioneagle/goutil/src/win"
 )
 
 type nullBrushWin struct {

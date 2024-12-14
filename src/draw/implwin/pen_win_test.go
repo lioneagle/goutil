@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"draw"
-	"win"
+	"github.com/lioneagle/goutil/src/draw"
+	"github.com/lioneagle/goutil/src/win"
 )
 
 func TestGetPenStyleWin(t *testing.T) {

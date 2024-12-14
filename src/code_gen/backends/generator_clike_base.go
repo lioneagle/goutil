@@ -122,11 +122,19 @@ func (this *CLikeGeneratorBase) GenMultiLineComment(comment string) {
 }
 
 func (this *CLikeGeneratorBase) VisitComment(val *model.Comment) {
+	fmt.Println("CLikeGeneratorBase: VisitComment")
 	if val.IsSingleLine() {
 		this.genSingleLineCommentWithoutIndent(val.GetComment())
 	} else {
 		this.GenMultiLineComment(val.GetComment())
 	}
+}
+
+func (this *CLikeGeneratorBase) VisitCodesBegin(val *model.Codes) {
+	this.GenMultiLineComment(val.GetComment())
+}
+
+func (this *CLikeGeneratorBase) VisitCodesEnd(val *model.Codes) {
 }
 
 func (this *CLikeGeneratorBase) VisitBlockBegin(val *model.Block) {
@@ -138,7 +146,12 @@ func (this *CLikeGeneratorBase) VisitBlockEnd(val *model.Block) {
 }
 
 func (this *CLikeGeneratorBase) VisitSentence(val *model.Sentence) {
+	if len(val.GetCode()) > 0 {
 	this.Fprintln(this.w, val.GetCode())
+	} else {
+		this.PrintReturn(this.w)
+	}
+
 }
 
 func (this *CLikeGeneratorBase) VisitStructBegin(val *model.Struct) {
@@ -519,7 +532,14 @@ func (this *CLikeGeneratorBase) VisitMacroMultiChoiceBegin(val *model.MultiChoic
 }
 
 func (this *CLikeGeneratorBase) VisitMacroChoiceFirstBegin(val *model.Choice) {
-	this.Fprintfln(this.w, "#if %s", val.GetCondition())
+	macro := "#if"
+	switch val.GetChoiceType() {
+	case model.CHOICE_TYPE_MACRO_IFDEF:
+		macro = "#ifdef"
+	case model.CHOICE_TYPE_MACRO_IFNDEF:
+		macro = "#ifndef"
+	}
+	this.Fprintfln(this.w, "%s %s", macro, val.GetCondition())
 	this.EnterIndent(this.config.Indent().MacroIf)
 }
 
@@ -551,5 +571,35 @@ func (this *CLikeGeneratorBase) VisitMacroMultiChoiceLastCode(val model.Code) {
 }
 
 func (this *CLikeGeneratorBase) VisitMacroMultiChoiceEnd(val *model.MultiChoice) {
+	if len(val.GetEndComment()) > 0 {
+		this.Fprint(this.w, "#endif")
+		chars.PrintIndent(this.w, 2)
+		this.genSingleLineCommentWithoutIndent(val.GetEndComment())
+		this.PrintReturn(this.w)
+	} else {
 	this.Fprintln(this.w, "#endif")
 }
+}
+
+func (this *CLikeGeneratorBase) VisitModuleImport(val *model.ModuleImport) {
+	this.Fprintfln(this.w, `#include "%s"`, val.GetName())
+
+}
+
+func (this *CLikeGeneratorBase) VisitModuleImportListBegin(val *model.ModuleImportList) {
+	this.GenMultiLineComment(val.GetComment())
+}
+
+func (this *CLikeGeneratorBase) VisitModuleImportListEnd(val *model.ModuleImportList) {
+}
+
+func (this *CLikeGeneratorBase) VisitFileBegin(val *model.File) {
+
+	this.GenMultiLineComment(val.GetComment())
+}
+
+func (this *CLikeGeneratorBase) VisitFileEnd(val *model.File) {
+}
+
+/*func (this *CLikeGeneratorBase) VisitFileList(val *model.FileList) {
+}*/

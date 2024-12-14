@@ -7,6 +7,8 @@ import (
 	"reflect"
 	"runtime"
 	"testing"
+
+	"github.com/lioneagle/goutil/src/diff"
 )
 
 func TestGroup(t *testing.T, testdata interface{}, fn func(interface{}) interface{}) (bool, string) {
@@ -52,8 +54,8 @@ func TestGroup(t *testing.T, testdata interface{}, fn func(interface{}) interfac
 
 			if typeOfFiled == typeOfRet1 {
 
-				w := &diffWriter{writer: buf, label: label1}
-				ok := w.diff(ret1[0].Elem(), val1.Field(j))
+				w := diff.NewDiffWriter(buf, label1)
+				ok := w.Diff(ret1[0].Elem(), val1.Field(j))
 				if !ok {
 					ret = false
 					//return false, buf.String()
@@ -97,7 +99,7 @@ func ASSERT_FALSE(t *testing.T, condition bool, format string, args ...interface
 }
 
 func EXPECT_EQ(t *testing.T, actual, wanted interface{}, format string, args ...interface{}) {
-	equal, result := DiffEx("", actual, wanted)
+	equal, result := diff.DiffEx("", actual, wanted)
 
 	if !equal {
 		_, file, line, _ := runtime.Caller(1)
@@ -106,7 +108,7 @@ func EXPECT_EQ(t *testing.T, actual, wanted interface{}, format string, args ...
 }
 
 func ASSERT_EQ(t *testing.T, actual, wanted interface{}, format string, args ...interface{}) {
-	equal, result := DiffEx("", actual, wanted)
+	equal, result := diff.DiffEx("", actual, wanted)
 
 	if !equal {
 		_, file, line, _ := runtime.Caller(1)
@@ -116,7 +118,7 @@ func ASSERT_EQ(t *testing.T, actual, wanted interface{}, format string, args ...
 }
 
 func EXPECT_NE(t *testing.T, actual, wanted interface{}, format string, args ...interface{}) {
-	equal, _ := DiffEx("", actual, wanted)
+	equal, _ := diff.DiffEx("", actual, wanted)
 
 	if equal {
 		_, file, line, _ := runtime.Caller(1)
@@ -125,7 +127,7 @@ func EXPECT_NE(t *testing.T, actual, wanted interface{}, format string, args ...
 }
 
 func ASSERT_NE(t *testing.T, actual, wanted interface{}, format string, args ...interface{}) {
-	equal, _ := DiffEx("", actual, wanted)
+	equal, _ := diff.DiffEx("", actual, wanted)
 
 	if equal {
 		_, file, line, _ := runtime.Caller(1)

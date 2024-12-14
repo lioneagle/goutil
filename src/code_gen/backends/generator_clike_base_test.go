@@ -20,7 +20,7 @@ func TestCLikeGeneratorGenBlock(t *testing.T) {
 
 	block := model.NewBlock()
 	sentence := model.NewSentence("test_gen_block();")
-	block.AppendCode(sentence)
+	block.GetCodes().Append(sentence)
 
 	block.Accept(generator)
 
@@ -598,6 +598,8 @@ func TestCLikeGeneratorGenMacroChoice(t *testing.T) {
 	generator := NewCLikeGeneratorBase(testFiles.Output.File, config)
 
 	choices := model.NewMultiChoice()
+	choices.SetChoiceType(model.MULTI_CHOCIE_TYPE_MACRO)
+
 	choices.SetComment("generate #if")
 
 	choice := model.NewChoice()
@@ -609,11 +611,78 @@ func TestCLikeGeneratorGenMacroChoice(t *testing.T) {
 	choice.SetCode(macro)
 	choices.AppendChoice(choice)
 
-	choices.AcceptAsMacro(generator)
+	choices.Accept(generator)
 
 	choices.SetLastCode(model.NewSentence("x -= 3;"))
 	macro.SetHasParams()
-	choices.AcceptAsMacro(generator)
+
+	choices.Accept(generator)
+
+	err = file.FileEqual(testFiles.Output.Name, testFiles.Standard.Name)
+	test.EXPECT_EQ(t, err, nil, "")
+}
+
+func TestCLikeGeneratorGenModuleImport(t *testing.T) {
+	testFiles, err := test.GetTestFiles(t, "../test_data/clike/", "clike_genertator_gen_module_import.c")
+	test.ASSERT_EQ(t, err, nil, "")
+	defer testFiles.Output.File.Close()
+
+	config := NewCConfig()
+	generator := NewCLikeGeneratorBase(testFiles.Output.File, config)
+
+	module1 := model.NewModuleImport("module1")
+	module2 := model.NewModuleImport("module2")
+
+	modules := model.NewModuleImportList()
+	modules.AppendModule(module1)
+	modules.SetComment("generate single module import")
+	modules.Accept(generator)
+
+	modules.AppendModule(module2)
+	modules.SetComment("generate multiple module import")
+	modules.Accept(generator)
+
+	err = file.FileEqual(testFiles.Output.Name, testFiles.Standard.Name)
+	test.EXPECT_EQ(t, err, nil, "")
+}
+
+func TestCLikeGeneratorGenHFile(t *testing.T) {
+	testFiles, err := test.GetTestFiles(t, "../test_data/clike/", "clike_genertator_gen_hfile.h")
+	test.ASSERT_EQ(t, err, nil, "")
+	defer testFiles.Output.File.Close()
+
+	config := NewCConfig()
+	generator := NewCLikeGeneratorBase(testFiles.Output.File, config)
+
+	hfile := model.NewFile("test.h")
+
+	choices := model.NewMultiChoice()
+
+	choice := model.NewChoice()
+	choice.SetCondition("TEST_H")
+	codes1 := model.NewCodes()
+	choice.SetCode(codes1)
+	choice.SetChoiceType(model.CHOICE_TYPE_MACRO_IFNDEF)
+
+	choices.AppendChoice(choice)
+
+	modules := model.NewModuleImportList()
+	modules.AppendModule(
+		model.NewModuleImport("module1"),
+		model.NewModuleImport("module2"),
+	)
+
+	codes1.Append(
+		model.NewSentence(""),
+		modules,
+		model.NewSentence(""),
+	)
+	hfile.GetCodes().Append(choices)
+
+	choices.SetChoiceType(model.MULTI_CHOCIE_TYPE_MACRO)
+	choices.SetEndComment("end of TEST_H")
+
+	hfile.Accept(generator)
 
 	err = file.FileEqual(testFiles.Output.Name, testFiles.Standard.Name)
 	test.EXPECT_EQ(t, err, nil, "")
