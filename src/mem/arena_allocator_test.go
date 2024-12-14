@@ -17,8 +17,8 @@ func TestArenaAllocatorAllocOk(t *testing.T) {
 	test.EXPECT_NE(t, addr, MEM_PTR_NIL, "")
 	test.EXPECT_EQ(t, allocSize, uint32(1024), "")
 	test.EXPECT_EQ(t, allocator.Used(), uint32(1024), "")
-	test.EXPECT_EQ(t, allocator.Stat().AllocNum(), uint64(1), "")
-	test.EXPECT_EQ(t, allocator.Stat().AllocNumOk(), uint64(1), "")
+	test.EXPECT_EQ(t, allocator.Stat().AllocNum(), StatNumber(1), "")
+	test.EXPECT_EQ(t, allocator.Stat().AllocNumOk(), StatNumber(1), "")
 
 	allocator.FreeAll()
 	addr, _ = allocator.AllocWithClear(8)
@@ -295,13 +295,29 @@ func BenchmarkArenaAllocatorAllocBytes2(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		allocator.FreeAll()
 		addr := allocator.AllocBytesBegin()
+		allocator.AppendBytes(data)
+		allocator.AllocBytesEnd(addr)
+	}
+}
+
+func BenchmarkArenaAllocatorAllocBytes3(b *testing.B) {
+	b.StopTimer()
+	allocator := NewArenaAllocator(1024*128, 1)
+	data := []byte("01234567890123456789012345678901")
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		allocator.FreeAll()
+		addr := allocator.AllocBytesBegin()
 		allocator.AppendBytes(data[0:16])
 		allocator.AppendBytes(data[16:])
 		allocator.AllocBytesEnd(addr)
 	}
 }
 
-func BenchmarkArenaAllocatorAllocBytes3(b *testing.B) {
+func BenchmarkArenaAllocatorAllocBytes4(b *testing.B) {
 	b.StopTimer()
 	allocator := NewArenaAllocator(1024*128, 1)
 	data := []byte("01234567890123456789012345678901")
@@ -319,7 +335,7 @@ func BenchmarkArenaAllocatorAllocBytes3(b *testing.B) {
 	}
 }
 
-func BenchmarkArenaAllocatorAllocBytes4(b *testing.B) {
+func BenchmarkArenaAllocatorAllocBytes5(b *testing.B) {
 	b.StopTimer()
 	allocator := NewArenaAllocator(1024*128, 1)
 	data := []byte("01234567890123456789012345678901")
@@ -334,5 +350,112 @@ func BenchmarkArenaAllocatorAllocBytes4(b *testing.B) {
 			allocator.AppendByteNoCheck(v)
 		}
 		allocator.AllocBytesEnd(addr)
+	}
+}
+
+func f1(allocator *ArenaAllocator, data []byte) {
+	_, buf := allocator.AllocBytesBeginEx()
+	/*for i, v := range data {
+		buf[i] = v
+	}*/
+	if len(buf) < len(data) {
+		return
+	}
+
+	copy(buf, data)
+	allocator.AllocBytesEndEx(uint32(len(data)))
+}
+
+func BenchmarkArenaAllocatorAllocBytes5Ex1(b *testing.B) {
+	b.StopTimer()
+	allocator := NewArenaAllocator(1024*128, 1)
+	data := []byte("01234567890123456789012345678901")
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		allocator.FreeAll()
+		_, buf := allocator.AllocBytesBeginEx()
+		/*for i, v := range data {
+			buf[i] = v
+		}*/
+
+		copy(buf, data)
+		allocator.AllocBytesEndEx(uint32(len(data)))
+	}
+}
+
+func BenchmarkArenaAllocatorAllocBytes5Ex2(b *testing.B) {
+	b.StopTimer()
+	allocator := NewArenaAllocator(1024*128, 1)
+	data := []byte("01234567890123456789012345678901")
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		allocator.FreeAll()
+		_, buf := allocator.AllocBytesBeginEx()
+		num := 0
+		for i, v := range data {
+			buf[i] = v
+			num++
+		}
+		allocator.AllocBytesEndEx(uint32(num))
+	}
+}
+
+func BenchmarkArenaAllocatorAllocBytes5Ex3(b *testing.B) {
+	b.StopTimer()
+	allocator := NewArenaAllocator(1024*128, 1)
+	data := []byte("01234567890123456789012345678901")
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		allocator.FreeAll()
+		f1(allocator, data)
+	}
+}
+
+func BenchmarkZeroMem1(b *testing.B) {
+	b.StopTimer()
+	allocator := NewArenaAllocator(1024*128, 1)
+	addr, _ := allocator.Alloc(32)
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		ZeroMem(allocator.GetUintptr(addr), 32)
+	}
+}
+
+func BenchmarkZeroMem2(b *testing.B) {
+	b.StopTimer()
+	allocator := NewArenaAllocator(1024*128, 1)
+	addr, _ := allocator.Alloc(32)
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		allocator.ZeroMem(addr, 32)
+	}
+}
+
+func BenchmarkZeroMem3(b *testing.B) {
+	b.StopTimer()
+	allocator := NewArenaAllocator(1024*128, 1)
+	data := []byte("01234567890123456789012345678901")
+	addr := allocator.AllocBytes(data)
+	b.ReportAllocs()
+	b.SetBytes(2)
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		allocator.ZeroBytes(addr)
 	}
 }

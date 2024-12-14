@@ -68,23 +68,21 @@ func (this *ArenaAllocator) Alloc(size uint32) (addr MemPtr, allocSize uint32) {
 	this.allocNum++
 	used := this.used
 
-	this.used = RoundToAlign(this.used+size, this.align)
-	if this.used > uint32(cap(this.mem)) {
+	newSize := RoundToAlign(this.used+size, this.align)
+	if newSize > uint32(cap(this.mem)) {
 		return MEM_PTR_NIL, 0
 	}
+	this.used = newSize
 
 	this.allocNumOk++
 
-	return MemPtr(used), this.used - used
+	return MemPtr(used), newSize - used
 }
 
 func (this *ArenaAllocator) AllocWithClear(size uint32) (addr MemPtr, allocSize uint32) {
 	addr, num := this.Alloc(size)
 	if addr != MEM_PTR_NIL {
-		src := this.mem[addr : addr+MemPtr(num)]
-		for i := range src {
-			src[i] = 0
-		}
+		this.ZeroMem(addr, size)
 	}
 
 	return addr, num
@@ -94,6 +92,16 @@ func (this *ArenaAllocator) ZeroMem(addr MemPtr, num uint32) {
 	src := this.mem[addr : uint32(addr)+num]
 	for i := range src {
 		src[i] = 0
+	}
+}
+
+func (this *ArenaAllocator) ZeroBytes(addr MemPtr) {
+	buf := this.GetBytes(addr)
+	if len(buf) <= 0 {
+		return
+	}
+	for i := range buf {
+		buf[i] = 0
 	}
 }
 
@@ -150,6 +158,22 @@ func (this *ArenaAllocator) AllocBytesEnd(addr MemPtr) {
 	this.allocNumOk++
 }
 
+func (this *ArenaAllocator) AllocBytesBeginEx() (MemPtr, []byte) {
+	this.allocNum++
+
+	if (this.used + 2) > uint32(cap(this.mem)) {
+		return MEM_PTR_NIL, nil
+	}
+
+	return MemPtr(this.used + 2), this.mem[this.used+2:]
+}
+
+func (this *ArenaAllocator) AllocBytesEndEx(num uint32) {
+	binary.LittleEndian.PutUint16(this.mem[this.used:], uint16(num))
+	this.used = RoundToAlign(this.used+2+num, this.align)
+	this.allocNumOk++
+}
+
 func (this *ArenaAllocator) Strlen(addr MemPtr) int {
 	if addr < 2 {
 		return 0
@@ -168,6 +192,17 @@ func (this *ArenaAllocator) FreePart(remain uint32) {
 		return
 	}
 	this.used = remain + ARENA_ALLOCATOR_PREFIX_LEN
+}
+
+func (this *ArenaAllocator) GetBytes(addr MemPtr) []byte {
+	if addr == MEM_PTR_NIL {
+		return []byte{}
+	}
+
+	size := this.Strlen(addr)
+
+	header := reflect.SliceHeader{Data: this.GetUintptr(addr), Len: size, Cap: size}
+	return *(*[]byte)(unsafe.Pointer(&header))
 }
 
 func (this *ArenaAllocator) GetString(addr MemPtr) string {
