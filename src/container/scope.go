@@ -2,6 +2,7 @@ package container
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -21,6 +22,23 @@ func NewScope[T any](name string) *Scope[T] {
 	}
 }
 
+func (this *Scope[T]) GetFullPath() string {
+	return this.fullPath
+}
+
+func (this *Scope[T]) GetData() T {
+	return this.data
+}
+
+func (this *Scope[T]) SetData(data T) {
+	this.data = data
+}
+
+func (this *Scope[T]) FindScopeByFullPath(fullPath string) *Scope[T] {
+	_, path := GetPathAndNameByFullPath(fullPath)
+	return this.FindScope(path...)
+}
+
 func (this *Scope[T]) FindScope(path ...string) *Scope[T] {
 	scope := this
 
@@ -32,6 +50,11 @@ func (this *Scope[T]) FindScope(path ...string) *Scope[T] {
 		}
 	}
 	return scope
+}
+
+func (this *Scope[T]) AddScopeByFullPath(fullPath string) *Scope[T] {
+	_, path := GetPathAndNameByFullPath(fullPath)
+	return this.AddScope(path...)
 }
 
 func (this *Scope[T]) AddScope(path ...string) *Scope[T] {
@@ -85,18 +108,6 @@ func (this *Scope[T]) FindData(path ...string) *T {
 	return &scope.data
 }
 
-func (this *Scope[T]) GetFullPath() string {
-	return this.fullPath
-}
-
-func (this *Scope[T]) GetData() T {
-	return this.data
-}
-
-func (this *Scope[T]) SetData(data T) {
-	this.data = data
-}
-
 func (this *Scope[T]) ForEach(op func(fullPath string, data *T) (halt bool, err error)) error {
 	if op == nil {
 		return nil
@@ -116,4 +127,15 @@ func (this *Scope[T]) ForEach(op func(fullPath string, data *T) (halt bool, err 
 	})
 
 	return err
+}
+
+func GetPathAndNameByFullPath(fullPath string) (name string, path []string) {
+	path = strings.Split(fullPath, "/")
+	if len(path) <= 1 || path[0] != "" {
+		return "", nil
+	}
+
+	name = path[len(path)-1]
+	path = path[1 : len(path)-1]
+	return name, path
 }
