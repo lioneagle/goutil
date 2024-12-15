@@ -9,27 +9,27 @@ import (
 	"github.com/pkg/errors"
 )
 
-type OderedMap[KEY constraints.Ordered, VAL any] struct {
+type OrderedMap[KEY constraints.Ordered, VAL any] struct {
 	order []KEY
 	data  map[KEY]VAL
 }
 
-func NewOrderedMap[KEY constraints.Ordered, VAL any]() *OderedMap[KEY, VAL] {
-	return &OderedMap[KEY, VAL]{
+func NewOrderedMap[KEY constraints.Ordered, VAL any]() *OrderedMap[KEY, VAL] {
+	return &OrderedMap[KEY, VAL]{
 		order: make([]KEY, 0),
 		data:  make(map[KEY]VAL),
 	}
 }
 
-func (this *OderedMap[KEY, VAL]) Len() int {
+func (this *OrderedMap[KEY, VAL]) Len() int {
 	return len(this.data)
 }
 
-func (this *OderedMap[KEY, VAL]) IsEmpty() bool {
+func (this *OrderedMap[KEY, VAL]) IsEmpty() bool {
 	return len(this.data) == 0
 }
 
-func (this *OderedMap[KEY, VAL]) Add(key KEY, val VAL) {
+func (this *OrderedMap[KEY, VAL]) Add(key KEY, val VAL) {
 	_, ok := this.data[key]
 	if !ok {
 		this.order = append(this.order, key)
@@ -37,7 +37,7 @@ func (this *OderedMap[KEY, VAL]) Add(key KEY, val VAL) {
 	this.data[key] = val
 }
 
-func (this *OderedMap[KEY, VAL]) Del(key KEY) {
+func (this *OrderedMap[KEY, VAL]) Del(key KEY) {
 	_, ok := this.data[key]
 	if !ok {
 		return
@@ -51,13 +51,13 @@ func (this *OderedMap[KEY, VAL]) Del(key KEY) {
 	}
 }
 
-func (this *OderedMap[KEY, VAL]) Find(key KEY) (VAL, bool) {
+func (this *OrderedMap[KEY, VAL]) Find(key KEY) (VAL, bool) {
 	val, ok := this.data[key]
 	return val, ok
 }
 
-func (this *OderedMap[KEY, VAL]) Clone() *OderedMap[KEY, VAL] {
-	ret := &OderedMap[KEY, VAL]{
+func (this *OrderedMap[KEY, VAL]) Clone() *OrderedMap[KEY, VAL] {
+	ret := &OrderedMap[KEY, VAL]{
 		order: make([]KEY, len(this.order), len(this.order)),
 		data:  make(map[KEY]VAL, len(this.data)),
 	}
@@ -69,7 +69,7 @@ func (this *OderedMap[KEY, VAL]) Clone() *OderedMap[KEY, VAL] {
 	return ret
 }
 
-func (this *OderedMap[KEY, VAL]) ToSlice() ([]KEY, []VAL) {
+func (this *OrderedMap[KEY, VAL]) ToSlice() ([]KEY, []VAL) {
 	key := make([]KEY, len(this.order), len(this.order))
 	val := make([]VAL, 0, len(this.data))
 
@@ -80,7 +80,7 @@ func (this *OderedMap[KEY, VAL]) ToSlice() ([]KEY, []VAL) {
 	return key, val
 }
 
-func (this *OderedMap[KEY, VAL]) ForEach(
+func (this *OrderedMap[KEY, VAL]) ForEach(
 	op func(key KEY, val VAL) (halt bool, err error),
 ) error {
 	if op == nil {
@@ -104,25 +104,25 @@ func (this *OderedMap[KEY, VAL]) ForEach(
 	return nil
 }
 
-func (this *OderedMap[KEY, VAL]) Sort() {
+func (this *OrderedMap[KEY, VAL]) Sort() {
 	sort.Slice(this.order, func(i, j int) bool {
 		return this.order[i] < this.order[j]
 	})
 }
 
-func (this *OderedMap[KEY, VAL]) SortStable() {
+func (this *OrderedMap[KEY, VAL]) SortStable() {
 	sort.SliceStable(this.order, func(i, j int) bool {
 		return this.order[i] < this.order[j]
 	})
 }
 
-func (this *OderedMap[KEY, VAL]) SortReverse() {
+func (this *OrderedMap[KEY, VAL]) SortReverse() {
 	sort.Slice(this.order, func(i, j int) bool {
 		return this.order[i] > this.order[j]
 	})
 }
 
-func (this *OderedMap[KEY, VAL]) SortReverseStable() {
+func (this *OrderedMap[KEY, VAL]) SortReverseStable() {
 	sort.SliceStable(this.order, func(i, j int) bool {
 		return this.order[i] > this.order[j]
 	})
