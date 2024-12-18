@@ -1,5 +1,11 @@
 package metrics
 
+type RateEmaConfig struct {
+	Name              string // 名称
+	SampleInterval_ms uint64 // 采样间隔，单位：毫秒s
+	Period_ms         uint64 // 计算周期, 单位：毫秒
+}
+
 /* RateEma用于计算EMA（Exponential Moving Average）速率的metric
  * EMA(n) = EMA(n-1) + alpha * [X(n) - EMA(n-1)]
  *
@@ -25,12 +31,12 @@ type RateEma struct {
  * alpha缺省取 2 / (N + 1)
  *
  */
-func NewRateEma(name string, sampleInterval_ms, period_ms uint64) *RateEma {
+func NewRateEma(config *RateEmaConfig) *RateEma {
 	return &RateEma{
-		name:              name,
-		sampleInterval_ms: sampleInterval_ms,
-		period_ms:         period_ms,
-		alpha:             2.0 / (float64(period_ms)/float64(sampleInterval_ms) + 1.0),
+		name:              config.Name,
+		sampleInterval_ms: config.SampleInterval_ms,
+		period_ms:         config.Period_ms,
+		alpha:             2.0 / (float64(config.Period_ms)/float64(config.SampleInterval_ms) + 1.0),
 	}
 }
 

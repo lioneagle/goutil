@@ -6,8 +6,8 @@ import (
 
 type RateSmaConfig struct {
 	Name              string // 名称
-	MaxPeriod_ms      uint64 // 最大计算周期, 单位：毫秒
 	SampleInterval_ms uint64 // 采样间隔，单位：毫秒
+	MaxPeriod_ms      uint64 // 最大计算周期, 单位：毫秒
 }
 
 /* RateSma用于计算SMA（Simple Moving Average）速率的metric

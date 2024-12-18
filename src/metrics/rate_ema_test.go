@@ -12,7 +12,11 @@ import (
 func TestRateEmaCalc(t *testing.T) {
 	period := 9
 
-	rate1 := NewRateEma("A", 1, uint64(period))
+	rate1 := NewRateEma(&RateEmaConfig{
+		Name:              "A",
+		SampleInterval_ms: 1,
+		Period_ms:         uint64(period),
+	})
 	capacity := 100
 
 	r1 := rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -48,7 +52,11 @@ func TestRateEmaCalc(t *testing.T) {
 		{incNum: 4, wanted: 2.0},
 	}
 
-	rate := NewRateEma("A", 1000, 5000)
+	rate := NewRateEma(&RateEmaConfig{
+		Name:              "A",
+		SampleInterval_ms: 1000,
+		Period_ms:         5000,
+	})
 
 	time := uint64(0)
 

@@ -23,11 +23,15 @@ func NewRate(rateType, name string, sampleInterval_ms, period_ms uint64, timer N
 	case "sma":
 		return NewRateSma(&RateSmaConfig{
 			Name:              name,
-			MaxPeriod_ms:      period_ms,
 			SampleInterval_ms: sampleInterval_ms,
+			MaxPeriod_ms:      period_ms,
 		}), nil
 	case "ema":
-		return NewRateEma(name, sampleInterval_ms, period_ms), nil
+		return NewRateEma(&RateEmaConfig{
+			Name:              name,
+			SampleInterval_ms: sampleInterval_ms,
+			Period_ms:         period_ms,
+		}), nil
 	case "tma":
 		return NewRateTma(name, sampleInterval_ms, period_ms, timer), nil
 	default:
