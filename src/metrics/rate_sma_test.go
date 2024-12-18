@@ -26,8 +26,8 @@ func TestRateSmaCalcFromPrevSampleWithDataCountOnSecond(t *testing.T) {
 	rate := NewRateSma(
 		&RateSmaConfig{
 			Name:              "A",
-			MaxPeriod_ms:      5000,
 			SampleInterval_ms: 1000,
+			MaxPeriod_ms:      5000,
 		},
 	)
 	caps := make([]float64, 5, 5)
@@ -82,8 +82,8 @@ func TestRateSmaCalcFromPrevSampleWithDataCountLessThenOneSecond(t *testing.T) {
 	rate := NewRateSma(
 		&RateSmaConfig{
 			Name:              "A",
-			MaxPeriod_ms:      5000,
 			SampleInterval_ms: 1000,
+			MaxPeriod_ms:      5000,
 		},
 	)
 

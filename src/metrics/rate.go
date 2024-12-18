@@ -33,7 +33,12 @@ func NewRate(rateType, name string, sampleInterval_ms, period_ms uint64, timer N
 			Period_ms:         period_ms,
 		}), nil
 	case "tma":
-		return NewRateTma(name, sampleInterval_ms, period_ms, timer), nil
+		return NewRateTma(&RateTmaConfig{
+			Name:              name,
+			SampleInterval_ms: sampleInterval_ms,
+			MaxPeriod_ms:      period_ms,
+			Timer:             timer,
+		}), nil
 	default:
 		return nil, errors.Errorf("unknown metric rate type: %s", rateType)
 	}

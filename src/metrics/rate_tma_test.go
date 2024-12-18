@@ -44,7 +44,12 @@ func TestRateTmaCalc(t *testing.T) {
 
 	nower := &nower{}
 
-	rate := NewRateTma("A", 1000, 5, nower.Now)
+	rate := NewRateTma(&RateTmaConfig{
+		Name:              "A",
+		SampleInterval_ms: 1000,
+		MaxPeriod_ms:      5000,
+		Timer:             nower.Now,
+	})
 
 	time1 := nower.Now()
 	nower.Push(time1)

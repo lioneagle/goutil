@@ -12,6 +12,13 @@ type tmaNode struct {
 	count     uint64
 }
 
+type RateTmaConfig struct {
+	Name              string // 名称
+	SampleInterval_ms uint64 // 采样间隔，单位：毫秒s
+	MaxPeriod_ms      uint64 // 最大计算周期, 单位：毫秒
+	Timer             Nower
+}
+
 /* RateTma以当前时间与第一个采样点时间差来计算平均速率
  * TMA = sum(X(1)...X(n)) / (Now - T(1))
  */
@@ -33,18 +40,18 @@ type RateTma struct {
  * 当前时间戳为2s，则当前平均速率为: (3+1)/ (2-1) = 4
  * 当前时间戳为2.5s，则当前平均速率为: (3+1)/ (2.5-1) = 4/1.5 = 8/3
  */
-func NewRateTma(name string, sampleInterval_ms, period uint64, timer Nower) *RateTma {
-	capacity := period + 1
+func NewRateTma(config *RateTmaConfig) *RateTma {
+	capacity := config.MaxPeriod_ms/config.SampleInterval_ms + 1
 
 	ret := &RateTma{
-		name:              name,
-		sampleInterval_ms: sampleInterval_ms,
-		maxPeriod_ms:      period,
+		name:              config.Name,
+		sampleInterval_ms: config.SampleInterval_ms,
+		maxPeriod_ms:      config.MaxPeriod_ms,
 		ring:              make([]tmaNode, capacity, capacity),
-		timer:             timer,
+		timer:             config.Timer,
 	}
 
-	if timer == nil {
+	if config.Timer == nil {
 		ret.timer = time.Now
 	}
 
@@ -105,10 +112,18 @@ func (this *RateTma) Period() uint64 {
 }
 
 func (this *RateTma) Calc() float64 {
+	return this.CalcByPeriod(this.maxPeriod_ms)
+}
+
+func (this *RateTma) CalcByPeriod(period uint64) float64 {
+	return this.calcFromPrevSample(period)
+}
+
+func (this *RateTma) calcFromPrevSample(period uint64) float64 {
 	now := this.timer()
 	ringLen := uint64(this.Len())
 	curr := (this.totalSamples - 1 + ringLen) % ringLen
-	prev := (this.totalSamples - 1 - this.maxPeriod_ms + ringLen) % ringLen
+	prev := (this.totalSamples - 1 - period/this.sampleInterval_ms + ringLen) % ringLen
 
 	return float64(this.ring[curr].count-this.ring[prev].count) /
 		now.Sub(this.ring[prev].timestamp).Seconds()
